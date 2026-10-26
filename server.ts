@@ -1,5 +1,5 @@
-import { EiaService } from "./src/eia.service.ts";
-
+import { EiaService } from "./src/eia.service";
+//import { type EiaSeriesDatum, FetchSeriesOptions, EiaResponseParameters, EiaApiResponse, EiaApiError, FetchWtiDailyOptions,  } from "./src/EIA_models/eiamodels";
 const port = Number(Bun.env.APP_PORT ?? 3000);
 const host = Bun.env.APP_HOST ?? "localhost";
 const eia = new EiaService(); // reads Bun.env.EIA_API_KEY

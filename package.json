@@ -3,8 +3,9 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "bun run --watch server.ts"
-
+    "dev": "bun run --watch server.ts",
+    "bug": "bun --inspect-wait server.ts",
+    "dug": "bun --inspect server.ts"
   },
   "dependencies": {},
   "module": "server.ts",

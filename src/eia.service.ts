@@ -9,16 +9,20 @@
  *   const prices = await eia.fetchWtiDaily();
  *   console.log(prices[0]); // { period: "2024-01-01", value: 75.5 }
  */
+// EiaResponseParameters,EiaResponse,EiaApiResponseX
+import { type EiaSeriesDatum, FetchSeriesOptions, 
+    EiaApiResponse, EiaApiError, FetchWtiDailyOptions,EiaQueryParams
+    } from "./EIA_models/eiamodels";
 
 const EIA_BASE_URL = "https://api.eia.gov/v2/petroleum/pri/spt/data/";
-
+/* 
 export interface EiaSeriesDatum {
   period: string;
   value: number;
   // EIA v2 also returns these extra fields on each datum:
   // duoarea, area-name, product, product-name, process, process-name,
   // series, series-description, units
-}
+} 
 
 export interface EiaSort {
   column: string;
@@ -71,7 +75,7 @@ export interface FetchSeriesOptions {
   sortColumn?: string;
   sortDirection?: "asc" | "desc";
 }
-
+*/
 /**
  * Service for querying the EIA v2 petroleum/pri/spt endpoint.
  * Default series is RWTC (WTI crude oil spot price, daily).
@@ -112,7 +116,14 @@ export class EiaService {
       data: ["value"],
       offset: options.offset ?? 0,
       length: options.length ?? 5000,
-    });
+    },
+  {
+      frequency: "daily",
+      data: ["value"],
+      offset: options.offset ?? 0,
+      length: options.length ?? 5000,
+    }
+  );
   }
 
   /**
@@ -121,6 +132,7 @@ export class EiaService {
   async fetchSeriesData(
     series: string,
     options: FetchSeriesOptions = {},
+    params: EiaQueryParams = {}
   ): Promise<EiaSeriesDatum[]> {
     const {
       frequency = "daily",
@@ -136,6 +148,26 @@ export class EiaService {
     // Authentication
     url.searchParams.set("api_key", this.apiKey);
 
+    if (params.frequency) url.searchParams.set('frequency', params.frequency);
+    if (params.start) url.searchParams.set('start', params.start);
+    if (params.end) url.searchParams.set('end', params.end);
+    if (params.data && params.data.length > 0) {
+        data.forEach((d, i) => {
+          url.searchParams.set(`data[${i}]`, d);
+        });
+    }
+
+    if (params.length) url.searchParams.set('length', params.length.toString());
+    if (params.offset) url.searchParams.set('offset', params.offset.toString());
+    // Serialize EIA nested facets (e.g. facets[duoarea][]=NUS)
+    if (params.facets) {
+      for (const [key, values] of Object.entries(params.facets)) {
+        values.forEach((val) => {
+          url.searchParams.append(`facets[${key}][]`, val);
+        });
+      }
+    }
+/*
     // Frequency
     url.searchParams.set("frequency", frequency);
 
@@ -154,12 +186,17 @@ export class EiaService {
     // Pagination
     url.searchParams.set("offset", String(offset));
     url.searchParams.set("length", String(length));
-
+*/
     const requestUrl = url.toString();
 
     let response: Response;
+    //let responseX: Response;
     try {
+      //response = await fetch(requestUrl);
       response = await fetch(requestUrl);
+      
+      //debugger;
+      //console.log(result ? result.response : 'nores');
     } catch (err) {
       throw new EiaApiError(
         `Network error while fetching EIA series "${series}": ${
@@ -182,9 +219,9 @@ export class EiaService {
       );
     }
 
-    let json: EiaApiResponse;
+    let json: EiaApiResponse<EiaSeriesDatum>;
     try {
-      json = (await response.json()) as EiaApiResponse;
+      json = (await response.json());
     } catch (err) {
       throw new EiaApiError(
         `Failed to parse EIA API JSON response for series "${series}": ${
@@ -202,8 +239,8 @@ export class EiaService {
     }
 
     return json.response.data.map((d) => ({
-      period: d.period,
-      value: Number(d.value),
+      ...d,
+      value: Number(String(d.value ?? "").replace(/,/g, "")),
     }));
   }
 }
