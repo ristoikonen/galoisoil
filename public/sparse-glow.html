@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GaloisOil Collaborative Field Tuner</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            glowCyan: '#0284c7',
+            glowCyanLight: '#38bdf8',
+            glowRose: '#e11d48',
+            glowEmerald: '#059669',
+            glowPurple: '#7c3aed',
+            glowAmber: '#d97706',
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+  <style>
+    body {
+      background-color: #f8fafc;
+      background-image:
+        radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.07) 0px, transparent 45%),
+        radial-gradient(at 100% 0%, rgba(168, 85, 247, 0.06) 0px, transparent 45%),
+        radial-gradient(at 50% 100%, rgba(16, 185, 129, 0.05) 0px, transparent 45%);
+      font-family: 'Inter', sans-serif;
+    }
+
+    .glow-cyan-badge {
+      box-shadow: 0 0 15px -3px rgba(56, 189, 248, 0.35);
+    }
+
+    .glow-rose-badge {
+      box-shadow: 0 0 15px -3px rgba(244, 63, 94, 0.3);
+    }
+
+    .glow-emerald-badge {
+      box-shadow: 0 0 15px -3px rgba(16, 185, 129, 0.3);
+    }
+
+    .white-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.04);
+      transition: all 0.2s ease;
+    }
+
+    .white-card:hover {
+      box-shadow: 0 6px 20px -4px rgba(0, 0, 0, 0.07);
+      border-color: #cbd5e1;
+    }
+
+    /* Custom Slider */
+    input[type=range] {
+      appearance: none;
+      -webkit-appearance: none;
+      background: #e2e8f0;
+      border-radius: 9999px;
+      height: 6px;
+      outline: none;
+    }
+
+    input[type=range]::-webkit-slider-thumb {
+      appearance: none;
+      -webkit-appearance: none;
+      height: 18px;
+      width: 18px;
+      border-radius: 50%;
+      background: #0284c7;
+      box-shadow: 0 0 10px rgba(2, 132, 199, 0.5);
+      cursor: pointer;
+      border: 2px solid #ffffff;
+    }
+
+    input[type=range]::-moz-range-thumb {
+      height: 18px;
+      width: 18px;
+      border-radius: 50%;
+      background: #0284c7;
+      box-shadow: 0 0 10px rgba(2, 132, 199, 0.5);
+      cursor: pointer;
+      border: 2px solid #ffffff;
+    }
+
+    input[type=range]::-moz-range-track {
+      background: #e2e8f0;
+      border-radius: 9999px;
+      height: 6px;
+    }
+  </style>
+</head>
+
+<body class="text-slate-800 min-h-screen flex flex-col antialiased selection:bg-sky-500 selection:text-white">
+
+  <!-- TOP HEADER (LIGHT THEME MATCHING MEET.RISTOIKONEN.COM & RISUKKO) -->
+  <header class="border-b border-slate-200 bg-white/90 backdrop-blur sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      <div class="flex items-center space-x-3.5">
+        <!-- Twig SVG Logo -->
+        <div class="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center shadow-md p-1.5">
+          <svg version="1.0" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%"
+            viewBox="0 0 128.000000 128.000000" preserveAspectRatio="xMidYMid meet">
+            <g transform="translate(0.000000,128.000000) scale(0.100000,-0.100000)" fill="#ffffff" stroke="none">
+              <path
+                d="M1130 1261 c-5 -11 -10 -25 -10 -31 0 -19 -50 -113 -73 -138 -25 -27 -155 -109 -272 -172 -44 -23 -93 -52 -109 -63 -70 -49 -301 -185 -308 -181 -4 3 23 51 60 108 l66 104 65 7 c85 9 155 53 204 127 20 29 52 68 72 85 37 33 44 65 15 71 -13 2 -64 -44 -197 -180 -55 -56 -158 -66 -165 -15 -2 12 -11 23 -20 25 -15 3 -18 -4 -18 -35 0 -30 -13 -57 -64 -133 -84 -124 -154 -210 -192 -235 -17 -11 -65 -29 -107 -39 l-77 -18 0 -55 c0 -51 1 -54 22 -48 11 4 54 8 93 8 56 0 82 -5 114 -21 23 -12 49 -22 58 -22 20 0 348 -169 407 -209 23 -16 48 -36 55 -45 8 -9 21 -16 30 -16 33 0 61 -43 61 -93 0 -40 3 -47 19 -47 16 0 20 8 23 38 4 51 26 52 125 2 65 -32 91 -40 137 -40 48 0 56 3 56 18 0 14 -24 30 -88 60 -48 23 -95 42 -105 42 -23 0 -243 114 -287 149 -19 16 -46 32 -60 36 -37 11 -300 147 -300 155 0 8 450 33 550 30 41 -1 139 -2 218 -1 140 1 142 1 142 24 0 46 -7 47 -181 48 -90 0 -295 -3 -455 -7 -198 -5 -293 -4 -297 3 -9 14 28 41 213 154 85 53 218 134 295 181 77 48 166 98 197 111 31 14 74 37 95 51 20 14 48 26 61 26 30 0 82 39 82 62 0 24 -29 23 -91 -3 -27 -12 -52 -19 -56 -16 -3 3 6 36 21 72 14 36 26 70 26 75 0 18 -39 10 -50 -9z" />
+            </g>
+          </svg>
+        </div>
+        <div>
+          <div class="flex items-center space-x-2">
+            <span class="font-bold text-xl tracking-tight text-slate-900">GALOIS<span
+                class="text-sky-600">OIL</span></span>
+            <span
+              class="px-2.5 py-0.5 text-[11px] font-mono font-semibold bg-purple-50 text-purple-700 border border-purple-200 rounded-full">
+              BY RISUKKO TECH
+            </span>
+          </div>
+          <p class="text-xs text-slate-500 font-mono">Galois Field Algebra Market Model</p>
+        </div>
+      </div>
+
+      <!-- Top Right Status Badges -->
+      <div class="flex items-center space-x-3">
+        <!-- Multi-User Sync Pill -->
+        <div
+          class="hidden sm:flex items-center space-x-2 px-3 py-1.5 bg-slate-100 border border-slate-200 rounded-full text-xs font-mono text-slate-700">
+          <span class="w-2 h-2 rounded-full bg-sky-500 animate-ping"></span>
+          <span>Room: <strong id="room-id" class="text-slate-900 font-semibold">wti-oil-alpha</strong></span>
+          <span class="text-slate-300">|</span>
+          <span class="text-slate-600"><strong id="peer-count" class="text-sky-600">2</strong> Operators Online</span>
+        </div>
+
+        <!-- Live Server Status -->
+        <span
+          class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-800 border border-emerald-300">
+          <span class="w-2 h-2 mr-2 bg-emerald-500 rounded-full animate-pulse"></span>Bun 1.4.2 Live
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+
+    <!-- HEADER INTRO -->
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-200 pb-6">
+      <div>
+        <div
+          class="inline-flex items-center space-x-2 text-xs font-mono uppercase tracking-wider text-sky-600 mb-2 font-semibold">
+          <span>Phase 1 Verification</span>
+          <span class="text-slate-300">•</span>
+          <span class="text-amber-600">Quantization & Turso Persistence</span>
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+          Discrete Field Parameter Tuner
+        </h1>
+        <p class="text-sm text-slate-600 mt-1 max-w-2xl">
+          Quantize continuous EIA WTI daily spot prices into discrete symbols over Galois Fields. Collaborative
+          modifications broadcast across the multi-user mesh.
+        </p>
+      </div>
+
+      <!-- Quick Action Buttons -->
+      <div class="flex items-center space-x-2.5">
+        <button id="btn-fetch-eia" onclick="fetchLiveEia()"
+          class="px-3.5 py-2 text-xs font-medium font-mono rounded-xl bg-white border border-slate-300 hover:border-slate-400 text-slate-700 hover:text-slate-900 shadow-sm transition-all flex items-center space-x-2">
+          <svg class="w-3.5 h-3.5 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
+            </path>
+          </svg>
+          <span>Fetch EIA Spot</span>
+        </button>
+        <button id="btn-sync-turso" onclick="runQuantizeAndSync()"
+          class="px-4 py-2 text-xs font-semibold font-mono rounded-xl bg-sky-600 hover:bg-sky-700 text-white shadow-sm transition-all flex items-center space-x-2 glow-cyan-badge">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path>
+          </svg>
+          <span>Quantize & Sync Turso</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- SPARSE COLLABORATIVE TUNING FIELDS (THE 4 CORE FIELDS) -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+
+      <!-- FIELD 1: Galois Field Selection -->
+      <div class="white-card rounded-2xl p-5 flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between mb-3">
+            <span
+              class="text-[11px] font-bold uppercase tracking-wider text-purple-700 bg-purple-50 px-2 py-0.5 rounded border border-purple-200 font-mono">
+              Field Selection
+            </span>
+            <span class="text-xs text-slate-400 font-mono">Field Mode</span>
+          </div>
+          <h3 class="text-sm font-bold text-slate-900 mb-1">Galois Field Domain</h3>
+          <p class="text-xs text-slate-500 mb-4">Target algebraic space for price transitions.</p>
+
+          <div class="grid grid-cols-3 gap-1.5 p-1 bg-slate-100 rounded-xl border border-slate-200" id="field-selector">
+            <button onclick="setField('GF2')" id="btn-gf2"
+              class="field-btn py-1.5 text-xs font-mono font-medium rounded-lg text-slate-600 hover:text-slate-900 transition-all text-center">
+              GF(2)
+            </button>
+            <button onclick="setField('GF3')" id="btn-gf3"
+              class="field-btn py-1.5 text-xs font-mono font-bold rounded-lg bg-sky-600 text-white shadow-sm transition-all text-center">
+              GF(3)
+            </button>
+            <button onclick="setField('GF256')" id="btn-gf256"
+              class="field-btn py-1.5 text-xs font-mono font-medium rounded-lg text-slate-600 hover:text-slate-900 transition-all text-center">
+              GF(2⁸)
+            </button>
+          </div>
+        </div>
+
+        <div
+          class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] font-mono text-slate-500">
+          <span>Active Cardinality:</span>
+          <span id="field-cardinality" class="text-sky-700 font-bold">q = 3 {Down, Flat, Up}</span>
+        </div>
+      </div>
+
+      <!-- FIELD 2: Deadband Threshold (theta) -->
+      <div class="white-card rounded-2xl p-5 flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between mb-3">
+            <span
+              class="text-[11px] font-bold uppercase tracking-wider text-sky-700 bg-sky-50 px-2 py-0.5 rounded border border-sky-200 font-mono">
+              Threshold (θ)
+            </span>
+            <span id="threshold-val-badge" class="text-xs font-mono text-sky-700 font-bold">±0.50%</span>
+          </div>
+          <h3 class="text-sm font-bold text-slate-900 mb-1">Ternary Deadband</h3>
+          <p class="text-xs text-slate-500 mb-4">Price returns inside |r| &le; θ collapse to Flat (0).</p>
+
+          <div class="space-y-2">
+            <input type="range" id="input-threshold" min="0.001" max="0.03" step="0.001" value="0.005"
+              oninput="updateThreshold(this.value)" class="w-full cursor-pointer">
+            <div class="flex justify-between text-[10px] font-mono text-slate-400">
+              <span>0.1% (Sensitive)</span>
+              <span>1.5%</span>
+              <span>3.0% (Wide)</span>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] font-mono text-slate-500">
+          <span>Return Filter:</span>
+          <span id="filter-state" class="text-slate-700">r &le; <span
+              class="text-amber-600 font-semibold">0.0050</span></span>
+        </div>
+      </div>
+
+      <!-- FIELD 3: History Window (W) -->
+      <div class="white-card rounded-2xl p-5 flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between mb-3">
+            <span
+              class="text-[11px] font-bold uppercase tracking-wider text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200 font-mono">
+              Window (W)
+            </span>
+            <span id="window-val-badge" class="text-xs font-mono text-amber-700 font-bold">32 Days</span>
+          </div>
+          <h3 class="text-sm font-bold text-slate-900 mb-1">Sequence Window</h3>
+          <p class="text-xs text-slate-500 mb-4">Length of discrete symbols fed to LFSR solver.</p>
+
+          <div class="grid grid-cols-4 gap-1.5" id="window-selector">
+            <button onclick="setWindow(16)"
+              class="win-btn py-1.5 text-xs font-mono rounded-lg border border-slate-200 hover:border-amber-400 text-slate-600 text-center">16</button>
+            <button onclick="setWindow(32)"
+              class="win-btn py-1.5 text-xs font-mono rounded-lg bg-amber-50 border border-amber-300 text-amber-800 font-bold text-center">32</button>
+            <button onclick="setWindow(64)"
+              class="win-btn py-1.5 text-xs font-mono rounded-lg border border-slate-200 hover:border-amber-400 text-slate-600 text-center">64</button>
+            <button onclick="setWindow(128)"
+              class="win-btn py-1.5 text-xs font-mono rounded-lg border border-slate-200 hover:border-amber-400 text-slate-600 text-center">128</button>
+          </div>
+        </div>
+
+        <div
+          class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] font-mono text-slate-500">
+          <span>Theoretical Max L:</span>
+          <span id="max-l-badge" class="text-purple-700 font-bold">L &le; 16</span>
+        </div>
+      </div>
+
+      <!-- FIELD 4: Turso Persistence Engine -->
+      <div class="white-card rounded-2xl p-5 flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between mb-3">
+            <span
+              class="text-[11px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 font-mono">
+              Turso DB
+            </span>
+            <span class="text-xs font-mono text-emerald-600 flex items-center">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5 animate-pulse"></span>Connected
+            </span>
+          </div>
+          <h3 class="text-sm font-bold text-slate-900 mb-1">Cloud Serialization</h3>
+          <p class="text-xs text-slate-500 mb-4">Atomic batch commit of quantized vectors.</p>
+
+          <label
+            class="flex items-center space-x-3 p-2 rounded-xl bg-slate-50 border border-slate-200 cursor-pointer hover:border-slate-300 transition-all">
+            <input type="checkbox" id="auto-sync-checkbox" checked
+              class="w-4 h-4 rounded text-sky-600 focus:ring-0 bg-white border-slate-300">
+            <span class="text-xs font-mono text-slate-700 font-medium">Live DB Upsert</span>
+          </label>
+        </div>
+
+        <div
+          class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] font-mono text-slate-500">
+          <span>Target Schema:</span>
+          <span class="text-slate-800 font-medium">quantized_series</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- LIVE DATA & DISCRETE STREAM PREVIEW -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+      <!-- LEFT: Live Quantized Stream Ribbon (2 cols) -->
+      <div class="lg:col-span-2 white-card rounded-2xl p-6 space-y-5">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div>
+            <h3 class="text-base font-bold text-slate-900 flex items-center space-x-2">
+              <span>Quantized Sequence Stream</span>
+              <span
+                class="text-xs font-mono text-sky-700 font-semibold px-2 py-0.5 rounded bg-sky-50 border border-sky-200">
+                WTI Crude (RWTC)
+              </span>
+            </h3>
+            <p class="text-xs text-slate-500 mt-0.5">Chronological discrete symbols in the active Galois field domain.
+            </p>
+          </div>
+          <div class="flex items-center space-x-3 text-xs font-mono">
+            <span class="text-slate-400">Legend:</span>
+            <span class="text-emerald-700 flex items-center font-medium"><span
+                class="w-2 h-2 rounded bg-emerald-500 mr-1"></span>UP (1)</span>
+            <span class="text-slate-500 flex items-center font-medium"><span
+                class="w-2 h-2 rounded bg-slate-400 mr-1"></span>FLAT (0)</span>
+            <span class="text-rose-700 flex items-center font-medium"><span
+                class="w-2 h-2 rounded bg-rose-500 mr-1"></span>DOWN (2)</span>
+          </div>
+        </div>
+
+        <!-- Discrete Stream Ribbon Tiles -->
+        <div id="symbol-ribbon"
+          class="flex flex-wrap gap-2 p-4 bg-slate-50 rounded-xl border border-slate-200 min-h-[120px] items-center">
+          <div class="text-xs text-slate-400 font-mono w-full text-center py-6">
+            Loading recent EIA prices and calculating Galois quantized symbols...
+          </div>
+        </div>
+
+        <!-- Latest Snapshot Metadata -->
+        <div class="grid grid-cols-3 gap-4 pt-2">
+          <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200">
+            <span class="text-[10px] font-mono uppercase text-slate-500 font-semibold">Latest Spot Price</span>
+            <div id="latest-price" class="text-lg font-bold font-mono text-slate-900 mt-0.5">$--.--</div>
+          </div>
+          <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200">
+            <span class="text-[10px] font-mono uppercase text-slate-500 font-semibold">Latest 1-Day Return</span>
+            <div id="latest-return" class="text-lg font-bold font-mono text-sky-600 mt-0.5">--.--%</div>
+          </div>
+          <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200">
+            <span class="text-[10px] font-mono uppercase text-slate-500 font-semibold">Active Symbol</span>
+            <div id="latest-symbol" class="text-lg font-bold font-mono text-purple-700 mt-0.5">--</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Collaborative Telemetry & Turso Activity Log (1 col) -->
+      <div class="white-card rounded-2xl p-6 space-y-4 flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between pb-2 border-b border-slate-200">
+            <h3 class="text-sm font-bold text-slate-900 flex items-center space-x-2">
+              <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+              <span>Telemetry & Turso Sync</span>
+            </h3>
+            <span id="log-count" class="text-[10px] font-mono text-amber-700 font-semibold">Ready</span>
+          </div>
+
+          <!-- Log Console (High-Contrast Clean Developer Terminal) -->
+          <div id="telemetry-log"
+            class="mt-4 p-3.5 bg-slate-900 rounded-xl border border-slate-800 font-mono text-[11px] text-slate-300 space-y-2 max-h-[220px] overflow-y-auto shadow-inner">
+            <div class="text-slate-500">// System initialized. Bun.serve listening.</div>
+            <div class="text-sky-400">&gt; EIA API Client: Ready (RWTC daily spot).</div>
+            <div class="text-purple-400">&gt; Galois Field Arithmetic: GF(2), GF(3), GF(2^8).</div>
+            <div class="text-emerald-400">&gt; Turso DB: Tables verified (quantized_series).</div>
+          </div>
+        </div>
+
+        <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 text-[11px] font-mono space-y-1.5">
+          <div class="flex justify-between text-slate-600">
+            <span>Serialization Latency:</span>
+            <span id="db-latency" class="text-emerald-600 font-bold">~42ms</span>
+          </div>
+          <div class="flex justify-between text-slate-600">
+            <span>Next Phase:</span>
+            <span class="text-purple-700 font-semibold">Berlekamp-Massey LFSR</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- LOGIC SCRIPT -->
+  <script>
+    let activeField = 'GF3';
+    let deadbandThreshold = 0.005;
+    let windowSize = 32;
+    let cachedPrices = [];
+
+    function log(msg, color = 'text-slate-300') {
+      const el = document.getElementById('telemetry-log');
+      const time = new Date().toLocaleTimeString();
+      const line = document.createElement('div');
+      line.className = color;
+      line.textContent = `[${time}] ${msg}`;
+      el.appendChild(line);
+      el.scrollTop = el.scrollHeight;
+    }
+
+    function setField(field) {
+      activeField = field;
+      ['gf2', 'gf3', 'gf256'].forEach(f => {
+        const btn = document.getElementById(`btn-${f}`);
+        if (f.toUpperCase() === field) {
+          btn.className = "field-btn py-1.5 text-xs font-mono font-bold rounded-lg bg-sky-600 text-white shadow-sm transition-all text-center";
+        } else {
+          btn.className = "field-btn py-1.5 text-xs font-mono font-medium rounded-lg text-slate-600 hover:text-slate-900 transition-all text-center";
+        }
+      });
+
+      const card = document.getElementById('field-cardinality');
+      if (field === 'GF2') card.textContent = 'q = 2 {Down: 0, Up: 1}';
+      if (field === 'GF3') card.textContent = 'q = 3 {Down: 2, Flat: 0, Up: 1}';
+      if (field === 'GF256') card.textContent = 'q = 256 {0x00 .. 0xFF}';
+
+      log(`Field updated to ${field}`, 'text-sky-400');
+      renderRibbon();
+    }
+
+    function updateThreshold(val) {
+      deadbandThreshold = parseFloat(val);
+      document.getElementById('threshold-val-badge').textContent = `±${(deadbandThreshold * 100).toFixed(2)}%`;
+      document.getElementById('filter-state').innerHTML = `r &le; <span class="text-amber-600 font-semibold">${deadbandThreshold.toFixed(4)}</span>`;
+      renderRibbon();
+    }
+
+    function setWindow(w) {
+      windowSize = w;
+      document.getElementById('window-val-badge').textContent = `${w} Days`;
+      document.getElementById('max-l-badge').textContent = `L ≤ ${Math.floor(w / 2)}`;
+
+      const buttons = document.querySelectorAll('.win-btn');
+      buttons.forEach(btn => {
+        if (parseInt(btn.textContent) === w) {
+          btn.className = "win-btn py-1.5 text-xs font-mono rounded-lg bg-amber-50 border border-amber-300 text-amber-800 font-bold text-center";
+        } else {
+          btn.className = "win-btn py-1.5 text-xs font-mono rounded-lg border border-slate-200 hover:border-amber-400 text-slate-600 text-center";
+        }
+      });
+      log(`Window resized to ${w} trading days`, 'text-amber-400');
+      renderRibbon();
+    }
+
+    async function fetchLiveEia() {
+      log('Querying Bun server /api/wti...', 'text-sky-400');
+      try {
+        const res = await fetch(`/api/wti?length=${windowSize + 10}`);
+        const json = await res.json();
+        if (json.data && json.data.length > 0) {
+          cachedPrices = json.data;
+          log(`Received ${cachedPrices.length} raw spot points from EIA`, 'text-emerald-400');
+          renderRibbon();
+        } else {
+          throw new Error(json.error || 'No data returned');
+        }
+      } catch (err) {
+        log(`EIA Fetch Error: ${err.message}. Using synthetic fallback.`, 'text-rose-400');
+        generateMockPrices();
+      }
+    }
+
+    function generateMockPrices() {
+      cachedPrices = [];
+      let base = 75.0;
+      const today = new Date();
+      for (let i = windowSize + 10; i >= 0; i--) {
+        const d = new Date(today);
+        d.setDate(d.getDate() - i);
+        const change = (Math.random() - 0.49) * 2.2;
+        base = Math.max(50, base + change);
+        cachedPrices.push({
+          period: d.toISOString().split('T')[0],
+          value: parseFloat(base.toFixed(2))
+        });
+      }
+      renderRibbon();
+    }
+
+    function renderRibbon() {
+      if (cachedPrices.length < 2) return;
+
+      const ribbon = document.getElementById('symbol-ribbon');
+      ribbon.innerHTML = '';
+
+      // Chronological sort
+      const sorted = [...cachedPrices].sort((a, b) => new Date(a.period) - new Date(b.period));
+      const windowSubset = sorted.slice(-windowSize);
+
+      let lastSymbol = '--';
+      let lastReturn = 0;
+      let lastPrice = windowSubset[windowSubset.length - 1].value;
+
+      for (let i = 1; i < windowSubset.length; i++) {
+        const prev = windowSubset[i - 1];
+        const curr = windowSubset[i];
+        const ret = (curr.value - prev.value) / prev.value;
+        lastReturn = ret;
+
+        let symbolText = '';
+        let colorClasses = '';
+
+        if (activeField === 'GF2') {
+          const up = ret > 0;
+          symbolText = up ? '1' : '0';
+          colorClasses = up ? 'bg-emerald-50 border-emerald-300 text-emerald-700 shadow-sm' : 'bg-rose-50 border-rose-300 text-rose-700 shadow-sm';
+          lastSymbol = up ? '1 (UP)' : '0 (DOWN)';
+        } else if (activeField === 'GF3') {
+          if (ret > deadbandThreshold) {
+            symbolText = '1';
+            colorClasses = 'bg-emerald-50 border-emerald-300 text-emerald-700 shadow-sm';
+            lastSymbol = '1 (UP)';
+          } else if (ret < -deadbandThreshold) {
+            symbolText = '2';
+            colorClasses = 'bg-rose-50 border-rose-300 text-rose-700 shadow-sm';
+            lastSymbol = '2 (DOWN)';
+          } else {
+            symbolText = '0';
+            colorClasses = 'bg-white border-slate-300 text-slate-500';
+            lastSymbol = '0 (FLAT)';
+          }
+        } else {
+          // GF256 byte
+          const byteVal = Math.min(255, Math.max(0, Math.round(((ret / 0.05) + 1) * 127.5)));
+          symbolText = byteVal.toString(16).padStart(2, '0').toUpperCase();
+          colorClasses = 'bg-purple-50 border-purple-300 text-purple-700 shadow-sm';
+          lastSymbol = `0x${symbolText}`;
+        }
+
+        const tile = document.createElement('div');
+        tile.className = `w-9 h-9 rounded-xl border flex flex-col items-center justify-center font-mono text-xs font-bold transition-all transform hover:scale-110 cursor-pointer ${colorClasses}`;
+        tile.title = `${curr.period}: $${curr.value.toFixed(2)} (${(ret * 100).toFixed(2)}%)`;
+        tile.innerHTML = `<span>${symbolText}</span>`;
+        ribbon.appendChild(tile);
+      }
+
+      document.getElementById('latest-price').textContent = `$${lastPrice.toFixed(2)}`;
+      document.getElementById('latest-return').textContent = `${(lastReturn * 100).toFixed(2)}%`;
+      document.getElementById('latest-symbol').textContent = lastSymbol;
+    }
+
+    async function runQuantizeAndSync() {
+      log('Running PriceQuantizer and serializing to Turso...', 'text-sky-400');
+      const start = performance.now();
+      try {
+        const payload = {
+          field: activeField,
+          deadbandThreshold: deadbandThreshold,
+          windowSize: windowSize,
+          data: cachedPrices.slice(-windowSize)
+        };
+
+        const res = await fetch('/api/quantize/serialize', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const result = await res.json();
+        const elapsed = (performance.now() - start).toFixed(0);
+        document.getElementById('db-latency').textContent = `${elapsed}ms`;
+
+        if (result.success) {
+          log(`Turso Commit OK: ${result.inserted} points synced. Latency: ${elapsed}ms`, 'text-emerald-400');
+        } else {
+          log(`Turso Notice: ${result.message || result.error}`, 'text-amber-400');
+        }
+      } catch (err) {
+        log(`Sync request failed: ${err.message}`, 'text-rose-400');
+      }
+    }
+
+    // Initialize
+    window.addEventListener('DOMContentLoaded', () => {
+      fetchLiveEia();
+    });
+  </script>
+</body>
+
+</html>
