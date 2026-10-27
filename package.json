@@ -7,11 +7,16 @@
     "bug": "bun --inspect-wait server.ts",
     "dug": "bun --inspect server.ts"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@libsql/client": "^0.18.0",
+    "drizzle-orm": "^0.45.4"
+  },
   "module": "server.ts",
   "private": true,
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "dotenv": "^18.0.9",
+    "drizzle-kit": "^0.31.11"
   },
   "peerDependencies": {
     "typescript": "^7"

@@ -167,7 +167,7 @@ export class EiaService {
         });
       }
     }
-/*
+
     // Frequency
     url.searchParams.set("frequency", frequency);
 
@@ -186,15 +186,12 @@ export class EiaService {
     // Pagination
     url.searchParams.set("offset", String(offset));
     url.searchParams.set("length", String(length));
-*/
-    const requestUrl = url.toString();
 
+    const requestUrl = url.toString();
+    //debugger;
     let response: Response;
-    //let responseX: Response;
     try {
-      //response = await fetch(requestUrl);
       response = await fetch(requestUrl);
-      
       //debugger;
       //console.log(result ? result.response : 'nores');
     } catch (err) {
