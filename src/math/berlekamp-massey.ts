@@ -254,7 +254,9 @@ export class BerlekampMassey {
     } else if (fieldType === "GF3") {
       label = predictedSymbol === 1 ? "UP" : predictedSymbol === 2 ? "DOWN" : "FLAT";
     } else {
-      label = `0x${predictedSymbol.toString(16).padStart(2, "0").toUpperCase()}`;
+      const hex = `0x${predictedSymbol.toString(16).padStart(2, "0").toUpperCase()}`;
+      const dir = predictedSymbol > 132 ? "UP" : predictedSymbol < 124 ? "DOWN" : "FLAT";
+      label = `${hex} (${dir})`;
     }
 
     // Stability: How far is L from random walk max (N/2)

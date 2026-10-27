@@ -360,23 +360,46 @@
     <!-- PHASE 2: LFSR PREDICTOR & BERLEKAMP-MASSEY OUTCOME PANEL -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
 
-      <!-- OUTCOME 1: Tomorrow's Forecast Token -->
+      <!-- OUTCOME 1: State Transition & Tomorrow's Forecast Token -->
       <div class="white-card top-card-themed rounded-2xl p-5 flex flex-col justify-between">
         <div>
           <div class="flex items-center justify-between mb-3">
             <span class="text-[11px] font-bold uppercase tracking-wider text-sky-700 bg-sky-50 px-2 py-0.5 rounded border border-sky-200 font-mono">
-              Tomorrow's Forecast
+              Transition &amp; Forecast
             </span>
-            <span class="text-xs themed-subtext font-mono">t + 1 Step</span>
+            <span id="forecast-confidence" class="text-xs themed-subtext font-mono font-semibold">L = 6 / 16</span>
           </div>
-          <div class="flex items-center space-x-3 my-2">
-            <div id="forecast-symbol-badge" class="px-3.5 py-1.5 rounded-xl text-base font-bold font-mono bg-emerald-50 text-emerald-700 border border-emerald-300 shadow-sm flex items-center space-x-2">
-              <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-              <span id="forecast-symbol-text">1 (UP)</span>
+
+          <!-- Dual Pills: Today (t) -> Tomorrow (t+1) -->
+          <div class="flex items-center justify-between gap-2 my-2.5">
+            <!-- TODAY (t) -->
+            <div class="flex-1 p-2.5 rounded-xl themed-control border border-slate-200 flex flex-col">
+              <span class="text-[10px] font-mono uppercase tracking-wider text-slate-500 font-bold mb-1.5">
+                Today (t)
+              </span>
+              <div id="today-symbol-badge" class="px-2.5 py-1.5 rounded-lg text-xs font-bold font-mono bg-rose-50 text-rose-700 border border-rose-300 shadow-sm flex items-center justify-center">
+                <span id="today-symbol-text">2 (DOWN)</span>
+              </div>
             </div>
-            <span id="forecast-confidence" class="text-xs themed-subtext font-mono">L = 6 / 16</span>
+
+            <!-- Transition Arrow -->
+            <div class="text-slate-400 font-mono text-sm px-0.5">➔</div>
+
+            <!-- TOMORROW (t+1) -->
+            <div class="flex-1 p-2.5 rounded-xl themed-control border border-sky-200 bg-sky-50/30 flex flex-col">
+              <span class="text-[10px] font-mono uppercase tracking-wider text-sky-700 font-bold mb-1.5 flex items-center justify-between">
+                <span>Tomorrow (t+1)</span>
+                <span class="w-1.5 h-1.5 rounded-full bg-sky-500 animate-pulse"></span>
+              </span>
+              <div id="forecast-symbol-badge" class="px-2.5 py-1.5 rounded-lg text-xs font-bold font-mono bg-emerald-50 text-emerald-700 border border-emerald-300 shadow-sm flex items-center justify-center">
+                <span id="forecast-symbol-text">1 (UP)</span>
+              </div>
+            </div>
           </div>
-          <p id="forecast-description" class="text-xs themed-subtext mt-2">LFSR recurrence predicts bullish price movement.</p>
+
+          <p id="forecast-description" class="text-xs themed-subtext mt-2 leading-relaxed">
+            LFSR recurrence predicts counter-trend rebound.
+          </p>
         </div>
         <div class="mt-4 pt-3 border-t border-sky-100 flex items-center justify-between text-[11px] font-mono themed-subtext">
           <span>Target Date:</span>
@@ -488,7 +511,7 @@
             <div id="latest-return" class="text-lg font-bold font-mono text-sky-600 mt-0.5">--.--%</div>
           </div>
           <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200">
-            <span class="text-[10px] font-mono uppercase text-slate-500 font-semibold">Active Symbol</span>
+            <span class="text-[10px] font-mono uppercase text-slate-500 font-semibold">Active Symbol (Today)</span>
             <div id="latest-symbol" class="text-lg font-bold font-mono text-purple-700 mt-0.5">--</div>
           </div>
         </div>
@@ -562,7 +585,7 @@
       const card = document.getElementById('field-cardinality');
       if (field === 'GF2') card.textContent = 'q = 2 {Down: 0, Up: 1}';
       if (field === 'GF3') card.textContent = 'q = 3 {Down: 2, Flat: 0, Up: 1}';
-      if (field === 'GF256') card.textContent = 'q = 256 {0x00 .. 0xFF}';
+      if (field === 'GF256') card.textContent = 'q = 256 {<0x80 Down, 0x80 Flat, >0x80 Up}';
 
       log(`Field updated to ${field}`, 'text-sky-400');
       renderRibbon();
@@ -670,11 +693,19 @@
             lastSymbol = '0 (FLAT)';
           }
         } else {
-          // GF256 byte
+          // GF256 byte: 128 (0x80) is neutral return baseline
           const byteVal = Math.min(255, Math.max(0, Math.round(((ret / 0.05) + 1) * 127.5)));
           symbolText = byteVal.toString(16).padStart(2, '0').toUpperCase();
-          colorClasses = 'bg-purple-50 border-purple-300 text-purple-700 shadow-sm';
-          lastSymbol = `0x${symbolText}`;
+          if (byteVal > 132) {
+            colorClasses = 'bg-emerald-50 border-emerald-300 text-emerald-700 shadow-sm';
+            lastSymbol = `0x${symbolText} (UP)`;
+          } else if (byteVal < 124) {
+            colorClasses = 'bg-rose-50 border-rose-300 text-rose-700 shadow-sm';
+            lastSymbol = `0x${symbolText} (DOWN)`;
+          } else {
+            colorClasses = 'bg-white border-slate-300 text-slate-600 shadow-sm';
+            lastSymbol = `0x${symbolText} (FLAT)`;
+          }
         }
 
         const tile = document.createElement('div');
@@ -799,10 +830,17 @@
       for (let i = 1; i < c.length; i++) {
         const coef = c[i];
         if (coef === 0) continue;
-        const coefStr = fieldType === 'GF2' ? '' : coef === 1 ? '' : `${coef}`;
+        let coefStr = '';
+        if (fieldType === 'GF2') {
+          coefStr = '';
+        } else if (fieldType === 'GF3') {
+          coefStr = coef === 1 ? '' : `${coef}`;
+        } else {
+          coefStr = `0x${coef.toString(16).padStart(2, '0').toUpperCase()}·`;
+        }
         terms.push(i === 1 ? `${coefStr}D` : `${coefStr}D^${i}`);
       }
-      return terms.join(' + ') + ` (mod ${fieldType === 'GF2' ? '2' : fieldType === 'GF3' ? '3' : '256'})`;
+      return terms.join(' + ') + ` (mod ${fieldType === 'GF2' ? '2' : fieldType === 'GF3' ? '3' : 'GF(2⁸)'})`;
     }
 
     function executeLFSRPredictor(symbols) {
@@ -812,7 +850,10 @@
       const { predicted, c, l } = predictNextSymbol(windowSlice, activeField);
       const maxL = Math.floor(windowSize / 2);
 
-      // 1. Update Tomorrow's Forecast Card
+      // 1. Update Transition & Forecast Card (Today & Tomorrow)
+      const currentSym = symbols[symbols.length - 1];
+      const todayBadge = document.getElementById('today-symbol-badge');
+      const todayText = document.getElementById('today-symbol-text');
       const badge = document.getElementById('forecast-symbol-badge');
       const badgeText = document.getElementById('forecast-symbol-text');
       const desc = document.getElementById('forecast-description');
@@ -820,34 +861,109 @@
 
       conf.textContent = `L = ${l} / ${maxL}`;
 
+      let todayDir = 'FLAT';
+      let predDir = 'FLAT';
+
+      // Format Today (t) Badge
+      if (activeField === 'GF2') {
+        if (currentSym === 1) {
+          todayDir = 'UP';
+          todayBadge.className = "px-2.5 py-1.5 rounded-lg text-xs font-bold font-mono bg-emerald-50 text-emerald-700 border border-emerald-300 shadow-sm flex items-center justify-center";
+          todayText.textContent = "1 (UP)";
+        } else {
+          todayDir = 'DOWN';
+          todayBadge.className = "px-2.5 py-1.5 rounded-lg text-xs font-bold font-mono bg-rose-50 text-rose-700 border border-rose-300 shadow-sm flex items-center justify-center";
+          todayText.textContent = "0 (DOWN)";
+        }
+      } else if (activeField === 'GF3') {
+        if (currentSym === 1) {
+          todayDir = 'UP';
+          todayBadge.className = "px-2.5 py-1.5 rounded-lg text-xs font-bold font-mono bg-emerald-50 text-emerald-700 border border-emerald-300 shadow-sm flex items-center justify-center";
+          todayText.textContent = "1 (UP)";
+        } else if (currentSym === 2) {
+          todayDir = 'DOWN';
+          todayBadge.className = "px-2.5 py-1.5 rounded-lg text-xs font-bold font-mono bg-rose-50 text-rose-700 border border-rose-300 shadow-sm flex items-center justify-center";
+          todayText.textContent = "2 (DOWN)";
+        } else {
+          todayDir = 'FLAT';
+          todayBadge.className = "px-2.5 py-1.5 rounded-lg text-xs font-bold font-mono bg-slate-100 text-slate-700 border border-slate-300 shadow-sm flex items-center justify-center";
+          todayText.textContent = "0 (FLAT)";
+        }
+      } else {
+        const hexToday = `0x${currentSym.toString(16).padStart(2, '0').toUpperCase()}`;
+        if (currentSym > 132) {
+          todayDir = 'UP';
+          todayBadge.className = "px-2.5 py-1.5 rounded-lg text-xs font-bold font-mono bg-emerald-50 text-emerald-700 border border-emerald-300 shadow-sm flex items-center justify-center";
+          todayText.textContent = `${hexToday} (UP)`;
+        } else if (currentSym < 124) {
+          todayDir = 'DOWN';
+          todayBadge.className = "px-2.5 py-1.5 rounded-lg text-xs font-bold font-mono bg-rose-50 text-rose-700 border border-rose-300 shadow-sm flex items-center justify-center";
+          todayText.textContent = `${hexToday} (DOWN)`;
+        } else {
+          todayDir = 'FLAT';
+          todayBadge.className = "px-2.5 py-1.5 rounded-lg text-xs font-bold font-mono bg-slate-100 text-slate-700 border border-slate-300 shadow-sm flex items-center justify-center";
+          todayText.textContent = `${hexToday} (FLAT)`;
+        }
+      }
+
+      // Format Tomorrow (t+1) Badge
       if (activeField === 'GF2') {
         if (predicted === 1) {
-          badge.className = "px-3.5 py-1.5 rounded-xl text-base font-bold font-mono bg-emerald-50 text-emerald-700 border border-emerald-300 shadow-sm flex items-center space-x-2";
+          predDir = 'UP';
+          badge.className = "px-2.5 py-1.5 rounded-lg text-xs font-bold font-mono bg-emerald-50 text-emerald-700 border border-emerald-300 shadow-sm flex items-center justify-center";
           badgeText.textContent = "1 (UP)";
-          desc.textContent = "LFSR momentum recurrence predicts bullish price movement.";
         } else {
-          badge.className = "px-3.5 py-1.5 rounded-xl text-base font-bold font-mono bg-rose-50 text-rose-700 border border-rose-300 shadow-sm flex items-center space-x-2";
+          predDir = 'DOWN';
+          badge.className = "px-2.5 py-1.5 rounded-lg text-xs font-bold font-mono bg-rose-50 text-rose-700 border border-rose-300 shadow-sm flex items-center justify-center";
           badgeText.textContent = "0 (DOWN)";
-          desc.textContent = "LFSR momentum recurrence predicts bearish price movement.";
         }
       } else if (activeField === 'GF3') {
         if (predicted === 1) {
-          badge.className = "px-3.5 py-1.5 rounded-xl text-base font-bold font-mono bg-emerald-50 text-emerald-700 border border-emerald-300 shadow-sm flex items-center space-x-2";
+          predDir = 'UP';
+          badge.className = "px-2.5 py-1.5 rounded-lg text-xs font-bold font-mono bg-emerald-50 text-emerald-700 border border-emerald-300 shadow-sm flex items-center justify-center";
           badgeText.textContent = "1 (UP)";
-          desc.textContent = "Ternary LFSR cycle predicts upward breakout beyond threshold.";
         } else if (predicted === 2) {
-          badge.className = "px-3.5 py-1.5 rounded-xl text-base font-bold font-mono bg-rose-50 text-rose-700 border border-rose-300 shadow-sm flex items-center space-x-2";
+          predDir = 'DOWN';
+          badge.className = "px-2.5 py-1.5 rounded-lg text-xs font-bold font-mono bg-rose-50 text-rose-700 border border-rose-300 shadow-sm flex items-center justify-center";
           badgeText.textContent = "2 (DOWN)";
-          desc.textContent = "Ternary LFSR cycle predicts downward drop beyond threshold.";
         } else {
-          badge.className = "px-3.5 py-1.5 rounded-xl text-base font-bold font-mono bg-slate-100 text-slate-700 border border-slate-300 shadow-sm flex items-center space-x-2";
+          predDir = 'FLAT';
+          badge.className = "px-2.5 py-1.5 rounded-lg text-xs font-bold font-mono bg-slate-100 text-slate-700 border border-slate-300 shadow-sm flex items-center justify-center";
           badgeText.textContent = "0 (FLAT)";
-          desc.textContent = "Ternary LFSR cycle predicts price consolidation inside deadband.";
         }
       } else {
-        badge.className = "px-3.5 py-1.5 rounded-xl text-base font-bold font-mono bg-purple-50 text-purple-700 border border-purple-300 shadow-sm flex items-center space-x-2";
-        badgeText.textContent = `0x${predicted.toString(16).padStart(2, '0').toUpperCase()}`;
-        desc.textContent = "GF(256) 8-bit discrete byte state projection.";
+        const hex = `0x${predicted.toString(16).padStart(2, '0').toUpperCase()}`;
+        const zEst = (((predicted / 255) * 6) - 3).toFixed(1);
+        const signedZ = parseFloat(zEst) > 0 ? `+${zEst}σ` : `${zEst}σ`;
+
+        if (predicted > 132) {
+          predDir = 'UP';
+          badge.className = "px-2.5 py-1.5 rounded-lg text-xs font-bold font-mono bg-emerald-50 text-emerald-700 border border-emerald-300 shadow-sm flex items-center justify-center";
+          badgeText.textContent = `${hex} (UP)`;
+        } else if (predicted < 124) {
+          predDir = 'DOWN';
+          badge.className = "px-2.5 py-1.5 rounded-lg text-xs font-bold font-mono bg-rose-50 text-rose-700 border border-rose-300 shadow-sm flex items-center justify-center";
+          badgeText.textContent = `${hex} (DOWN)`;
+        } else {
+          predDir = 'FLAT';
+          badge.className = "px-2.5 py-1.5 rounded-lg text-xs font-bold font-mono bg-slate-100 text-slate-700 border border-slate-300 shadow-sm flex items-center justify-center";
+          badgeText.textContent = `${hex} (FLAT)`;
+        }
+      }
+
+      // Contextual State Transition Description
+      if (todayDir === 'DOWN' && predDir === 'UP') {
+        desc.textContent = "LFSR recurrence predicts counter-trend rebound (Down ➔ Up reversal).";
+      } else if (todayDir === 'UP' && predDir === 'DOWN') {
+        desc.textContent = "LFSR recurrence predicts cycle peak pullback (Up ➔ Down reversal).";
+      } else if (todayDir === 'UP' && predDir === 'UP') {
+        desc.textContent = "LFSR recurrence predicts bullish trend continuation (Up ➔ Up momentum).";
+      } else if (todayDir === 'DOWN' && predDir === 'DOWN') {
+        desc.textContent = "LFSR recurrence predicts bearish trend continuation (Down ➔ Down drift).";
+      } else if (predDir === 'FLAT') {
+        desc.textContent = "LFSR recurrence predicts price consolidation inside deadband.";
+      } else {
+        desc.textContent = `LFSR recurrence projects transition from consolidation to ${predDir.toLowerCase()} movement.`;
       }
 
       // 2. Update Minimal Polynomial Card

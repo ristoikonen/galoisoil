@@ -150,6 +150,9 @@ export class PriceQuantizer {
       const normalized = (clamped + clipZScore) / (2 * clipZScore);
       const symbol = Math.min(255, Math.max(0, Math.round(normalized * 255)));
 
+      const hex = `0x${symbol.toString(16).padStart(2, "0").toUpperCase()}`;
+      const dir = symbol > 132 ? "UP" : symbol < 124 ? "DOWN" : "FLAT";
+
       return {
         id: `GF256_${pt.date}`,
         date: pt.date,
@@ -157,7 +160,7 @@ export class PriceQuantizer {
         returnPct: pt.returnPct,
         fieldType: "GF256",
         symbol,
-        symbolLabel: `0x${symbol.toString(16).padStart(2, "0").toUpperCase()}`,
+        symbolLabel: `${hex} (${dir})`,
         params: { mean, stdDev, clipZScore },
       };
     });
