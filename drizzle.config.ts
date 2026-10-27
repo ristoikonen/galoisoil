@@ -1,4 +1,5 @@
-import "dotenv/config"; // 👈 This explicitly loads your .env file
+// Comments out to gen tables, NOTE: Bun env's does not work!
+/* import "dotenv/config"; // 👈 This explicitly loads your .env file
 import { defineConfig } from "drizzle-kit";
 
 export default defineConfig({
@@ -11,3 +12,4 @@ export default defineConfig({
     authToken: process.env.TURSO_AUTH_TOKEN!,
   },
 });
+ */
