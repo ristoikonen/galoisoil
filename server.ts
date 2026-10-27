@@ -3,6 +3,8 @@ import planPageText from "./public/plan.html" with { type: "text" };
 import sparseGlowText from "./public/sparse-glow.html" with { type: "text" };
 import { PriceQuantizer, type GaloisFieldType } from "./src/quantizer/price-quantizer";
 import { ensureTablesExist } from "./src/db/client";
+import { BerlekampMassey } from "./src/math/berlekamp-massey";
+
 
 const port = Number(Bun.env.APP_PORT ?? 3000);
 const host = Bun.env.APP_HOST ?? "localhost";
@@ -128,6 +130,51 @@ const server = Bun.serve({
                         field: body.field ?? "GF3",
                         count: quantized.length,
                         data: quantized.slice(-10), // return last 10 points for inspection
+                    });
+                } catch (err) {
+                    return Response.json(
+                        { error: err instanceof Error ? err.message : String(err) },
+                        { status: 500 },
+                    );
+                }
+            },
+        },
+
+        "/api/lfsr/predict": {
+            POST: async (req: Request) => {
+                try {
+                    const body = (await req.json()) as {
+                        field?: GaloisFieldType;
+                        deadbandThreshold?: number;
+                        windowSize?: number;
+                        data?: Array<{ period: string; value: number }>;
+                    };
+
+                    let rawData = body.data;
+                    if (!rawData || rawData.length === 0) {
+                        rawData = await eia.fetchWtiDaily({ length: 120 });
+                    }
+
+                    const field = body.field ?? "GF3";
+                    const deadband = body.deadbandThreshold ?? 0.005;
+                    const windowSize = body.windowSize ?? 32;
+
+                    const quantized = PriceQuantizer.quantize(rawData, {
+                        field,
+                        deadbandThreshold: deadband,
+                    });
+
+                    const symbols = quantized.map((q) => q.symbol);
+                    const prediction = BerlekampMassey.predictNext(symbols.slice(-windowSize), field);
+                    const backtest = BerlekampMassey.walkForwardBacktest(symbols, windowSize, field);
+
+                    return Response.json({
+                        success: true,
+                        field,
+                        windowSize,
+                        totalPoints: quantized.length,
+                        prediction,
+                        backtest,
                     });
                 } catch (err) {
                     return Response.json(
