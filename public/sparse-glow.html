@@ -183,16 +183,10 @@
         <div
           class="hidden sm:flex items-center space-x-2 px-3 py-1.5 bg-slate-100 border border-slate-200 rounded-full text-xs font-mono text-slate-700">
           <span class="w-2 h-2 rounded-full bg-sky-500 animate-ping"></span>
-          <span>Room: <strong id="room-id" class="text-slate-900 font-semibold">wti-oil-alpha</strong></span>
+          <span id="room-text">Room: <strong id="room-id" class="text-slate-900 font-semibold">Wti</strong> | Source: <strong class="text-sky-700 font-semibold">EIA</strong></span>
           <span class="text-slate-300">|</span>
           <span class="text-slate-600"><strong id="peer-count" class="text-sky-600">2</strong> Operators Online</span>
         </div>
-
-        <!-- Live Server Status -->
-        <span
-          class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-800 border border-emerald-300">
-          <span class="w-2 h-2 mr-2 bg-emerald-500 rounded-full animate-pulse"></span>Bun 1.4.2 Live
-        </span>
       </div>
     </div>
   </header>
@@ -203,39 +197,36 @@
     <!-- HEADER INTRO -->
     <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-200 pb-6">
       <div>
-        <div
-          class="inline-flex items-center space-x-2 text-xs font-mono uppercase tracking-wider text-sky-600 mb-2 font-semibold">
-          <span>Phase 1 Verification</span>
-          <span class="text-slate-300">•</span>
-          <span class="text-amber-600">Quantization & Turso Persistence</span>
+        <div id="commodity-breadcrumbs"
+          class="inline-flex items-center space-x-2 text-xs font-mono uppercase tracking-wider mb-2 select-none">
+          <span id="crumb-wti" class="text-sky-900 font-bold transition-colors cursor-pointer" onclick="selectCommodity('RWTC')">Wti</span>
+          <span class="text-sky-300">•</span>
+          <span id="crumb-brent" class="text-sky-500 hover:text-sky-700 font-medium transition-colors cursor-pointer" onclick="selectCommodity('RBRTE')">Brent</span>
+          <span class="text-sky-300">•</span>
+          <span id="crumb-henry" class="text-sky-500 hover:text-sky-700 font-medium transition-colors cursor-pointer" onclick="selectCommodity('RNGC1')">Henry Hub</span>
         </div>
-        <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+        <h1 id="main-heading" class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight transition-all">
           WTI Oil Price Quantization Engine
         </h1>
-        <p class="text-sm text-slate-600 mt-1 max-w-2xl">
+        <p id="main-subtext" class="text-sm text-slate-600 mt-1 max-w-2xl transition-all">
           Quantize continuous EIA WTI daily spot prices into discrete symbols over Galois Fields. <br />Collaborative
           modifications broadcast across the multi-user mesh.
         </p>
       </div><!--  -->
 
-      <!-- Quick Action Buttons -->
+      <!-- Quick Action Buttons: 3 Choices (Wti, Brent, Henry Hub) -->
       <div class="flex items-center space-x-2.5">
-        <button id="btn-fetch-eia" onclick="fetchLiveEia()"
-          class="px-3.5 py-2 text-xs font-medium font-mono rounded-xl bg-white border border-slate-300 hover:border-slate-400 text-slate-700 hover:text-slate-900 shadow-sm transition-all flex items-center space-x-2">
-          <svg class="w-3.5 h-3.5 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
-            </path>
-          </svg>
-          <span>Fetch EIA Spot</span>
+        <button id="btn-commodity-wti" onclick="selectCommodity('RWTC')"
+          class="commodity-btn px-4 py-2.5 text-xs font-mono font-bold rounded-xl transition-all flex items-center space-x-2 bg-sky-600 text-white border border-sky-600 shadow-md glow-cyan-badge">
+          <span>WTI</span>
         </button>
-        <button id="btn-sync-turso" onclick="runQuantizeAndSync()"
-          class="px-4 py-2 text-xs font-semibold font-mono rounded-xl bg-sky-600 hover:bg-sky-700 text-white shadow-sm transition-all flex items-center space-x-2 glow-cyan-badge">
-          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path>
-          </svg>
-          <span>Quantize & Sync Turso</span>
+        <button id="btn-commodity-brent" onclick="selectCommodity('RBRTE')"
+          class="commodity-btn px-4 py-2.5 text-xs font-mono font-bold rounded-xl transition-all flex items-center space-x-2 bg-white border border-slate-300 hover:border-sky-400 text-slate-700 hover:text-sky-700 shadow-sm">
+          <span>Brent</span>
+        </button>
+        <button id="btn-commodity-henry" onclick="selectCommodity('RNGC1')"
+          class="commodity-btn px-4 py-2.5 text-xs font-mono font-bold rounded-xl transition-all flex items-center space-x-2 bg-white border border-slate-300 hover:border-sky-400 text-slate-700 hover:text-sky-700 shadow-sm">
+          <span>Henry Hub</span>
         </button>
       </div>
     </div>
@@ -601,7 +592,7 @@
           <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-100">
             <div class="flex items-center space-x-2.5">
               <span class="w-2.5 h-2.5 rounded-full bg-sky-500 animate-pulse"></span>
-              <h3 class="text-sm font-bold font-mono text-slate-800 uppercase tracking-wider">
+              <h3 id="chart-heading" class="text-sm font-bold font-mono text-slate-800 uppercase tracking-wider">
                 WTI Spot Price &amp; Macro Retracement Chart
               </h3>
             </div>
@@ -634,8 +625,8 @@
                     <input type="checkbox" id="chk-layer-area" checked onchange="toggleLayerArea(this.checked)"
                       class="w-3.5 h-3.5 mt-0.5 rounded text-sky-600 focus:ring-0 bg-white border-slate-300 cursor-pointer">
                     <div>
-                      <span class="block text-slate-800 font-semibold group-hover:text-sky-600 transition-colors">WTI Spot Area</span>
-                      <span class="block text-[10px] text-slate-400">Daily spot close curve</span>
+                      <span id="layer-area-label" class="block text-slate-800 font-semibold group-hover:text-sky-600 transition-colors">WTI Spot Area</span>
+                      <span id="layer-area-sub" class="block text-[10px] text-slate-400">Daily spot close curve</span>
                     </div>
                   </label>
 
@@ -645,7 +636,7 @@
                       class="w-3.5 h-3.5 mt-0.5 rounded text-amber-600 focus:ring-0 bg-white border-slate-300 cursor-pointer">
                     <div>
                       <span class="block text-slate-800 font-semibold group-hover:text-amber-600 transition-colors">7 Fibonacci Shelves</span>
-                      <span class="block text-[10px] text-slate-400">$119.51 ➔ $63.21 Grid</span>
+                      <span id="fib-grid-sub" class="block text-[10px] text-slate-400">$119.51 ➔ $63.21 Grid</span>
                     </div>
                   </label>
 
@@ -665,15 +656,15 @@
               <div class="pt-2 border-t border-slate-200/80 space-y-1 text-[10px] text-slate-500">
                 <div class="flex items-center justify-between">
                   <span>61.8% Pocket:</span>
-                  <span class="font-bold text-[#f78522]">$84.72</span>
+                  <span id="fib-ref-pocket" class="font-bold text-[#f78522]">$84.72</span>
                 </div>
                 <div class="flex items-center justify-between">
                   <span>50.0% Midpoint:</span>
-                  <span class="font-bold text-sky-700">$91.36</span>
+                  <span id="fib-ref-midpoint" class="font-bold text-sky-700">$91.36</span>
                 </div>
                 <div class="flex items-center justify-between">
                   <span>23.6% Pullback:</span>
-                  <span class="font-bold text-amber-700">$106.22</span>
+                  <span id="fib-ref-pullback" class="font-bold text-amber-700">$106.22</span>
                 </div>
               </div>
             </div>
@@ -879,6 +870,163 @@
     });
 
     let serverMode = 'standalone_binary';
+    let currentCommodity = 'RWTC';
+
+    const COMMODITY_CONFIG = {
+      RWTC: {
+        symbol: 'RWTC',
+        shortName: 'WTI',
+        crumbName: 'Wti',
+        fullName: 'WTI Crude Oil',
+        heading: 'WTI Oil Price Quantization Engine',
+        subtext: 'Quantize continuous EIA WTI daily spot prices into discrete symbols over Galois Fields. Collaborative modifications broadcast across the multi-user mesh.',
+        roomText: 'Room: Wti | Source: EIA',
+        chartHeading: 'WTI Spot Price & Macro Retracement Chart',
+        layerAreaLabel: 'WTI Spot Area',
+        layerAreaSub: 'Daily spot close curve',
+        units: '$/BBL',
+        fibGridSub: '$119.51 ➔ $63.21 Grid',
+        fibLevels: [
+          { price: 119.51, title: '0.0% Peak ($119.51)', color: '#64748b', lineStyle: 2 },
+          { price: 106.22, title: '23.6% Pullback ($106.22)', color: '#d97706', lineStyle: 2 },
+          { price: 97.99, title: '38.2% Shelf ($97.99)', color: '#d97706', lineStyle: 2 },
+          { price: 91.36, title: '50.0% Midpoint ($91.36)', color: '#0284c7', lineStyle: 2 },
+          { price: 84.72, title: '61.8% Pocket ($84.72)', color: '#f78522', lineStyle: 0, lineWidth: 2 },
+          { price: 75.26, title: '78.6% Defense ($75.26)', color: '#e11d48', lineStyle: 2 },
+          { price: 63.21, title: '100% Base ($63.21)', color: '#64748b', lineStyle: 2 }
+        ],
+        pocketRef: '$84.72',
+        midpointRef: '$91.36',
+        pullbackRef: '$106.22'
+      },
+      RBRTE: {
+        symbol: 'RBRTE',
+        shortName: 'Brent',
+        crumbName: 'Brent',
+        fullName: 'Brent Crude Oil',
+        heading: 'Brent Oil Price Quantization Engine',
+        subtext: 'Quantize continuous EIA Brent daily spot prices into discrete symbols over Galois Fields. Collaborative modifications broadcast across the multi-user mesh.',
+        roomText: 'Room: Brent | Source: EIA',
+        chartHeading: 'Brent Spot Price & Macro Retracement Chart',
+        layerAreaLabel: 'Brent Spot Area',
+        layerAreaSub: 'Daily spot close curve',
+        units: '$/BBL',
+        fibGridSub: '$139.12 ➔ $70.00 Grid',
+        fibLevels: [
+          { price: 139.12, title: '0.0% Peak ($139.12)', color: '#64748b', lineStyle: 2 },
+          { price: 122.81, title: '23.6% Pullback ($122.81)', color: '#d97706', lineStyle: 2 },
+          { price: 112.72, title: '38.2% Shelf ($112.72)', color: '#d97706', lineStyle: 2 },
+          { price: 104.56, title: '50.0% Midpoint ($104.56)', color: '#0284c7', lineStyle: 2 },
+          { price: 96.40, title: '61.8% Pocket ($96.40)', color: '#f78522', lineStyle: 0, lineWidth: 2 },
+          { price: 84.79, title: '78.6% Defense ($84.79)', color: '#e11d48', lineStyle: 2 },
+          { price: 70.00, title: '100% Base ($70.00)', color: '#64748b', lineStyle: 2 }
+        ],
+        pocketRef: '$96.40',
+        midpointRef: '$104.56',
+        pullbackRef: '$122.81'
+      },
+      RNGC1: {
+        symbol: 'RNGC1',
+        shortName: 'Henry Hub',
+        crumbName: 'Henry Hub',
+        fullName: 'Henry Hub Natural Gas',
+        heading: 'Henry Hub Gas Price Quantization Engine',
+        subtext: 'Quantize continuous EIA Henry Hub daily gas prices into discrete symbols over Galois Fields. Collaborative modifications broadcast across the multi-user mesh.',
+        roomText: 'Room: Henry Hub | Source: EIA',
+        chartHeading: 'Henry Hub Natural Gas Price & Macro Retracement Chart',
+        layerAreaLabel: 'Henry Hub Gas Area',
+        layerAreaSub: 'Daily contract close curve',
+        units: '$/MMBTU',
+        fibGridSub: '$9.85 ➔ $1.50 Grid',
+        fibLevels: [
+          { price: 9.85, title: '0.0% Peak ($9.85)', color: '#64748b', lineStyle: 2 },
+          { price: 7.88, title: '23.6% Pullback ($7.88)', color: '#d97706', lineStyle: 2 },
+          { price: 6.66, title: '38.2% Shelf ($6.66)', color: '#d97706', lineStyle: 2 },
+          { price: 5.68, title: '50.0% Midpoint ($5.68)', color: '#0284c7', lineStyle: 2 },
+          { price: 4.69, title: '61.8% Pocket ($4.69)', color: '#f78522', lineStyle: 0, lineWidth: 2 },
+          { price: 3.29, title: '78.6% Defense ($3.29)', color: '#e11d48', lineStyle: 2 },
+          { price: 1.50, title: '100% Base ($1.50)', color: '#64748b', lineStyle: 2 }
+        ],
+        pocketRef: '$4.69',
+        midpointRef: '$5.68',
+        pullbackRef: '$7.88'
+      }
+    };
+
+    let currentFibLevels = COMMODITY_CONFIG.RWTC.fibLevels;
+
+    async function selectCommodity(sym) {
+      if (!COMMODITY_CONFIG[sym]) return;
+      currentCommodity = sym;
+      const cfg = COMMODITY_CONFIG[sym];
+
+      // 1. Update Breadcrumbs (all blue, active darker blue)
+      const crumbs = {
+        RWTC: document.getElementById('crumb-wti'),
+        RBRTE: document.getElementById('crumb-brent'),
+        RNGC1: document.getElementById('crumb-henry')
+      };
+      for (const [s, el] of Object.entries(crumbs)) {
+        if (!el) continue;
+        if (s === sym) {
+          el.className = 'text-sky-900 font-bold transition-colors cursor-pointer';
+        } else {
+          el.className = 'text-sky-500 hover:text-sky-700 font-medium transition-colors cursor-pointer';
+        }
+      }
+
+      // 2. Update 3 Quick Action Buttons
+      const btns = {
+        RWTC: document.getElementById('btn-commodity-wti'),
+        RBRTE: document.getElementById('btn-commodity-brent'),
+        RNGC1: document.getElementById('btn-commodity-henry')
+      };
+      for (const [s, el] of Object.entries(btns)) {
+        if (!el) continue;
+        if (s === sym) {
+          el.className = 'commodity-btn px-4 py-2.5 text-xs font-mono font-bold rounded-xl transition-all flex items-center space-x-2 bg-sky-600 text-white border border-sky-600 shadow-md glow-cyan-badge';
+        } else {
+          el.className = 'commodity-btn px-4 py-2.5 text-xs font-mono font-bold rounded-xl transition-all flex items-center space-x-2 bg-white border border-slate-300 hover:border-sky-400 text-slate-700 hover:text-sky-700 shadow-sm';
+        }
+      }
+
+      // 3. Update Text & Headers
+      const roomEl = document.getElementById('room-id');
+      if (roomEl) roomEl.textContent = cfg.crumbName;
+
+      const mainHeadingEl = document.getElementById('main-heading');
+      if (mainHeadingEl) mainHeadingEl.textContent = cfg.heading;
+
+      const mainSubtextEl = document.getElementById('main-subtext');
+      if (mainSubtextEl) mainSubtextEl.textContent = cfg.subtext;
+
+      const chartHeadingEl = document.getElementById('chart-heading');
+      if (chartHeadingEl) chartHeadingEl.textContent = cfg.chartHeading;
+
+      const layerAreaLabelEl = document.getElementById('layer-area-label');
+      if (layerAreaLabelEl) layerAreaLabelEl.textContent = cfg.layerAreaLabel;
+
+      const layerAreaSubEl = document.getElementById('layer-area-sub');
+      if (layerAreaSubEl) layerAreaSubEl.textContent = cfg.layerAreaSub;
+
+      const fibGridSubEl = document.getElementById('fib-grid-sub');
+      if (fibGridSubEl) fibGridSubEl.textContent = cfg.fibGridSub;
+
+      const fibPocketEl = document.getElementById('fib-ref-pocket');
+      if (fibPocketEl) fibPocketEl.textContent = cfg.pocketRef;
+
+      const fibMidpointEl = document.getElementById('fib-ref-midpoint');
+      if (fibMidpointEl) fibMidpointEl.textContent = cfg.midpointRef;
+
+      const fibPullbackEl = document.getElementById('fib-ref-pullback');
+      if (fibPullbackEl) fibPullbackEl.textContent = cfg.pullbackRef;
+
+      // 4. Update active Fibonacci levels
+      currentFibLevels = cfg.fibLevels;
+
+      // 5. Fetch and render data for this commodity
+      await fetchLiveEia();
+    }
 
     function formatAuDate(dateStr) {
       if (!dateStr) return '--/--/----';
@@ -927,14 +1075,15 @@
     }
 
     async function fetchLiveEia() {
-      log('Querying commodity series /api/wti...', 'text-sky-400');
+      const cfg = COMMODITY_CONFIG[currentCommodity] || COMMODITY_CONFIG.RWTC;
+      log(`Querying ${cfg.fullName} (/api/wti?series=${currentCommodity})...`, 'text-sky-400');
       try {
-        const res = await fetch(`/api/wti?length=${windowSize + 10}`);
+        const res = await fetch(`/api/wti?series=${currentCommodity}&length=${windowSize + 10}`);
         const json = await res.json();
         if (json.data && json.data.length > 0) {
           cachedPrices = json.data;
           const srcTag = json.source === 'binary_store' ? '40-Year Binary Store' : 'EIA API';
-          log(`Loaded ${cachedPrices.length} points via ${srcTag}`, 'text-emerald-400');
+          log(`Loaded ${cachedPrices.length} ${cfg.shortName} points via ${srcTag}`, 'text-emerald-400');
           updateDataSourceInfo(json.source === 'binary_store' ? 'Bin' : 'DB', cachedPrices);
           renderRibbon();
         } else {
@@ -1028,7 +1177,7 @@
         ribbon.appendChild(tile);
       }
 
-      document.getElementById('latest-price').textContent = `$${lastPrice.toFixed(2)}`;
+      document.getElementById('latest-price').textContent = `$${lastPrice.toFixed(lastPrice < 10 ? 3 : 2)}`;
       document.getElementById('latest-return').textContent = `${(lastReturn * 100).toFixed(2)}%`;
       document.getElementById('latest-symbol').textContent = lastSymbol;
 
@@ -1451,16 +1600,7 @@
     let tvAreaSeries = null;
     let fibPriceLines = [];
     let calculatedMarkers = [];
-
-    const CHART_FIB_LEVELS = [
-      { price: 119.51, title: '0.0% Peak ($119.51)', color: '#64748b', lineStyle: 2 },
-      { price: 106.22, title: '23.6% Pullback ($106.22)', color: '#d97706', lineStyle: 2 },
-      { price: 97.99, title: '38.2% Shelf ($97.99)', color: '#d97706', lineStyle: 2 },
-      { price: 91.36, title: '50.0% Midpoint ($91.36)', color: '#0284c7', lineStyle: 2 },
-      { price: 84.72, title: '61.8% Pocket ($84.72)', color: '#f78522', lineStyle: 0, lineWidth: 2 },
-      { price: 75.26, title: '78.6% Defense ($75.26)', color: '#e11d48', lineStyle: 2 },
-      { price: 63.21, title: '100% Base ($63.21)', color: '#64748b', lineStyle: 2 }
-    ];
+    // Active Fibonacci levels (dynamically updated per commodity)
 
     function initTradingViewChart() {
       const container = document.getElementById('tv-chart-container');
@@ -1556,25 +1696,29 @@
 
       for (let i = 1; i < windowSubset.length; i++) {
         const pt = windowSubset[i];
-        for (const fib of CHART_FIB_LEVELS) {
+        const midPrice = currentFibLevels[3]?.price || 91.36;
+        const pocketPrice = currentFibLevels[4]?.price || 84.72;
+        const pullbackPrice = currentFibLevels[1]?.price || 106.22;
+
+        for (const fib of currentFibLevels) {
           const diffPct = Math.abs(pt.value - fib.price) / fib.price;
           if (diffPct <= 0.025) {
-            if (fib.price <= 91.36 && i % 4 === 0) {
+            if (fib.price <= midPrice && i % 4 === 0) {
               calculatedMarkers.push({
                 time: pt.time,
                 position: 'belowBar',
                 color: '#059669',
                 shape: 'arrowUp',
-                text: fib.price === 84.72 ? 'Φ Pocket Turn' : 'Fib Support'
+                text: fib.price === pocketPrice ? 'Φ Pocket Turn' : 'Fib Support'
               });
               break;
-            } else if (fib.price >= 97.99 && i % 5 === 0) {
+            } else if (fib.price >= currentFibLevels[2]?.price && i % 5 === 0) {
               calculatedMarkers.push({
                 time: pt.time,
                 position: 'aboveBar',
                 color: '#e11d48',
                 shape: 'arrowDown',
-                text: fib.price === 106.22 ? 'Φ Pullback' : 'Fib Resistance'
+                text: fib.price === pullbackPrice ? 'Φ Pullback' : 'Fib Resistance'
               });
               break;
             }
@@ -1633,7 +1777,7 @@
 
       const chk = document.getElementById('chk-layer-fib');
       if (chk && chk.checked) {
-        CHART_FIB_LEVELS.forEach(lvl => {
+        currentFibLevels.forEach(lvl => {
           const pl = tvAreaSeries.createPriceLine({
             price: lvl.price,
             color: lvl.color,
