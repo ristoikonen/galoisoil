@@ -13,15 +13,11 @@
     },
     {
       "source": "/sparse",
-      "destination": "/public/sparse-glow.html"
+      "destination": "/sparse-glow.html"
     },
     {
       "source": "/plan",
-      "destination": "/public/plan.html"
-    },
-    {
-      "source": "/",
-      "destination": "/public/sparse-glow.html"
+      "destination": "/plan.html"
     }
   ]
 }

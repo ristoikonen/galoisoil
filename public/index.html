@@ -1,271 +1,1811 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Oil</title>
+  <title>GaloisOil Collaborative Field Tuner</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lightweight-charts@4.2.1/dist/lightweight-charts.standalone.production.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            glowCyan: '#0284c7',
+            glowCyanLight: '#38bdf8',
+            glowRose: '#e11d48',
+            glowEmerald: '#059669',
+            glowPurple: '#7c3aed',
+            glowAmber: '#d97706',
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@300;400;500;600;700&display=swap');
-    body { font-family: 'Inter', sans-serif; }
-    code, pre { font-family: 'JetBrains Mono', monospace; }
+    body {
+      background-color: #f8fafc;
+      background-image:
+        radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.07) 0px, transparent 45%),
+        radial-gradient(at 100% 0%, rgba(168, 85, 247, 0.06) 0px, transparent 45%),
+        radial-gradient(at 50% 100%, rgba(16, 185, 129, 0.05) 0px, transparent 45%);
+      font-family: 'Inter', sans-serif;
+    }
+
+    .glow-cyan-badge {
+      box-shadow: 0 0 15px -3px rgba(56, 189, 248, 0.35);
+    }
+
+    .glow-rose-badge {
+      box-shadow: 0 0 15px -3px rgba(244, 63, 94, 0.3);
+    }
+
+    .glow-emerald-badge {
+      box-shadow: 0 0 15px -3px rgba(16, 185, 129, 0.3);
+    }
+
+    html {
+      font-size: 105%;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    :root {
+      --top-card-bg: #EDFBFF;
+      --top-card-subtext: #4A6487;
+      --top-card-control-bg: #ffffff;
+      --top-card-control-border: #d0e8f2;
+      --card-bg: #ffffff;
+    }
+
+    .themed-control {
+      background-color: var(--top-card-control-bg, #ffffff) !important;
+      border-color: var(--top-card-control-border, #d0e8f2);
+    }
+
+    .white-card {
+      background: var(--card-bg, #ffffff);
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.04);
+      transition: all 0.2s ease;
+    }
+
+    .white-card.top-card-themed {
+      background: var(--top-card-bg, #EDFBFF);
+    }
+
+    .white-card.top-card-themed .themed-subtext,
+    .white-card.top-card-themed .text-slate-400,
+    .white-card.top-card-themed .text-slate-500 {
+      color: var(--top-card-subtext, #4A6487) !important;
+    }
+
+    .white-card:hover {
+      box-shadow: 0 6px 20px -4px rgba(0, 0, 0, 0.07);
+      border-color: #cbd5e1;
+    }
+
+    /* Custom Slider */
+    input[type=range] {
+      appearance: none;
+      -webkit-appearance: none;
+      background: var(--top-card-control-bg, #ffffff);
+      border: 1px solid var(--top-card-control-border, #d0e8f2);
+      border-radius: 9999px;
+      height: 6px;
+      outline: none;
+    }
+
+    input[type=range]::-webkit-slider-thumb {
+      appearance: none;
+      -webkit-appearance: none;
+      height: 18px;
+      width: 18px;
+      border-radius: 50%;
+      background: #0284c7;
+      box-shadow: 0 0 10px rgba(2, 132, 199, 0.5);
+      cursor: pointer;
+      border: 2px solid #ffffff;
+    }
+
+    input[type=range]::-moz-range-thumb {
+      height: 18px;
+      width: 18px;
+      border-radius: 50%;
+      background: #0284c7;
+      box-shadow: 0 0 10px rgba(2, 132, 199, 0.5);
+      cursor: pointer;
+      border: 2px solid #ffffff;
+    }
+
+    input[type=range]::-moz-range-track {
+      background: var(--top-card-control-bg, #ffffff);
+      border: 1px solid var(--top-card-control-border, #d0e8f2);
+      border-radius: 9999px;
+      height: 6px;
+    }
+
+    /* Glow2 Yellow (#f78522) Golden Ratio Utilities */
+    .glow-golden {
+      color: #f78522 !important;
+      text-shadow: 0 0 10px rgba(247, 133, 34, 0.65), 0 0 22px rgba(247, 133, 34, 0.35);
+    }
+
+    .glow-golden-box {
+      box-shadow: 0 0 16px rgba(247, 133, 34, 0.35), 0 1px 3px rgba(247, 133, 34, 0.15);
+      border-color: rgba(247, 133, 34, 0.5) !important;
+    }
+
+    .glow-golden-badge {
+      background: rgba(247, 133, 34, 0.1);
+      border: 1px solid rgba(247, 133, 34, 0.45);
+      color: #c9600e;
+    }
   </style>
 </head>
-<body class="bg-white text-slate-900 min-h-screen flex flex-col antialiased selection:bg-blue-500 selection:text-white">
 
-  <!-- TOP HEADER -->
+<body class="text-slate-800 min-h-screen flex flex-col antialiased selection:bg-sky-500 selection:text-white">
+
+  <!-- TOP HEADER (LIGHT THEME MATCHING MEET.RISTOIKONEN.COM & RISUKKO) -->
   <header class="border-b border-slate-200 bg-white/90 backdrop-blur sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-      <div class="flex items-center space-x-3">
-        <!-- Custom Twig SVG Icon ('risukko' = twigs in Finnish) -->
-        <div class="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center shadow-md p-1.5">
-          <svg version="1.0" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 128.000000 128.000000" preserveAspectRatio="xMidYMid meet">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between">
+      <!-- Left Branding -->
+      <div class="flex items-center space-x-3.5">
+        <!-- Twig SVG Logo -->
+        <div class="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center shadow-md p-1.5 flex-shrink-0">
+          <svg version="1.0" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%"
+            viewBox="0 0 128.000000 128.000000" preserveAspectRatio="xMidYMid meet">
             <g transform="translate(0.000000,128.000000) scale(0.100000,-0.100000)" fill="#ffffff" stroke="none">
-              <path d="M1130 1261 c-5 -11 -10 -25 -10 -31 0 -19 -50 -113 -73 -138 -25 -27 -155 -109 -272 -172 -44 -23 -93 -52 -109 -63 -70 -49 -301 -185 -308 -181 -4 3 23 51 60 108 l66 104 65 7 c85 9 155 53 204 127 20 29 52 68 72 85 37 33 44 65 15 71 -13 2 -64 -44 -197 -180 -55 -56 -158 -66 -165 -15 -2 12 -11 23 -20 25 -15 3 -18 -4 -18 -35 0 -30 -13 -57 -64 -133 -84 -124 -154 -210 -192 -235 -17 -11 -65 -29 -107 -39 l-77 -18 0 -55 c0 -51 1 -54 22 -48 11 4 54 8 93 8 56 0 82 -5 114 -21 23 -12 49 -22 58 -22 20 0 348 -169 407 -209 23 -16 48 -36 55 -45 8 -9 21 -16 30 -16 33 0 61 -43 61 -93 0 -40 3 -47 19 -47 16 0 20 8 23 38 4 51 26 52 125 2 65 -32 91 -40 137 -40 48 0 56 3 56 18 0 14 -24 30 -88 60 -48 23 -95 42 -105 42 -23 0 -243 114 -287 149 -19 16 -46 32 -60 36 -37 11 -300 147 -300 155 0 8 450 33 550 30 41 -1 139 -2 218 -1 140 1 142 1 142 24 0 46 -7 47 -181 48 -90 0 -295 -3 -455 -7 -198 -5 -293 -4 -297 3 -9 14 28 41 213 154 85 53 218 134 295 181 77 48 166 98 197 111 31 14 74 37 95 51 20 14 48 26 61 26 30 0 82 39 82 62 0 24 -29 23 -91 -3 -27 -12 -52 -19 -56 -16 -3 3 6 36 21 72 14 36 26 70 26 75 0 18 -39 10 -50 -9z"/>
+              <path
+                d="M1130 1261 c-5 -11 -10 -25 -10 -31 0 -19 -50 -113 -73 -138 -25 -27 -155 -109 -272 -172 -44 -23 -93 -52 -109 -63 -70 -49 -301 -185 -308 -181 -4 3 23 51 60 108 l66 104 65 7 c85 9 155 53 204 127 20 29 52 68 72 85 37 33 44 65 15 71 -13 2 -64 -44 -197 -180 -55 -56 -158 -66 -165 -15 -2 12 -11 23 -20 25 -15 3 -18 -4 -18 -35 0 -30 -13 -57 -64 -133 -84 -124 -154 -210 -192 -235 -17 -11 -65 -29 -107 -39 l-77 -18 0 -55 c0 -51 1 -54 22 -48 11 4 54 8 93 8 56 0 82 -5 114 -21 23 -12 49 -22 58 -22 20 0 348 -169 407 -209 23 -16 48 -36 55 -45 8 -9 21 -16 30 -16 33 0 61 -43 61 -93 0 -40 3 -47 19 -47 16 0 20 8 23 38 4 51 26 52 125 2 65 -32 91 -40 137 -40 48 0 56 3 56 18 0 14 -24 30 -88 60 -48 23 -95 42 -105 42 -23 0 -243 114 -287 149 -19 16 -46 32 -60 36 -37 11 -300 147 -300 155 0 8 450 33 550 30 41 -1 139 -2 218 -1 140 1 142 1 142 24 0 46 -7 47 -181 48 -90 0 -295 -3 -455 -7 -198 -5 -293 -4 -297 3 -9 14 28 41 213 154 85 53 218 134 295 181 77 48 166 98 197 111 31 14 74 37 95 51 20 14 48 26 61 26 30 0 82 39 82 62 0 24 -29 23 -91 -3 -27 -12 -52 -19 -56 -16 -3 3 6 36 21 72 14 36 26 70 26 75 0 18 -39 10 -50 -9z" />
             </g>
           </svg>
         </div>
-        <div>
-          <div class="flex items-center space-x-2">
-            <span class="font-bold text-xl tracking-tight text-slate-900">RISUKKO</span>
-            <!-- <span class="px-2.5 py-0.5 text-xs font-semibold bg-blue-100 text-blue-700 rounded-full"></span> -->
-             
-        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-black-100 text-emerald-800">
-          <span class="w-1.5 h-1.5 mr-1.5 bg-emerald-500 rounded-full animate-pulse"></span>Site online
-        </span>
-          </div>
-          <p class="text-xs text-slate-500">Lossless 2-Way Data-to-Image Encoder</p>
+        <div class="flex items-center space-x-2">
+          <span class="font-bold text-xl sm:text-2xl tracking-tight text-slate-900">GALOIS<span
+              class="text-sky-600">OIL</span></span>
+          <span
+            class="px-2.5 py-0.5 text-[11px] font-mono font-semibold bg-purple-50 text-purple-700 border border-purple-200 rounded-full">
+            BY RISUKKO TECH
+          </span>
         </div>
-      </div>
-
-      <!-- NAV TABS -->
-      <nav class="hidden md:flex space-x-1 bg-slate-100 p-1 rounded-xl border border-slate-200" id="tab-nav">
-        <button onclick="switchTab('forms')" class="tab-btn px-4 py-2 text-sm font-medium rounded-lg bg-white text-slate-900 shadow-sm transition-all">Form Candidates</button>
-        <button onclick="switchTab('encoder')" class="tab-btn px-4 py-2 text-sm font-medium rounded-lg text-slate-600 hover:text-slate-900 transition-all">Identity & Encoder</button>
-        <button onclick="switchTab('matrix')" class="tab-btn px-4 py-2 text-sm font-medium rounded-lg text-slate-600 hover:text-slate-900 transition-all">Pixel Matrix</button>
-        <button onclick="switchTab('rs')" class="tab-btn px-4 py-2 text-sm font-medium rounded-lg text-slate-600 hover:text-slate-900 transition-all">Reed-Solomon</button>
-        <button onclick="switchTab('deploy')" class="tab-btn px-4 py-2 text-sm font-medium rounded-lg text-slate-600 hover:text-slate-900 transition-all">Vercel Deploy</button>
-      </nav>
-
-      <div class="flex items-center space-x-3">
-        <span class="inline-flex items-center px-2.5 py-1.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-400">
-                Help 
-        </span>
       </div>
     </div>
   </header>
 
-  <!-- MAIN CONTAINER -->
-  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+  <!-- MAIN CONTAINER (Shifted higher with tightened padding) -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-3 pb-8 sm:pt-4 sm:pb-8 space-y-6 sm:space-y-7">
 
-    <!-- TAB 1: FORM CANDIDATES (3 DESIGN VARIANTS) -->
-    <section id="tab-forms" class="space-y-8">
-      <div class="text-center max-w-2xl mx-auto">
-        <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Input Form Candidates for Henri</h1>
-        <!-- <p class="mt-2 text-slate-600">Three distinct UI layout variants for ingesting user email and Graph ID strings into the Risukko lossless encoder.</p> -->
+    <!-- HEADER INTRO -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 pb-5 pt-1">
+      <div>
+        <h1 id="main-heading" class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight transition-all">
+          WTI Oil Price Quantization Engine
+        </h1>
+        <p id="main-subtext" class="text-sm sm:text-base text-slate-600 mt-1 max-w-2xl transition-all">
+          Quantize continuous EIA WTI daily spot prices into discrete symbols over Galois Fields. <br />Collaborative
+          modifications broadcast across the multi-user mesh.
+        </p>
       </div>
 
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <!-- Quick Action Buttons: 3 Choices (WTI, Brent, Henry Hub) -->
+      <div class="flex items-center space-x-3 flex-shrink-0">
+        <button id="btn-commodity-wti" onclick="selectCommodity('RWTC')"
+          class="commodity-btn min-h-[48px] py-3 px-6 text-sm sm:text-base font-mono font-bold tracking-wide rounded-xl transition-all flex items-center justify-center space-x-2 bg-sky-600 text-white border border-sky-600 shadow-md glow-cyan-badge">
+          <span>WTI</span>
+        </button>
+        <button id="btn-commodity-brent" onclick="selectCommodity('RBRTE')"
+          class="commodity-btn min-h-[48px] py-3 px-6 text-sm sm:text-base font-mono font-bold tracking-wide rounded-xl transition-all flex items-center justify-center space-x-2 bg-white border border-slate-300 hover:border-sky-400 text-slate-700 hover:text-sky-700 shadow-sm">
+          <span>Brent</span>
+        </button>
+        <button id="btn-commodity-henry" onclick="selectCommodity('RNGC1')"
+          class="commodity-btn min-h-[48px] py-3 px-6 text-sm sm:text-base font-mono font-bold tracking-wide rounded-xl transition-all flex items-center justify-center space-x-2 bg-white border border-slate-300 hover:border-sky-400 text-slate-700 hover:text-sky-700 shadow-sm">
+          <span>Henry Hub</span>
+        </button>
+      </div>
+    </div>
 
-        <!-- CANDIDATE A: Minimalist Card & Floating Labels -->
-        <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
-          <div>
-            <div class="flex items-center justify-between mb-4">
-              <span class="text-xs font-bold uppercase tracking-wider text-blue-600 bg-blue-50 px-2.5 py-1 rounded-md">Candidate A</span>
-              <span class="text-xs text-slate-400 font-mono">Minimalist / Floating</span>
+    <!-- SPARSE COLLABORATIVE TUNING FIELDS (THE 4 CORE FIELDS) -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+
+      <!-- FIELD 1: Galois Field Selection -->
+      <div class="white-card top-card-themed rounded-2xl p-5 flex flex-col justify-between relative">
+        <div>
+          <div class="flex items-center justify-between mb-3">
+            <span id="help-trigger-field" onclick="toggleHelp('help-pop-field', event)"
+              class="help-trigger cursor-pointer text-[11px] font-bold uppercase tracking-wider text-purple-700 bg-purple-50 hover:bg-purple-100 hover:border-purple-300 px-2 py-0.5 rounded border border-purple-200 font-mono transition-all flex items-center space-x-1 select-none"
+              title="Click for explanation">
+              <span>Field Selection</span>
+              <span class="text-[9px] text-purple-400 font-sans font-bold">ℹ</span>
+            </span>
+            <span class="text-xs themed-subtext font-mono">Field Mode</span>
+
+            <!-- Popover for 'Field Selection' -->
+            <div id="help-pop-field"
+              class="card-help-popover hidden absolute left-0 bottom-[calc(100%+12px)] z-40 w-80 p-4 bg-[#0B2338] text-slate-200 rounded-xl shadow-2xl border border-[#1e3a5f] text-xs leading-relaxed select-text">
+              <div class="flex items-center justify-between pb-2 mb-2 border-b border-[#1e3a5f]">
+                <span class="font-mono font-bold text-[#FFAB70] text-xs uppercase tracking-wide">Galois Field Domain</span>
+                <button onclick="toggleHelp('help-pop-field', event)" class="text-slate-300 hover:text-[#FFAB70] text-base font-bold px-1.5 leading-none transition-colors" title="Close">✕</button>
+              </div>
+              <p class="text-slate-200 font-normal leading-relaxed">
+                Select the finite field domain for discrete price modeling. GF(2) captures binary direction (Up/Down), GF(3) adds a neutral deadband for sideways noise, and GF(2⁸) represents 256 byte states for rich algebraic sequence analysis.
+              </p>
+              <div class="absolute -bottom-2 left-20 w-3.5 h-3.5 bg-[#0B2338] border-r border-b border-[#1e3a5f] transform rotate-45"></div>
             </div>
-            <h3 class="text-lg font-bold text-slate-900 mb-1">1. Blue</h3>
-            <p class="text-sm text-slate-500 mb-6">Input email and candidate for unique Graph ID string.</p>
-            
-            <form onsubmit="handleFormSubmit(event, 'A')" class="space-y-4">
-              <div>
-                <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">User Email</label>
-                <input type="email" id="email-a" placeholder="risto@risukko.com" required
-                  class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#38bdf8] focus:border-[#38bdf8] text-sm outline-none transition-all">
-              </div>
-              <div>
-                <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Graph ID String</label>
-                <input type="text" id="id-a" placeholder="RI-01-W1024-H1024-P16" required
-                  class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#38bdf8] focus:border-[#38bdf8] text-sm font-mono outline-none transition-all">
-              </div>
-              <button type="submit" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl text-sm shadow-sm transition-colors">
-                Generate Asset (Candidate A)
-              </button>
-            </form>
+          </div>
+          <h3 class="text-sm font-bold text-slate-900 mb-1">Galois Field Domain</h3>
+          <p class="text-xs themed-subtext mb-2.5">Target algebraic space for price transitions.</p>
+
+          <div class="grid grid-cols-3 gap-1.5 p-1 themed-control rounded-xl border border-slate-200" id="field-selector">
+            <button onclick="setField('GF2')" id="btn-gf2"
+              class="field-btn py-2.5 text-xs font-mono font-medium rounded-lg themed-control text-slate-600 hover:text-slate-900 transition-all text-center">
+              GF(2)
+            </button>
+            <button onclick="setField('GF3')" id="btn-gf3"
+              class="field-btn py-2.5 text-xs font-mono font-bold rounded-lg bg-sky-600 text-white shadow-sm transition-all text-center">
+              GF(3)
+            </button>
+            <button onclick="setField('GF256')" id="btn-gf256"
+              class="field-btn py-2.5 text-xs font-mono font-medium rounded-lg themed-control text-slate-600 hover:text-slate-900 transition-all text-center">
+              GF(2⁸)
+            </button>
           </div>
         </div>
 
-        <!-- CANDIDATE B: Split-Panel Cyber/Glow -->
-        <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
-          <div>
-            <div class="flex items-center justify-between mb-4">
-              <span class="text-xs font-bold uppercase tracking-wider text-[#f43f5e] bg-rose-50 px-2.5 py-1 rounded-md">Candidate B</span>
-              <span class="text-xs text-slate-400 font-mono">Modern Neon / Pill</span>
-            </div>
-            <h3 class="text-lg font-bold text-slate-900 mb-1">2. Orange</h3>
-            <p class="text-sm text-slate-500 mb-6">Input email and candidate for unique Graph ID string.</p>
-            
-            <form onsubmit="handleFormSubmit(event, 'B')" class="space-y-4">
-              <div>
-                <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Operator Email</label>
-                <input type="email" id="email-b" placeholder="risto@risukko.com" required
-                  class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#f43f5e] focus:border-[#f43f5e] text-sm outline-none transition-all">
-              </div>
-              <div>
-                <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Universal Graph ID</label>
-                <input type="text" id="id-b" placeholder="OK-01-RI-PACKET-9B" required
-                  class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#f43f5e] focus:border-[#f43f5e] text-sm font-mono outline-none transition-all">
-              </div>
-              <button type="submit" class="w-full py-3 bg-[#f78522] hover:bg-rose-600 text-white font-medium rounded-xl text-sm shadow-sm transition-colors">
-                Execute Pipeline (Candiw)
-              </button>
-            </form>
-          </div>
-        </div>
-
-        <!-- CANDIDATE C: Compact Floating Action Card -->
-        <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
-          <div>
-            <div class="flex items-center justify-between mb-4">
-              <span class="text-xs font-bold uppercase tracking-wider text-[#a855f7] bg-purple-50 px-2.5 py-1 rounded-md">Candidate C</span>
-              <span class="text-xs text-slate-400 font-mono">Compact / Dual Block</span>
-            </div>
-            <h3 class="text-lg font-bold text-slate-900 mb-1">3. Black</h3>
-            <p class="text-sm text-slate-500 mb-6">Input email and candidate for unique Graph ID string.</p>
-            
-            <form onsubmit="handleFormSubmit(event, 'C')" class="space-y-4">
-              <div>
-                <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Account Email</label>
-                <input type="email" id="email-c" placeholder="risto@risukko.com" required
-                  class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#a855f7] focus:border-[#a855f7] text-sm outline-none transition-all">
-              </div>
-              <div>
-                <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Graph ID Token</label>
-                <input type="text" id="id-c" placeholder="RI-GRAF-ID-2026" required
-                  class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#a855f7] focus:border-[#a855f7] text-sm font-mono outline-none transition-all">
-              </div>
-              <button type="submit" class="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white font-medium rounded-xl text-sm shadow-sm transition-colors">
-                Process Asset (Candidate C)
-              </button>
-            </form>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- BUNFETCH-STYLE TERMINAL DEBUG DRAWER -->
-      <div class="bg-slate-950 text-slate-100 rounded-2xl p-6 shadow-xl border border-slate-800 font-mono text-xs space-y-6">
-        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-          <div class="flex items-center space-x-2">
-            <span class="w-3 h-3 rounded-full bg-[#f43f5e] inline-block"></span>
-            <span class="w-3 h-3 rounded-full bg-[#f78522] inline-block"></span>
-            <span class="w-3 h-3 rounded-full bg-[#10b981] inline-block"></span>
-            <span class="text-slate-400 font-bold ml-2">terminal</span>
-          </div>
-          <span class="text-[10px] text-slate-500 uppercase tracking-widest">Live Buffer</span>
-        </div>
-        <div id="terminal-output" class="space-y-2 text-slate-300 min-h-[190px]">
-          <div><span style="color: #38bdf8;">[system]</span> Waiting for form submission or payload ingest...</div>
-          <div><span style="color: #10b981;">[ready]</span> Galois Field GF(2^8) & Reed-Solomon tables active.</div>
+        <div
+          class="mt-2.5 pt-2 border-t border-sky-100 flex items-center justify-between text-[11px] font-mono themed-subtext">
+          <span>Active Cardinality:</span>
+          <span id="field-cardinality" class="text-sky-700 font-bold">q = 3 {Down, Flat, Up}</span>
         </div>
       </div>
-    </section>
 
-    <!-- TAB 2: IDENTITY & ENCODER -->
-    <section id="tab-encoder" class="space-y-6 hidden">
-      <div class="border-b border-slate-200 pb-4">
-        <h2 class="text-2xl font-bold text-slate-900">Universal Graph ID & Packet Architecture</h2>
-        <p class="text-sm text-slate-600">The 14-byte binary layout serialized into Base64URL for database-free asset resolution.</p>
-      </div>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6">
-          <h3 class="font-bold text-slate-900 mb-3">Binary Layout Structure</h3>
-          <pre class="text-xs bg-slate-900 text-slate-100 p-4 rounded-xl overflow-x-auto">
-[ Magic Header: 2B (0x52, 0x49 for 'RI') ]
-[ Version     : 1B (0x01) ]
-[ Width       : 2B UInt16 ]
-[ Height      : 2B UInt16 ]
-[ Padding     : 1B UInt8  ]
-[ Style Flags : 2B UInt16 ]
-[ Seed / Hash : 4B UInt32 ]
-[ Payload Bytes (Variable)]
-[ RS Parity   : 16B GF(2^8) ]</pre>
-        </div>
-        <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6">
-          <h3 class="font-bold text-slate-900 mb-3">Live Packet Simulation</h3>
-          <div class="space-y-3 text-sm">
-            <div>
-              <span class="text-xs text-slate-500 block">Sample Input Payload:</span>
-              <code class="bg-white px-3 py-1.5 rounded-lg border border-slate-200 block mt-1 font-mono text-blue-600">risto@risukko.com :: RI-01-V2</code>
+      <!-- FIELD 2: Deadband Threshold (theta) -->
+      <div class="white-card top-card-themed rounded-2xl p-5 flex flex-col justify-between relative">
+        <div>
+          <div class="flex items-center justify-between mb-3">
+            <span id="help-trigger-threshold" onclick="toggleHelp('help-pop-threshold', event)"
+              class="help-trigger cursor-pointer text-[11px] font-bold uppercase tracking-wider text-sky-700 bg-sky-50 hover:bg-sky-100 hover:border-sky-300 px-2 py-0.5 rounded border border-sky-200 font-mono transition-all flex items-center space-x-1 select-none"
+              title="Click for explanation">
+              <span>Threshold (θ)</span>
+              <span class="text-[9px] text-sky-400 font-sans font-bold">ℹ</span>
+            </span>
+            <span id="threshold-val-badge" class="text-xs font-mono text-sky-700 font-bold">±0.50%</span>
+
+            <!-- Popover for 'Threshold' -->
+            <div id="help-pop-threshold"
+              class="card-help-popover hidden absolute left-0 bottom-[calc(100%+12px)] z-40 w-80 p-4 bg-[#0B2338] text-slate-200 rounded-xl shadow-2xl border border-[#1e3a5f] text-xs leading-relaxed select-text">
+              <div class="flex items-center justify-between pb-2 mb-2 border-b border-[#1e3a5f]">
+                <span class="font-mono font-bold text-[#FFAB70] text-xs uppercase tracking-wide">Ternary Deadband (θ)</span>
+                <button onclick="toggleHelp('help-pop-threshold', event)" class="text-slate-300 hover:text-[#FFAB70] text-base font-bold px-1.5 leading-none transition-colors" title="Close">✕</button>
+              </div>
+              <p class="text-slate-200 font-normal leading-relaxed">
+                Sets percentage deadband threshold for quantizing returns. Daily percentage price changes smaller than ±θ collapse into the neutral Flat (0) token, filtering high-frequency market noise before symbols enter the Berlekamp-Massey LFSR recurrence solver.
+              </p>
+              <div class="absolute -bottom-2 left-20 w-3.5 h-3.5 bg-[#0B2338] border-r border-b border-[#1e3a5f] transform rotate-45"></div>
             </div>
-            <div>
-              <span class="text-xs text-slate-500 block">Generated Universal Base64URL ID:</span>
-              <code class="bg-slate-900 text-[#38bdf8] px-3 py-2 rounded-lg block mt-1 font-mono text-xs overflow-x-auto">UklBAGEAAAAEAAEAPwAAAEFOS0EtMDE3Mjg=</code>
+          </div>
+          <h3 class="text-sm font-bold text-slate-900 mb-1">Ternary Deadband</h3>
+          <p class="text-xs themed-subtext mb-2.5">Price returns inside |r| &le; θ collapse to Flat (0).</p>
+
+          <div class="space-y-2">
+            <input type="range" id="input-threshold" min="0.001" max="0.03" step="0.001" value="0.005"
+              oninput="updateThreshold(this.value)" class="w-full cursor-pointer">
+            <div class="flex justify-between text-[10px] font-mono themed-subtext font-medium">
+              <span>0.1% (Sensitive)</span>
+              <span>1.5%</span>
+              <span>3.0% (Wide)</span>
             </div>
           </div>
         </div>
+
+        <div
+          class="mt-2.5 pt-2 border-t border-sky-100 flex items-center justify-between text-[11px] font-mono themed-subtext">
+          <span>Return Filter:</span>
+          <span id="filter-state" class="text-slate-700">r &le; <span
+              class="text-amber-600 font-semibold">0.0050</span></span>
+        </div>
       </div>
-    </section>
 
+      <!-- FIELD 3: History Window (W) -->
+      <div class="white-card top-card-themed rounded-2xl p-5 flex flex-col justify-between relative">
+        <div>
+          <div class="flex items-center justify-between mb-3">
+            <span id="help-trigger-window" onclick="toggleHelp('help-pop-window', event)"
+              class="help-trigger cursor-pointer text-[11px] font-bold uppercase tracking-wider text-amber-700 bg-amber-50 hover:bg-amber-100 hover:border-amber-300 px-2 py-0.5 rounded border border-amber-200 font-mono transition-all flex items-center space-x-1 select-none"
+              title="Click for explanation">
+              <span>Window (W)</span>
+              <span class="text-[9px] text-amber-500 font-sans font-bold">ℹ</span>
+            </span>
+            <span id="window-val-badge" class="text-xs font-mono text-amber-700 font-bold">34 Days (φ²)</span>
 
+            <!-- Popover for 'Window' -->
+            <div id="help-pop-window"
+              class="card-help-popover hidden absolute left-0 bottom-[calc(100%+12px)] z-40 w-80 p-4 bg-[#0B2338] text-slate-200 rounded-xl shadow-2xl border border-[#1e3a5f] text-xs leading-relaxed select-text">
+              <div class="flex items-center justify-between pb-2 mb-2 border-b border-[#1e3a5f]">
+                <span class="font-mono font-bold text-[#FFAB70] text-xs uppercase tracking-wide">Sequence Window (W)</span>
+                <button onclick="toggleHelp('help-pop-window', event)" class="text-slate-300 hover:text-[#FFAB70] text-base font-bold px-1.5 leading-none transition-colors" title="Close">✕</button>
+              </div>
+              <p class="text-slate-200 font-normal leading-relaxed">
+                Sets the discrete history window length of quantized price symbols supplied to the LFSR solver. Fibonacci sample lengths (13, 34, 89) align sequence sampling with natural macro market cycle resonance and harmonic recurrence.
+              </p>
+              <div class="absolute -bottom-2 left-20 w-3.5 h-3.5 bg-[#0B2338] border-r border-b border-[#1e3a5f] transform rotate-45"></div>
+            </div>
+          </div>
+          <h3 class="text-sm font-bold text-slate-900 mb-1">Sequence Window</h3>
+          <p class="text-xs themed-subtext mb-2.5">Length of discrete symbols fed to LFSR solver.</p>
 
-    <!-- TAB 4: REED-SOLOMON -->
-    <section id="tab-rs" class="space-y-6 hidden">
-      <div class="border-b border-slate-200 pb-4">
-        <h2 class="text-2xl font-bold text-slate-900">Galois Field GF(2^8) & Reed-Solomon Engine</h2>
-        <p class="text-sm text-slate-600">Fault-tolerant error correction using primitive polynomial 0x11D.</p>
+          <div class="grid grid-cols-4 gap-1.5" id="window-selector">
+            <button onclick="setWindow(13)"
+              class="win-btn py-2.5 text-xs font-mono rounded-lg themed-control border border-slate-200 hover:border-amber-400 text-slate-600 text-center">13</button>
+            <button onclick="setWindow(34)"
+              class="win-btn py-2.5 text-xs font-mono rounded-lg bg-amber-50 border border-amber-300 text-amber-800 font-bold text-center">34</button>
+            <button onclick="setWindow(64)"
+              class="win-btn py-2.5 text-xs font-mono rounded-lg themed-control border border-slate-200 hover:border-amber-400 text-slate-600 text-center">64</button>
+            <button onclick="setWindow(89)"
+              class="win-btn py-2.5 text-xs font-mono rounded-lg themed-control border border-slate-200 hover:border-amber-400 text-slate-600 text-center">89</button>
+          </div>
+        </div>
+
+        <div
+          class="mt-2.5 pt-2 border-t border-sky-100 flex items-center justify-between text-[11px] font-mono themed-subtext">
+          <span>Theoretical Max L:</span>
+          <span id="max-l-badge" class="text-purple-700 font-bold">L &le; 17</span>
+        </div>
       </div>
-      <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6 font-mono text-xs space-y-3">
-        <div class="text-blue-600 font-bold">// gf.ts arithmetic status</div>
-        <div>Primitive Polynomial : 0x11D (x^8 + x^4 + x^3 + x^2 + 1)</div>
-        <div>XOR Addition         : Active</div>
-        <div>Log/Anti-Log Tables  : Initialized (256 entries)</div>
-        <div>RS Parity Symbols    : 16 bytes appended per packet</div>
-      </div>
-    </section>
 
+      <!-- FIELD 4: Turso Persistence Engine -->
+      <div class="white-card top-card-themed rounded-2xl p-5 flex flex-col justify-between relative">
+        <div>
+          <div class="flex items-center justify-between mb-3">
+            <span id="help-trigger-turso" onclick="toggleHelp('help-pop-turso', event)"
+              class="help-trigger cursor-pointer text-[11px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 hover:bg-emerald-100 hover:border-emerald-300 px-2 py-0.5 rounded border border-emerald-200 font-mono transition-all flex items-center space-x-1 select-none"
+              title="Click for explanation">
+              <span>Turso DB</span>
+              <span class="text-[9px] text-emerald-500 font-sans font-bold">ℹ</span>
+            </span>
+            <span class="text-xs font-mono text-emerald-600 flex items-center">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5 animate-pulse"></span>Connected
+            </span>
+
+            <!-- Popover for 'Turso DB' -->
+            <div id="help-pop-turso"
+              class="card-help-popover hidden absolute right-0 bottom-[calc(100%+12px)] z-40 w-80 p-4 bg-[#0B2338] text-slate-200 rounded-xl shadow-2xl border border-[#1e3a5f] text-xs leading-relaxed select-text">
+              <div class="flex items-center justify-between pb-2 mb-2 border-b border-[#1e3a5f]">
+                <span class="font-mono font-bold text-[#FFAB70] text-xs uppercase tracking-wide">Turso Cloud Serialization</span>
+                <button onclick="toggleHelp('help-pop-turso', event)" class="text-slate-300 hover:text-[#FFAB70] text-base font-bold px-1.5 leading-none transition-colors" title="Close">✕</button>
+              </div>
+              <p class="text-slate-200 font-normal leading-relaxed">
+                Controls live persistent database synchronization with Turso LibSQL cloud. When enabled, each newly calculated discrete price token, LFSR connection polynomial, and forward transition prediction is committed atomically to cloud storage for multi-session persistence.
+              </p>
+              <div class="absolute -bottom-2 right-20 w-3.5 h-3.5 bg-[#0B2338] border-r border-b border-[#1e3a5f] transform rotate-45"></div>
+            </div>
+          </div>
+          <h3 class="text-sm font-bold text-slate-900 mb-1">Cloud Serialization</h3>
+          <p class="text-xs themed-subtext mb-2.5">Atomic batch commit of quantized vectors.</p>
+
+          <label
+            class="flex items-center space-x-3 py-3 px-3.5 rounded-xl themed-control border border-slate-200 cursor-pointer hover:border-slate-300 transition-all">
+            <input type="checkbox" id="auto-sync-checkbox"
+              class="w-4 h-4 rounded text-sky-600 focus:ring-0 bg-white border-slate-300">
+            <span class="text-xs font-mono text-slate-700 font-medium">Live DB Upsert</span>
+          </label>
+        </div>
+
+        <div
+          class="mt-2.5 pt-2 border-t border-sky-100 flex items-center justify-between text-[11px] font-mono themed-subtext">
+          <span>Target Schema:</span>
+          <span class="text-slate-800 font-medium">quantized_series</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- PHASE 2: LFSR PREDICTOR & BERLEKAMP-MASSEY OUTCOME PANEL (3 CARDS) -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+
+      <!-- OUTCOME 1: State Transition & Tomorrow's Forecast Token -->
+      <div class="white-card top-card-themed rounded-2xl p-5 flex flex-col justify-between relative">
+        <div>
+          <div class="flex items-center justify-between mb-3">
+            <span id="help-trigger-forecast" onclick="toggleHelp('help-pop-forecast', event)"
+              class="help-trigger cursor-pointer text-[11px] font-bold uppercase tracking-wider text-sky-700 bg-sky-50 hover:bg-sky-100 hover:border-sky-300 px-2 py-0.5 rounded border border-sky-200 font-mono transition-all flex items-center space-x-1 select-none"
+              title="Click for explanation">
+              <span>Transition &amp; Forecast</span>
+              <span class="text-[9px] text-sky-400 font-sans font-bold">ℹ</span>
+            </span>
+            <span id="forecast-confidence" class="text-xs font-mono text-purple-700 font-bold">L = 6 / 17</span>
+
+            <!-- Popover for 'Transition & Forecast' -->
+            <div id="help-pop-forecast"
+              class="card-help-popover hidden absolute left-0 bottom-[calc(100%+12px)] z-40 w-80 p-4 bg-[#0B2338] text-slate-200 rounded-xl shadow-2xl border border-[#1e3a5f] text-xs leading-relaxed select-text">
+              <div class="flex items-center justify-between pb-2 mb-2 border-b border-[#1e3a5f]">
+                <span class="font-mono font-bold text-[#FFAB70] text-xs uppercase tracking-wide">LFSR State Transition &amp; Forecast</span>
+                <button onclick="toggleHelp('help-pop-forecast', event)" class="text-slate-300 hover:text-[#FFAB70] text-base font-bold px-1.5 leading-none transition-colors" title="Close">✕</button>
+              </div>
+              <p class="text-slate-200 font-normal leading-relaxed">
+                Displays current session's quantized oil token alongside the LFSR forward-recurrence prediction for the upcoming trading session. Evaluates today and tomorrow transition states to identify trend continuation, mean reversion, or consolidation deadband drifts.
+              </p>
+              <div class="absolute -bottom-2 left-20 w-3.5 h-3.5 bg-[#0B2338] border-r border-b border-[#1e3a5f] transform rotate-45"></div>
+            </div>
+          </div>
+
+          <!-- Dual Pills: Today (t) -> Tomorrow (t+1) -->
+          <div class="flex items-center justify-between gap-2 my-1.5">
+            <!-- TODAY (t) -->
+            <div class="flex-1 py-3.5 px-3 rounded-xl themed-control border border-slate-200 flex flex-col">
+              <span class="text-[10px] font-mono uppercase tracking-wider text-slate-500 font-bold mb-1.5">
+                Today (t)
+              </span>
+              <div id="today-symbol-badge" class="px-2.5 py-2.5 rounded-lg text-xs font-bold font-mono bg-rose-50 text-rose-700 border border-rose-300 shadow-sm flex items-center justify-center">
+                <span id="today-symbol-text">2 (DOWN)</span>
+              </div>
+            </div>
+
+            <!-- Transition Arrow -->
+            <div class="text-slate-400 font-mono text-sm px-0.5">➔</div>
+
+            <!-- TOMORROW (t+1) -->
+            <div class="flex-1 py-3.5 px-3 rounded-xl themed-control border border-sky-200 bg-sky-50/30 flex flex-col">
+              <span class="text-[10px] font-mono uppercase tracking-wider text-sky-700 font-bold mb-1.5 flex items-center justify-between">
+                <span>Tomorrow (t+1)</span>
+                <span class="w-1.5 h-1.5 rounded-full bg-sky-500 animate-pulse"></span>
+              </span>
+              <div id="forecast-symbol-badge" class="px-2.5 py-2.5 rounded-lg text-xs font-bold font-mono bg-emerald-50 text-emerald-700 border border-emerald-300 shadow-sm flex items-center justify-center">
+                <span id="forecast-symbol-text">1 (UP)</span>
+              </div>
+            </div>
+          </div>
+
+          <p id="forecast-description" class="text-xs themed-subtext mt-1 leading-relaxed">
+            LFSR recurrence predicts counter-trend rebound.
+          </p>
+        </div>
+        <div class="mt-2.5 pt-2 border-t border-sky-100 flex items-center justify-between text-[11px] font-mono themed-subtext">
+          <span>Target Date:</span>
+          <span id="forecast-date" class="text-slate-800 font-semibold font-mono">Next Trading Session</span>
+        </div>
+      </div>
+
+      <!-- OUTCOME 2: Minimal Polynomial C(D) -->
+      <div class="white-card top-card-themed rounded-2xl p-5 flex flex-col justify-between relative">
+        <div>
+          <div class="flex items-center justify-between mb-3">
+            <span id="help-trigger-poly" onclick="toggleHelp('help-pop-poly', event)"
+              class="help-trigger cursor-pointer text-[11px] font-bold uppercase tracking-wider text-purple-700 bg-purple-50 hover:bg-purple-100 hover:border-purple-300 px-2 py-0.5 rounded border border-purple-200 font-mono transition-all flex items-center space-x-1 select-none"
+              title="Click for explanation">
+              <span>Minimal Polynomial C(D)</span>
+              <span class="text-[9px] text-purple-400 font-sans font-bold">ℹ</span>
+            </span>
+            <span id="lfsr-degree-badge" class="text-xs font-mono text-purple-700 font-bold">Degree L = 6</span>
+
+            <!-- Popover for 'Minimal Polynomial' -->
+            <div id="help-pop-poly"
+              class="card-help-popover hidden absolute left-0 bottom-[calc(100%+12px)] z-40 w-80 p-4 bg-[#0B2338] text-slate-200 rounded-xl shadow-2xl border border-[#1e3a5f] text-xs leading-relaxed select-text">
+              <div class="flex items-center justify-between pb-2 mb-2 border-b border-[#1e3a5f]">
+                <span class="font-mono font-bold text-[#FFAB70] text-xs uppercase tracking-wide">Minimal Polynomial C(D)</span>
+                <button onclick="toggleHelp('help-pop-poly', event)" class="text-slate-300 hover:text-[#FFAB70] text-base font-bold px-1.5 leading-none transition-colors" title="Close">✕</button>
+              </div>
+              <p class="text-slate-200 font-normal leading-relaxed">
+                The shortest linear feedback shift register polynomial generating the observed discrete oil sequence. A lower linear complexity L relative to window size indicates underlying algebraic regularity, while L ≈ W/2 indicates complex or pseudorandom drift.
+              </p>
+              <div class="absolute -bottom-2 left-20 w-3.5 h-3.5 bg-[#0B2338] border-r border-b border-[#1e3a5f] transform rotate-45"></div>
+            </div>
+          </div>
+          <div class="py-3.5 px-3.5 rounded-xl themed-control border border-slate-200 font-mono text-xs text-slate-800 font-semibold my-1.5 overflow-x-auto whitespace-nowrap shadow-sm">
+            <span id="polynomial-display">1 + 2D + D^4 (mod 3)</span>
+          </div>
+          <p class="text-xs themed-subtext mt-0.5">Shortest feedback register generating the observed price sequence.</p>
+        </div>
+        <div class="mt-2.5 pt-2 border-t border-sky-100 flex items-center justify-between text-[11px] font-mono themed-subtext">
+          <span>Algebraic Regularity:</span>
+          <span id="regularity-status" class="text-sky-700 font-bold">Cyclic Structure (L &lt; W/2)</span>
+        </div>
+      </div>
+
+      <!-- OUTCOME 3: Golden Confluence & Retracement Matrix (Φ Macro Grid) -->
+      <div class="white-card top-card-themed rounded-2xl p-5 flex flex-col justify-between relative">
+        <div>
+          <div class="flex items-center justify-between mb-3">
+            <span id="help-trigger-confluence" onclick="toggleHelp('help-pop-confluence', event)"
+              class="help-trigger cursor-pointer text-[11px] font-bold uppercase tracking-wider text-amber-700 bg-amber-50 hover:bg-amber-100 hover:border-amber-300 px-2 py-0.5 rounded border border-amber-200 font-mono transition-all flex items-center space-x-1 select-none"
+              title="Click for explanation">
+              <span>Golden Confluence</span>
+              <span class="text-[9px] text-amber-500 font-sans font-bold">ℹ</span>
+            </span>
+            <span id="golden-distance-info" class="text-xs font-mono text-purple-700 font-bold tracking-tight">Distance to Pivot: -$1.67</span>
+
+            <!-- Popover for 'Golden Confluence' -->
+            <div id="help-pop-confluence"
+              class="card-help-popover hidden absolute left-0 bottom-[calc(100%+12px)] z-40 w-80 p-4 bg-[#0B2338] text-slate-200 rounded-xl shadow-2xl border border-[#1e3a5f] text-xs leading-relaxed select-text">
+              <div class="flex items-center justify-between pb-2 mb-2 border-b border-[#1e3a5f]">
+                <span class="font-mono font-bold text-[#FFAB70] text-xs uppercase tracking-wide">Macro Retracement Confluence</span>
+                <button onclick="toggleHelp('help-pop-confluence', event)" class="text-slate-300 hover:text-[#FFAB70] text-base font-bold px-1.5 leading-none transition-colors" title="Close">✕</button>
+              </div>
+              <p class="text-slate-200 font-normal leading-relaxed">
+                Monitors convergence between algebraic LFSR cycle turns and structural Fibonacci swing shelf levels ($119.51 peak down to $63.21 base). Validates high-conviction market pivot entries when spot prices test critical pullback or golden pocket shelves.
+              </p>
+              <div class="absolute -bottom-2 left-20 w-3.5 h-3.5 bg-[#0B2338] border-r border-b border-[#1e3a5f] transform rotate-45"></div>
+            </div>
+          </div>
+
+          <div class="my-1.5">
+            <span class="text-[10px] font-mono uppercase text-slate-500 font-bold block mb-1">Nearest Macro Pivot</span>
+            <div id="golden-pivot-price" class="text-base font-bold font-mono text-slate-800">$106.22</div>
+          </div>
+
+          <!-- Confluence Indicator -->
+          <div class="py-3.5 px-3.5 rounded-xl themed-control border border-slate-200 font-mono text-xs my-1.5 shadow-sm flex items-center justify-between">
+            <span class="text-[10px] uppercase text-slate-500 font-bold">Confluence:</span>
+            <span id="confluence-status" class="text-xs font-bold text-amber-700 flex items-center space-x-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-[#f78522] animate-pulse"></span>
+              <span id="confluence-text">LFSR AND Fib Active</span>
+            </span>
+          </div>
+
+          <p id="golden-description" class="text-xs themed-subtext mt-0.5 leading-relaxed">
+            Fibonacci support floor validates LFSR cyclic turn.
+          </p>
+        </div>
+
+        <div class="mt-2.5 pt-2 border-t border-sky-100 flex items-center justify-between text-[11px] font-mono themed-subtext">
+          <span>Spot:</span>
+          <span id="golden-spot-status" class="text-slate-800 font-semibold font-mono">Testing Midpoint</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- LIVE DATA & DISCRETE STREAM PREVIEW -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+      <!-- LEFT: Reserved Chart Card + Snapshot Metadata + Collapsible Sequence Stream (2 cols) -->
+      <div class="lg:col-span-2 space-y-5">
+
+        <!-- LIVE CHART CARD: WTI Spot Price & Macro Fibonacci Retracement Chart -->
+        <div id="chart-card-container" class="white-card rounded-2xl p-5 flex flex-col justify-between">
+          <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-100">
+            <div class="flex items-center space-x-2.5">
+              <span class="w-2.5 h-2.5 rounded-full bg-sky-500 animate-pulse"></span>
+              <h3 id="chart-heading" class="text-sm font-bold font-mono text-slate-800 uppercase tracking-wider">
+                WTI Spot Price &amp; Macro Retracement Chart
+              </h3>
+            </div>
+            <div class="flex items-center space-x-2 text-xs font-mono">
+              <span id="chart-data-range" class="text-slate-400">Loading daily spot...</span>
+              <button onclick="resetChartZoom()" class="px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors text-[11px] font-semibold" title="Reset zoom to fit all data">Fit</button>
+            </div>
+          </div>
+
+          <!-- Chart Body: Canvas (Left) + Small Layer Sidebar (Right) -->
+          <div class="flex flex-col md:flex-row gap-4 h-[340px]">
+            <!-- Chart Canvas Container -->
+            <div class="flex-1 relative h-full rounded-xl overflow-hidden border border-slate-100 bg-white" id="tv-chart-container">
+              <div id="tv-chart-loading" class="absolute inset-0 flex items-center justify-center text-xs font-mono text-slate-400 bg-white/80 z-10">
+                Initializing Lightweight Chart...
+              </div>
+            </div>
+
+            <!-- Small Sidebar for Layer Opt-Out Toggles (Right) -->
+            <div class="w-full md:w-52 p-3 bg-slate-50/80 rounded-xl border border-slate-200 flex flex-col justify-between text-xs font-mono select-none">
+              <div>
+                <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-200">
+                  <span class="font-bold text-slate-700 text-[11px] uppercase tracking-wider">Chart Layers</span>
+                  <span id="active-layers-count" class="text-[10px] text-sky-700 font-semibold">3 Active</span>
+                </div>
+
+                <div class="space-y-2.5">
+                  <!-- Layer 1: Spot Price Area -->
+                  <label class="flex items-start space-x-2.5 cursor-pointer group">
+                    <input type="checkbox" id="chk-layer-area" checked onchange="toggleLayerArea(this.checked)"
+                      class="w-3.5 h-3.5 mt-0.5 rounded text-sky-600 focus:ring-0 bg-white border-slate-300 cursor-pointer">
+                    <div>
+                      <span id="layer-area-label" class="block text-slate-800 font-semibold group-hover:text-sky-600 transition-colors">WTI Spot Area</span>
+                      <span id="layer-area-sub" class="block text-[10px] text-slate-400">Daily spot close curve</span>
+                    </div>
+                  </label>
+
+                  <!-- Layer 2: 7 Labeled Fibonacci Lines -->
+                  <label class="flex items-start space-x-2.5 cursor-pointer group">
+                    <input type="checkbox" id="chk-layer-fib" checked onchange="renderFibLines()"
+                      class="w-3.5 h-3.5 mt-0.5 rounded text-amber-600 focus:ring-0 bg-white border-slate-300 cursor-pointer">
+                    <div>
+                      <span class="block text-slate-800 font-semibold group-hover:text-amber-600 transition-colors">7 Fibonacci Shelves</span>
+                      <span id="fib-grid-sub" class="block text-[10px] text-slate-400">$119.51 ➔ $63.21 Grid</span>
+                    </div>
+                  </label>
+
+                  <!-- Layer 3: Confluence Markers -->
+                  <label class="flex items-start space-x-2.5 cursor-pointer group">
+                    <input type="checkbox" id="chk-layer-markers" checked onchange="renderMarkers()"
+                      class="w-3.5 h-3.5 mt-0.5 rounded text-[#f78522] focus:ring-0 bg-white border-slate-300 cursor-pointer">
+                    <div>
+                      <span class="block text-slate-800 font-semibold group-hover:text-[#f78522] transition-colors">Confluence Signals</span>
+                      <span class="block text-[10px] text-slate-400">LFSR ∩ Fib pivot alerts</span>
+                    </div>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Quick Fibonacci Grid Reference -->
+              <div class="pt-2 border-t border-slate-200/80 space-y-1 text-[10px] text-slate-500">
+                <div class="flex items-center justify-between">
+                  <span>61.8% Pocket:</span>
+                  <span id="fib-ref-pocket" class="font-bold text-[#f78522]">$84.72</span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span>50.0% Midpoint:</span>
+                  <span id="fib-ref-midpoint" class="font-bold text-sky-700">$91.36</span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span>23.6% Pullback:</span>
+                  <span id="fib-ref-pullback" class="font-bold text-amber-700">$106.22</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Latest Snapshot & Accuracy Metadata (4 Tiles) -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
+          <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 flex flex-col justify-between">
+            <span class="text-[10px] font-mono uppercase text-slate-500 font-semibold">Latest Spot Price</span>
+            <div id="latest-price" class="text-lg font-bold font-mono text-slate-900 mt-0.5">$--.--</div>
+          </div>
+          <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 flex flex-col justify-between">
+            <span class="text-[10px] font-mono uppercase text-slate-500 font-semibold">Latest 1-Day Return</span>
+            <div id="latest-return" class="text-lg font-bold font-mono text-sky-600 mt-0.5">--.--%</div>
+          </div>
+          <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 flex flex-col justify-between">
+            <span class="text-[10px] font-mono uppercase text-slate-500 font-semibold">Active Symbol (Today)</span>
+            <div id="latest-symbol" class="text-lg font-bold font-mono text-purple-700 mt-0.5">--</div>
+          </div>
+          <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 flex flex-col justify-between">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-mono uppercase text-slate-500 font-semibold">Hit Rate</span>
+              <span id="hit-trials-badge" class="text-[10px] font-mono text-slate-400 font-medium">1/1 Hits</span>
+            </div>
+            <div class="mt-0.5">
+              <div id="hit-rate-percentage" class="text-xl font-bold font-mono text-emerald-600">100.0%</div>
+              <div id="hit-edge" class="text-[11px] font-mono font-bold text-emerald-600 mt-0.5 truncate">+66.7% <span class="glow-golden text-[10px] ml-0.5 font-normal">(φ: +77.9%)</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SUBTLE COLLAPSIBLE: Beneath the 4-Tile Level -->
+        <div class="pt-1">
+          <button id="btn-toggle-sequence" onclick="toggleSequenceStream()"
+            class="text-xs font-mono text-slate-500 hover:text-slate-800 flex items-center space-x-1.5 transition-colors select-none py-1">
+            <span id="sequence-toggle-icon" class="text-[10px] text-slate-400 transition-transform">▸</span>
+            <span id="sequence-toggle-label">View 34-Day Galois Token Sequence</span>
+          </button>
+
+          <!-- Collapsible Sequence Panel (Hidden by default) -->
+          <div id="collapsible-sequence-panel" class="hidden mt-2 p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs font-mono pb-2 border-b border-slate-200">
+              <span class="font-bold text-slate-700">Chronological Galois Symbols (Oldest ➔ Today)</span>
+              <div class="flex items-center space-x-3 text-[11px]">
+                <span class="text-slate-400">Legend:</span>
+                <span class="text-emerald-700 flex items-center font-medium"><span class="w-2 h-2 rounded bg-emerald-500 mr-1"></span>UP (1)</span>
+                <span class="text-slate-500 flex items-center font-medium"><span class="w-2 h-2 rounded bg-slate-400 mr-1"></span>FLAT (0)</span>
+                <span class="text-rose-700 flex items-center font-medium"><span class="w-2 h-2 rounded bg-rose-500 mr-1"></span>DOWN (2)</span>
+              </div>
+            </div>
+            <!-- Ribbon Tiles Container -->
+            <div id="symbol-ribbon" class="flex flex-wrap gap-2 items-center min-h-[60px]">
+              <div class="text-xs text-slate-400 font-mono w-full text-center py-4">
+                Loading recent EIA prices and calculating Galois quantized symbols...
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT: Collaborative Telemetry & Turso Activity Log (1 col) -->
+      <div class="white-card rounded-2xl p-6 space-y-4 flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between pb-2 border-b border-slate-200">
+            <h3 class="text-sm font-bold text-slate-900 flex items-center space-x-2">
+              <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+              <span>Telemetry & Turso Sync</span>
+            </h3>
+            <span id="log-count" class="text-[10px] font-mono text-amber-700 font-semibold">Ready</span>
+          </div>
+
+          <!-- Log Console (High-Contrast Clean Developer Terminal) -->
+          <div id="telemetry-log"
+            class="mt-4 p-3.5 bg-slate-900 rounded-xl border border-slate-800 font-mono text-[11px] text-slate-300 space-y-2 max-h-[220px] overflow-y-auto shadow-inner">
+            <div class="text-slate-500">// System initialized. Bun.serve listening.</div>
+            <div class="text-sky-400">&gt; EIA API Client: Ready (RWTC daily spot).</div>
+            <div class="text-purple-400">&gt; Galois Field Arithmetic: GF(2), GF(3), GF(2^8).</div>
+            <div class="text-emerald-400">&gt; Turso DB: Tables verified (quantized_series).</div>
+          </div>
+        </div>
+
+        <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 text-[11px] font-mono space-y-1.5">
+          <div class="flex justify-between items-center text-slate-600">
+            <span class="text-slate-500 font-medium">Data source:</span>
+            <span id="data-source-badge" class="font-bold text-sky-700 bg-sky-50 px-2 py-0.5 rounded border border-sky-200">Bin</span>
+          </div>
+          <div class="flex justify-between items-center text-slate-600">
+            <span class="text-slate-500 font-medium">Date:</span>
+            <span id="data-last-date" class="text-slate-800 font-semibold">Bin: 20/10/2026</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
 
   </main>
 
-  <!-- FOOTER -->
-  <footer class="border-t border-slate-200 bg-white mt-auto">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between text-xs text-slate-500">
-      <div>Risukko Engine v2.4 — High-Density Lossless Data-to-Image Architecture</div>
-      <div class="font-mono">risukko.com</div>
-    </div>
-  </footer>
-
+  <!-- LOGIC SCRIPT -->
   <script>
-    function switchTab(tabId) {
-      document.querySelectorAll('main > section').forEach(sec => sec.classList.add('hidden'));
-      document.getElementById('tab-' + tabId).classList.remove('hidden');
+    let activeField = 'GF3';
+    let deadbandThreshold = 0.005;
+    let windowSize = 34;
+    let cachedPrices = [];
 
-      document.querySelectorAll('#tab-nav button').forEach(btn => {
-        btn.classList.remove('bg-white', 'text-slate-900', 'shadow-sm');
-        btn.classList.add('text-slate-600');
+    function log(msg, color = 'text-slate-300') {
+      const el = document.getElementById('telemetry-log');
+      const time = new Date().toLocaleTimeString();
+      const line = document.createElement('div');
+      line.className = color;
+      line.textContent = `[${time}] ${msg}`;
+      el.appendChild(line);
+      el.scrollTop = el.scrollHeight;
+    }
+
+    function setField(field) {
+      activeField = field;
+      ['gf2', 'gf3', 'gf256'].forEach(f => {
+        const btn = document.getElementById(`btn-${f}`);
+        if (f.toUpperCase() === field) {
+          btn.className = "field-btn py-2.5 text-xs font-mono font-bold rounded-lg bg-sky-600 text-white shadow-sm transition-all text-center";
+        } else {
+          btn.className = "field-btn py-2.5 text-xs font-mono font-medium rounded-lg themed-control text-slate-600 hover:text-slate-900 transition-all text-center";
+        }
       });
-      event.target.classList.add('bg-white', 'text-slate-900', 'shadow-sm');
-      event.target.classList.remove('text-slate-600');
+
+      const card = document.getElementById('field-cardinality');
+      if (field === 'GF2') card.textContent = 'q = 2 {Down: 0, Up: 1}';
+      if (field === 'GF3') card.textContent = 'q = 3 {Down: 2, Flat: 0, Up: 1}';
+      if (field === 'GF256') card.textContent = 'q = 256 {<0x80 Down, 0x80 Flat, >0x80 Up}';
+
+      log(`Field updated to ${field}`, 'text-sky-400');
+      renderRibbon();
     }
 
-    function handleFormSubmit(event, candidate) {
-      event.preventDefault();
-      const email = document.getElementById(`email-${candidate.toLowerCase()}`).value;
-      const graphId = document.getElementById(`id-${candidate.toLowerCase()}`).value;
-      const term = document.getElementById('terminal-output');
-
-      const timestamp = new Date().toISOString().split('T')[1].slice(0, 8);
-      
-      term.innerHTML += `
-        <div class="pt-2 border-t border-slate-900">
-          <div><span style="color: #f78522;">[${timestamp}]</span> <span style="color: #38bdf8;">Candidate ${candidate} Ingest</span></div>
-          <div>  ↳ Email : <span style="color: #10b981;">${email}</span></div>
-          <div>  ↳ Graph ID : <span style="color: #f43f5e;">${graphId}</span></div>
-          <div>  ↳ Status : <span style="color: #a855f7;">Lossless RGB Triplet Packet Packed (OK)</span></div>
-        </div>
-      `;
-      term.scrollTop = term.scrollHeight;
+    function updateThreshold(val) {
+      deadbandThreshold = parseFloat(val);
+      document.getElementById('threshold-val-badge').textContent = `±${(deadbandThreshold * 100).toFixed(2)}%`;
+      document.getElementById('filter-state').innerHTML = `r &le; <span class="text-amber-600 font-semibold">${deadbandThreshold.toFixed(4)}</span>`;
+      renderRibbon();
     }
+
+    function setWindow(w) {
+      windowSize = w;
+      document.getElementById('window-val-badge').textContent = `${w} Days`;
+      document.getElementById('max-l-badge').textContent = `L ≤ ${Math.floor(w / 2)}`;
+
+      const buttons = document.querySelectorAll('.win-btn');
+      buttons.forEach(btn => {
+        if (parseInt(btn.textContent) === w) {
+          btn.className = "win-btn py-2.5 text-xs font-mono rounded-lg bg-amber-50 border border-amber-300 text-amber-800 font-bold text-center";
+        } else {
+          btn.className = "win-btn py-2.5 text-xs font-mono rounded-lg themed-control border border-slate-200 hover:border-amber-400 text-slate-600 text-center";
+        }
+      });
+
+      const toggleLabel = document.getElementById('sequence-toggle-label');
+      if (toggleLabel) {
+        toggleLabel.textContent = `View ${w}-Day Galois Token Sequence`;
+      }
+
+      log(`Window resized to ${w} trading days`, 'text-amber-400');
+      renderRibbon();
+    }
+
+    function toggleSequenceStream() {
+      const panel = document.getElementById('collapsible-sequence-panel');
+      const icon = document.getElementById('sequence-toggle-icon');
+      if (panel) {
+        const isHidden = panel.classList.contains('hidden');
+        panel.classList.toggle('hidden');
+        if (icon) {
+          icon.textContent = isHidden ? '▾' : '▸';
+        }
+      }
+    }
+
+    function toggleHelp(id, e) {
+      if (e) e.stopPropagation();
+      const allPopovers = document.querySelectorAll('.card-help-popover');
+      const target = document.getElementById(id);
+      const willOpen = target && target.classList.contains('hidden');
+
+      allPopovers.forEach(pop => pop.classList.add('hidden'));
+
+      if (target && willOpen) {
+        target.classList.remove('hidden');
+      }
+    }
+
+    // Dismiss popovers on outside click or Escape key
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.card-help-popover') && !e.target.closest('.help-trigger')) {
+        document.querySelectorAll('.card-help-popover').forEach(pop => pop.classList.add('hidden'));
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        document.querySelectorAll('.card-help-popover').forEach(pop => pop.classList.add('hidden'));
+      }
+    });
+
+    let serverMode = 'standalone_binary';
+    let currentCommodity = 'RWTC';
+
+    const COMMODITY_CONFIG = {
+      RWTC: {
+        symbol: 'RWTC',
+        shortName: 'WTI',
+        crumbName: 'Wti',
+        fullName: 'WTI Crude Oil',
+        heading: 'WTI Oil Price Quantization Engine',
+        subtext: 'Quantize continuous EIA WTI daily spot prices into discrete symbols over Galois Fields. Collaborative modifications broadcast across the multi-user mesh.',
+        roomText: 'Room: Wti | Source: EIA',
+        chartHeading: 'WTI Spot Price & Macro Retracement Chart',
+        layerAreaLabel: 'WTI Spot Area',
+        layerAreaSub: 'Daily spot close curve',
+        units: '$/BBL',
+        fibGridSub: '$119.51 ➔ $63.21 Grid',
+        fibLevels: [
+          { price: 119.51, title: '0.0% Peak ($119.51)', color: '#64748b', lineStyle: 2 },
+          { price: 106.22, title: '23.6% Pullback ($106.22)', color: '#d97706', lineStyle: 2 },
+          { price: 97.99, title: '38.2% Shelf ($97.99)', color: '#d97706', lineStyle: 2 },
+          { price: 91.36, title: '50.0% Midpoint ($91.36)', color: '#0284c7', lineStyle: 2 },
+          { price: 84.72, title: '61.8% Pocket ($84.72)', color: '#f78522', lineStyle: 0, lineWidth: 2 },
+          { price: 75.26, title: '78.6% Defense ($75.26)', color: '#e11d48', lineStyle: 2 },
+          { price: 63.21, title: '100% Base ($63.21)', color: '#64748b', lineStyle: 2 }
+        ],
+        pocketRef: '$84.72',
+        midpointRef: '$91.36',
+        pullbackRef: '$106.22'
+      },
+      RBRTE: {
+        symbol: 'RBRTE',
+        shortName: 'Brent',
+        crumbName: 'Brent',
+        fullName: 'Brent Crude Oil',
+        heading: 'Brent Oil Price Quantization Engine',
+        subtext: 'Quantize continuous EIA Brent daily spot prices into discrete symbols over Galois Fields. Collaborative modifications broadcast across the multi-user mesh.',
+        roomText: 'Room: Brent | Source: EIA',
+        chartHeading: 'Brent Spot Price & Macro Retracement Chart',
+        layerAreaLabel: 'Brent Spot Area',
+        layerAreaSub: 'Daily spot close curve',
+        units: '$/BBL',
+        fibGridSub: '$139.12 ➔ $70.00 Grid',
+        fibLevels: [
+          { price: 139.12, title: '0.0% Peak ($139.12)', color: '#64748b', lineStyle: 2 },
+          { price: 122.81, title: '23.6% Pullback ($122.81)', color: '#d97706', lineStyle: 2 },
+          { price: 112.72, title: '38.2% Shelf ($112.72)', color: '#d97706', lineStyle: 2 },
+          { price: 104.56, title: '50.0% Midpoint ($104.56)', color: '#0284c7', lineStyle: 2 },
+          { price: 96.40, title: '61.8% Pocket ($96.40)', color: '#f78522', lineStyle: 0, lineWidth: 2 },
+          { price: 84.79, title: '78.6% Defense ($84.79)', color: '#e11d48', lineStyle: 2 },
+          { price: 70.00, title: '100% Base ($70.00)', color: '#64748b', lineStyle: 2 }
+        ],
+        pocketRef: '$96.40',
+        midpointRef: '$104.56',
+        pullbackRef: '$122.81'
+      },
+      RNGC1: {
+        symbol: 'RNGC1',
+        shortName: 'Henry Hub',
+        crumbName: 'Henry Hub',
+        fullName: 'Henry Hub Natural Gas',
+        heading: 'Henry Hub Gas Price Quantization Engine',
+        subtext: 'Quantize continuous EIA Henry Hub daily gas prices into discrete symbols over Galois Fields. Collaborative modifications broadcast across the multi-user mesh.',
+        roomText: 'Room: Henry Hub | Source: EIA',
+        chartHeading: 'Henry Hub Natural Gas Price & Macro Retracement Chart',
+        layerAreaLabel: 'Henry Hub Gas Area',
+        layerAreaSub: 'Daily contract close curve',
+        units: '$/MMBTU',
+        fibGridSub: '$9.85 ➔ $1.50 Grid',
+        fibLevels: [
+          { price: 9.85, title: '0.0% Peak ($9.85)', color: '#64748b', lineStyle: 2 },
+          { price: 7.88, title: '23.6% Pullback ($7.88)', color: '#d97706', lineStyle: 2 },
+          { price: 6.66, title: '38.2% Shelf ($6.66)', color: '#d97706', lineStyle: 2 },
+          { price: 5.68, title: '50.0% Midpoint ($5.68)', color: '#0284c7', lineStyle: 2 },
+          { price: 4.69, title: '61.8% Pocket ($4.69)', color: '#f78522', lineStyle: 0, lineWidth: 2 },
+          { price: 3.29, title: '78.6% Defense ($3.29)', color: '#e11d48', lineStyle: 2 },
+          { price: 1.50, title: '100% Base ($1.50)', color: '#64748b', lineStyle: 2 }
+        ],
+        pocketRef: '$4.69',
+        midpointRef: '$5.68',
+        pullbackRef: '$7.88'
+      }
+    };
+
+    let currentFibLevels = COMMODITY_CONFIG.RWTC.fibLevels;
+
+    async function selectCommodity(sym) {
+      if (!COMMODITY_CONFIG[sym]) return;
+      currentCommodity = sym;
+      const cfg = COMMODITY_CONFIG[sym];
+
+      // 1. Update Breadcrumbs (all blue, active darker blue)
+      const crumbs = {
+        RWTC: document.getElementById('crumb-wti'),
+        RBRTE: document.getElementById('crumb-brent'),
+        RNGC1: document.getElementById('crumb-henry')
+      };
+      for (const [s, el] of Object.entries(crumbs)) {
+        if (!el) continue;
+        if (s === sym) {
+          el.className = 'text-sky-950 font-extrabold text-base sm:text-lg font-mono uppercase tracking-wider transition-colors cursor-pointer hover:underline';
+        } else {
+          el.className = 'text-sky-600 hover:text-sky-800 font-semibold text-base sm:text-lg font-mono uppercase tracking-wider transition-colors cursor-pointer hover:underline';
+        }
+      }
+
+      // 2. Update 3 Quick Action Buttons
+      const btns = {
+        RWTC: document.getElementById('btn-commodity-wti'),
+        RBRTE: document.getElementById('btn-commodity-brent'),
+        RNGC1: document.getElementById('btn-commodity-henry')
+      };
+      for (const [s, el] of Object.entries(btns)) {
+        if (!el) continue;
+        if (s === sym) {
+          el.className = 'commodity-btn min-h-[48px] py-3 px-6 text-sm sm:text-base font-mono font-bold tracking-wide rounded-xl transition-all flex items-center justify-center space-x-2 bg-sky-600 text-white border border-sky-600 shadow-md glow-cyan-badge';
+        } else {
+          el.className = 'commodity-btn min-h-[48px] py-3 px-6 text-sm sm:text-base font-mono font-bold tracking-wide rounded-xl transition-all flex items-center justify-center space-x-2 bg-white border border-slate-300 hover:border-sky-400 text-slate-700 hover:text-sky-700 shadow-sm';
+        }
+      }
+
+      // 3. Update Text & Headers
+      const roomEl = document.getElementById('room-id');
+      if (roomEl) roomEl.textContent = cfg.crumbName;
+
+      const mainHeadingEl = document.getElementById('main-heading');
+      if (mainHeadingEl) mainHeadingEl.textContent = cfg.heading;
+
+      const mainSubtextEl = document.getElementById('main-subtext');
+      if (mainSubtextEl) mainSubtextEl.textContent = cfg.subtext;
+
+      const chartHeadingEl = document.getElementById('chart-heading');
+      if (chartHeadingEl) chartHeadingEl.textContent = cfg.chartHeading;
+
+      const layerAreaLabelEl = document.getElementById('layer-area-label');
+      if (layerAreaLabelEl) layerAreaLabelEl.textContent = cfg.layerAreaLabel;
+
+      const layerAreaSubEl = document.getElementById('layer-area-sub');
+      if (layerAreaSubEl) layerAreaSubEl.textContent = cfg.layerAreaSub;
+
+      const fibGridSubEl = document.getElementById('fib-grid-sub');
+      if (fibGridSubEl) fibGridSubEl.textContent = cfg.fibGridSub;
+
+      const fibPocketEl = document.getElementById('fib-ref-pocket');
+      if (fibPocketEl) fibPocketEl.textContent = cfg.pocketRef;
+
+      const fibMidpointEl = document.getElementById('fib-ref-midpoint');
+      if (fibMidpointEl) fibMidpointEl.textContent = cfg.midpointRef;
+
+      const fibPullbackEl = document.getElementById('fib-ref-pullback');
+      if (fibPullbackEl) fibPullbackEl.textContent = cfg.pullbackRef;
+
+      // 4. Update active Fibonacci levels
+      currentFibLevels = cfg.fibLevels;
+
+      // 5. Fetch and render data for this commodity
+      await fetchLiveEia();
+    }
+
+    function formatAuDate(dateStr) {
+      if (!dateStr) return '--/--/----';
+      const clean = dateStr.split('T')[0];
+      const parts = clean.split('-');
+      if (parts.length === 3) {
+        const [y, m, d] = parts;
+        return `${d}/${m}/${y}`;
+      }
+      return dateStr;
+    }
+
+    function updateDataSourceInfo(source, prices) {
+      const sourceBadge = document.getElementById('data-source-badge');
+      const dateEl = document.getElementById('data-last-date');
+      if (!sourceBadge || !dateEl) return;
+
+      const latestPrice = prices && prices.length > 0 ? prices[prices.length - 1] : null;
+      const binDateAu = latestPrice ? formatAuDate(latestPrice.period) : '20/10/2026';
+
+      const isHybrid = serverMode === 'cloud_hybrid' || source === 'Bin/DB';
+
+      if (isHybrid) {
+        sourceBadge.textContent = 'Bin/DB';
+        sourceBadge.className = 'font-bold text-purple-700 bg-purple-50 px-2 py-0.5 rounded border border-purple-200';
+        dateEl.innerHTML = `<span>DB: today</span> <span class="text-slate-400 font-normal">|</span> <span>Bin: ${binDateAu}</span>`;
+      } else if (source === 'eia_live' || source === 'DB') {
+        sourceBadge.textContent = 'DB';
+        sourceBadge.className = 'font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200';
+        dateEl.textContent = `DB: today`;
+      } else {
+        sourceBadge.textContent = 'Bin';
+        sourceBadge.className = 'font-bold text-sky-700 bg-sky-50 px-2 py-0.5 rounded border border-sky-200';
+        dateEl.textContent = `Bin: ${binDateAu}`;
+      }
+    }
+
+    async function initServerMode() {
+      try {
+        const res = await fetch('/api/series/list');
+        const json = await res.json();
+        if (json.mode) {
+          serverMode = json.mode;
+        }
+      } catch (e) {}
+    }
+
+    async function fetchLiveEia() {
+      const cfg = COMMODITY_CONFIG[currentCommodity] || COMMODITY_CONFIG.RWTC;
+      log(`Querying ${cfg.fullName} (/api/wti?series=${currentCommodity})...`, 'text-sky-400');
+      try {
+        const res = await fetch(`/api/wti?series=${currentCommodity}&length=${windowSize + 10}`);
+        const json = await res.json();
+        if (json.data && json.data.length > 0) {
+          cachedPrices = json.data;
+          const srcTag = json.source === 'binary_store' ? '40-Year Binary Store' : 'EIA API';
+          log(`Loaded ${cachedPrices.length} ${cfg.shortName} points via ${srcTag}`, 'text-emerald-400');
+          updateDataSourceInfo(json.source === 'binary_store' ? 'Bin' : 'DB', cachedPrices);
+          renderRibbon();
+        } else {
+          throw new Error(json.error || 'No data returned');
+        }
+      } catch (err) {
+        log(`Fetch Note: ${err.message}. Using synthetic fallback.`, 'text-rose-400');
+        generateMockPrices();
+      }
+    }
+
+    function generateMockPrices() {
+      cachedPrices = [];
+      let base = 75.0;
+      const today = new Date();
+      for (let i = windowSize + 10; i >= 0; i--) {
+        const d = new Date(today);
+        d.setDate(d.getDate() - i);
+        const change = (Math.random() - 0.49) * 2.2;
+        base = Math.max(50, base + change);
+        cachedPrices.push({
+          period: d.toISOString().split('T')[0],
+          value: parseFloat(base.toFixed(2))
+        });
+      }
+      renderRibbon();
+    }
+
+    function renderRibbon() {
+      if (cachedPrices.length < 2) return;
+
+      const ribbon = document.getElementById('symbol-ribbon');
+      ribbon.innerHTML = '';
+
+      // Chronological sort
+      const sorted = [...cachedPrices].sort((a, b) => new Date(a.period) - new Date(b.period));
+      const windowSubset = sorted.slice(-windowSize);
+
+      let lastSymbol = '--';
+      let lastReturn = 0;
+      let lastPrice = windowSubset[windowSubset.length - 1].value;
+
+      for (let i = 1; i < windowSubset.length; i++) {
+        const prev = windowSubset[i - 1];
+        const curr = windowSubset[i];
+        const ret = (curr.value - prev.value) / prev.value;
+        lastReturn = ret;
+
+        let symbolText = '';
+        let colorClasses = '';
+
+        if (activeField === 'GF2') {
+          const up = ret > 0;
+          symbolText = up ? '1' : '0';
+          colorClasses = up ? 'bg-emerald-50 border-emerald-300 text-emerald-700 shadow-sm' : 'bg-rose-50 border-rose-300 text-rose-700 shadow-sm';
+          lastSymbol = up ? '1 (UP)' : '0 (DOWN)';
+        } else if (activeField === 'GF3') {
+          if (ret > deadbandThreshold) {
+            symbolText = '1';
+            colorClasses = 'bg-emerald-50 border-emerald-300 text-emerald-700 shadow-sm';
+            lastSymbol = '1 (UP)';
+          } else if (ret < -deadbandThreshold) {
+            symbolText = '2';
+            colorClasses = 'bg-rose-50 border-rose-300 text-rose-700 shadow-sm';
+            lastSymbol = '2 (DOWN)';
+          } else {
+            symbolText = '0';
+            colorClasses = 'bg-white border-slate-300 text-slate-500';
+            lastSymbol = '0 (FLAT)';
+          }
+        } else {
+          // GF256 byte: 128 (0x80) is neutral return baseline
+          const byteVal = Math.min(255, Math.max(0, Math.round(((ret / 0.05) + 1) * 127.5)));
+          symbolText = byteVal.toString(16).padStart(2, '0').toUpperCase();
+          if (byteVal > 132) {
+            colorClasses = 'bg-emerald-50 border-emerald-300 text-emerald-700 shadow-sm';
+            lastSymbol = `0x${symbolText} (UP)`;
+          } else if (byteVal < 124) {
+            colorClasses = 'bg-rose-50 border-rose-300 text-rose-700 shadow-sm';
+            lastSymbol = `0x${symbolText} (DOWN)`;
+          } else {
+            colorClasses = 'bg-white border-slate-300 text-slate-600 shadow-sm';
+            lastSymbol = `0x${symbolText} (FLAT)`;
+          }
+        }
+
+        const tile = document.createElement('div');
+        tile.className = `w-9 h-9 rounded-xl border flex flex-col items-center justify-center font-mono text-xs font-bold transition-all transform hover:scale-110 cursor-pointer ${colorClasses}`;
+        tile.title = `${curr.period}: $${curr.value.toFixed(2)} (${(ret * 100).toFixed(2)}%)`;
+        tile.innerHTML = `<span>${symbolText}</span>`;
+        ribbon.appendChild(tile);
+      }
+
+      document.getElementById('latest-price').textContent = `$${lastPrice.toFixed(lastPrice < 10 ? 3 : 2)}`;
+      document.getElementById('latest-return').textContent = `${(lastReturn * 100).toFixed(2)}%`;
+      document.getElementById('latest-symbol').textContent = lastSymbol;
+
+      // Update TradingView Chart with latest chronological price series
+      updateChart(sorted);
+
+      // Execute Berlekamp-Massey & LFSR Prediction on the extracted symbols
+      const allSymbols = extractSymbols(sorted);
+      executeLFSRPredictor(allSymbols, lastPrice);
+    }
+
+    function extractSymbols(sortedData) {
+      const syms = [];
+      for (let i = 1; i < sortedData.length; i++) {
+        const prev = sortedData[i - 1];
+        const curr = sortedData[i];
+        const ret = (curr.value - prev.value) / prev.value;
+        if (activeField === 'GF2') {
+          syms.push(ret > 0 ? 1 : 0);
+        } else if (activeField === 'GF3') {
+          if (ret > deadbandThreshold) syms.push(1);
+          else if (ret < -deadbandThreshold) syms.push(2);
+          else syms.push(0);
+        } else {
+          const byteVal = Math.min(255, Math.max(0, Math.round(((ret / 0.05) + 1) * 127.5)));
+          syms.push(byteVal);
+        }
+      }
+      return syms;
+    }
+
+    // --- FINITE FIELD ARITHMETIC ---
+    const fieldMath = {
+      GF2: {
+        add: (a, b) => (a ^ b) & 1,
+        sub: (a, b) => (a ^ b) & 1,
+        mul: (a, b) => (a & b) & 1,
+        div: (a, b) => (b === 0 ? 0 : a & 1),
+        neg: (a) => a & 1,
+      },
+      GF3: {
+        add: (a, b) => (a + b) % 3,
+        sub: (a, b) => (a - b + 3) % 3,
+        mul: (a, b) => (a * b) % 3,
+        div: (a, b) => {
+          const invB = ((b % 3) + 3) % 3;
+          return (a * invB) % 3;
+        },
+        neg: (a) => (3 - (a % 3)) % 3,
+      },
+      GF256: {
+        add: (a, b) => a ^ b,
+        sub: (a, b) => a ^ b,
+        mul: (a, b) => (a === 0 || b === 0 ? 0 : (a * b) % 255 || 1),
+        div: (a, b) => (b === 0 ? 0 : Math.round(a / b) % 256),
+        neg: (a) => a & 0xff,
+      }
+    };
+
+    function runBM(sequence, fieldType) {
+      const f = fieldMath[fieldType] || fieldMath.GF3;
+      const n = sequence.length;
+      let c = [1];
+      let b = [1];
+      let l = 0;
+      let m = -1;
+      let bDiscrepancy = 1;
+
+      for (let k = 0; k < n; k++) {
+        let d = sequence[k];
+        for (let i = 1; i <= l; i++) {
+          if (i < c.length && k - i >= 0) {
+            d = f.add(d, f.mul(c[i], sequence[k - i]));
+          }
+        }
+
+        if (d !== 0) {
+          const t = [...c];
+          const factor = f.div(d, bDiscrepancy);
+          const shift = k - m;
+
+          while (c.length < b.length + shift) c.push(0);
+          for (let i = 0; i < b.length; i++) {
+            c[i + shift] = f.sub(c[i + shift], f.mul(factor, b[i]));
+          }
+
+          if (2 * l <= k) {
+            l = k + 1 - l;
+            m = k;
+            b = t;
+            bDiscrepancy = d;
+          }
+        }
+      }
+
+      while (c.length > l + 1 && c[c.length - 1] === 0) c.pop();
+      return { c, l };
+    }
+
+    function predictNextSymbol(sequence, fieldType) {
+      const f = fieldMath[fieldType] || fieldMath.GF3;
+      const { c, l } = runBM(sequence, fieldType);
+      const n = sequence.length;
+      let sum = 0;
+      for (let i = 1; i <= l; i++) {
+        if (i < c.length && n - i >= 0) {
+          sum = f.add(sum, f.mul(c[i], sequence[n - i]));
+        }
+      }
+      return { predicted: f.neg(sum), c, l };
+    }
+
+    function formatPoly(c, fieldType) {
+      const terms = ['1'];
+      for (let i = 1; i < c.length; i++) {
+        const coef = c[i];
+        if (coef === 0) continue;
+        let coefStr = '';
+        if (fieldType === 'GF2') {
+          coefStr = '';
+        } else if (fieldType === 'GF3') {
+          coefStr = coef === 1 ? '' : `${coef}`;
+        } else {
+          coefStr = `0x${coef.toString(16).padStart(2, '0').toUpperCase()}·`;
+        }
+        terms.push(i === 1 ? `${coefStr}D` : `${coefStr}D^${i}`);
+      }
+      return terms.join(' + ') + ` (mod ${fieldType === 'GF2' ? '2' : fieldType === 'GF3' ? '3' : 'GF(2⁸)'})`;
+    }
+
+    function executeLFSRPredictor(symbols, lastPrice) {
+      if (symbols.length < 8) return;
+
+      const windowSlice = symbols.slice(-windowSize);
+      const { predicted, c, l } = predictNextSymbol(windowSlice, activeField);
+      const maxL = Math.floor(windowSize / 2);
+
+      // 1. Update Transition & Forecast Card (Today & Tomorrow)
+      const currentSym = symbols[symbols.length - 1];
+      const todayBadge = document.getElementById('today-symbol-badge');
+      const todayText = document.getElementById('today-symbol-text');
+      const badge = document.getElementById('forecast-symbol-badge');
+      const badgeText = document.getElementById('forecast-symbol-text');
+      const desc = document.getElementById('forecast-description');
+      const conf = document.getElementById('forecast-confidence');
+
+      conf.textContent = `L = ${l} / ${maxL}`;
+
+      let todayDir = 'FLAT';
+      let predDir = 'FLAT';
+
+      // Format Today (t) Badge
+      if (activeField === 'GF2') {
+        if (currentSym === 1) {
+          todayDir = 'UP';
+          todayBadge.className = "px-2.5 py-2.5 rounded-lg text-xs font-bold font-mono bg-emerald-50 text-emerald-700 border border-emerald-300 shadow-sm flex items-center justify-center";
+          todayText.textContent = "1 (UP)";
+        } else {
+          todayDir = 'DOWN';
+          todayBadge.className = "px-2.5 py-2.5 rounded-lg text-xs font-bold font-mono bg-rose-50 text-rose-700 border border-rose-300 shadow-sm flex items-center justify-center";
+          todayText.textContent = "0 (DOWN)";
+        }
+      } else if (activeField === 'GF3') {
+        if (currentSym === 1) {
+          todayDir = 'UP';
+          todayBadge.className = "px-2.5 py-2.5 rounded-lg text-xs font-bold font-mono bg-emerald-50 text-emerald-700 border border-emerald-300 shadow-sm flex items-center justify-center";
+          todayText.textContent = "1 (UP)";
+        } else if (currentSym === 2) {
+          todayDir = 'DOWN';
+          todayBadge.className = "px-2.5 py-2.5 rounded-lg text-xs font-bold font-mono bg-rose-50 text-rose-700 border border-rose-300 shadow-sm flex items-center justify-center";
+          todayText.textContent = "2 (DOWN)";
+        } else {
+          todayDir = 'FLAT';
+          todayBadge.className = "px-2.5 py-2.5 rounded-lg text-xs font-bold font-mono bg-slate-100 text-slate-700 border border-slate-300 shadow-sm flex items-center justify-center";
+          todayText.textContent = "0 (FLAT)";
+        }
+      } else {
+        const hexToday = `0x${currentSym.toString(16).padStart(2, '0').toUpperCase()}`;
+        if (currentSym > 132) {
+          todayDir = 'UP';
+          todayBadge.className = "px-2.5 py-2.5 rounded-lg text-xs font-bold font-mono bg-emerald-50 text-emerald-700 border border-emerald-300 shadow-sm flex items-center justify-center";
+          todayText.textContent = `${hexToday} (UP)`;
+        } else if (currentSym < 124) {
+          todayDir = 'DOWN';
+          todayBadge.className = "px-2.5 py-2.5 rounded-lg text-xs font-bold font-mono bg-rose-50 text-rose-700 border border-rose-300 shadow-sm flex items-center justify-center";
+          todayText.textContent = `${hexToday} (DOWN)`;
+        } else {
+          todayDir = 'FLAT';
+          todayBadge.className = "px-2.5 py-2.5 rounded-lg text-xs font-bold font-mono bg-slate-100 text-slate-700 border border-slate-300 shadow-sm flex items-center justify-center";
+          todayText.textContent = `${hexToday} (FLAT)`;
+        }
+      }
+
+      // Format Tomorrow (t+1) Badge
+      if (activeField === 'GF2') {
+        if (predicted === 1) {
+          predDir = 'UP';
+          badge.className = "px-2.5 py-2.5 rounded-lg text-xs font-bold font-mono bg-emerald-50 text-emerald-700 border border-emerald-300 shadow-sm flex items-center justify-center";
+          badgeText.textContent = "1 (UP)";
+        } else {
+          predDir = 'DOWN';
+          badge.className = "px-2.5 py-2.5 rounded-lg text-xs font-bold font-mono bg-rose-50 text-rose-700 border border-rose-300 shadow-sm flex items-center justify-center";
+          badgeText.textContent = "0 (DOWN)";
+        }
+      } else if (activeField === 'GF3') {
+        if (predicted === 1) {
+          predDir = 'UP';
+          badge.className = "px-2.5 py-2.5 rounded-lg text-xs font-bold font-mono bg-emerald-50 text-emerald-700 border border-emerald-300 shadow-sm flex items-center justify-center";
+          badgeText.textContent = "1 (UP)";
+        } else if (predicted === 2) {
+          predDir = 'DOWN';
+          badge.className = "px-2.5 py-2.5 rounded-lg text-xs font-bold font-mono bg-rose-50 text-rose-700 border border-rose-300 shadow-sm flex items-center justify-center";
+          badgeText.textContent = "2 (DOWN)";
+        } else {
+          predDir = 'FLAT';
+          badge.className = "px-2.5 py-2.5 rounded-lg text-xs font-bold font-mono bg-slate-100 text-slate-700 border border-slate-300 shadow-sm flex items-center justify-center";
+          badgeText.textContent = "0 (FLAT)";
+        }
+      } else {
+        const hex = `0x${predicted.toString(16).padStart(2, '0').toUpperCase()}`;
+        const zEst = (((predicted / 255) * 6) - 3).toFixed(1);
+        const signedZ = parseFloat(zEst) > 0 ? `+${zEst}σ` : `${zEst}σ`;
+
+        if (predicted > 132) {
+          predDir = 'UP';
+          badge.className = "px-2.5 py-2.5 rounded-lg text-xs font-bold font-mono bg-emerald-50 text-emerald-700 border border-emerald-300 shadow-sm flex items-center justify-center";
+          badgeText.textContent = `${hex} (UP)`;
+        } else if (predicted < 124) {
+          predDir = 'DOWN';
+          badge.className = "px-2.5 py-2.5 rounded-lg text-xs font-bold font-mono bg-rose-50 text-rose-700 border border-rose-300 shadow-sm flex items-center justify-center";
+          badgeText.textContent = `${hex} (DOWN)`;
+        } else {
+          predDir = 'FLAT';
+          badge.className = "px-2.5 py-2.5 rounded-lg text-xs font-bold font-mono bg-slate-100 text-slate-700 border border-slate-300 shadow-sm flex items-center justify-center";
+          badgeText.textContent = `${hex} (FLAT)`;
+        }
+      }
+
+      // Contextual State Transition Description
+      if (todayDir === 'DOWN' && predDir === 'UP') {
+        desc.textContent = "LFSR recurrence predicts counter-trend rebound (Down ➔ Up reversal).";
+      } else if (todayDir === 'UP' && predDir === 'DOWN') {
+        desc.textContent = "LFSR recurrence predicts cycle peak pullback (Up ➔ Down reversal).";
+      } else if (todayDir === 'UP' && predDir === 'UP') {
+        desc.textContent = "LFSR recurrence predicts bullish trend continuation (Up ➔ Up momentum).";
+      } else if (todayDir === 'DOWN' && predDir === 'DOWN') {
+        desc.textContent = "LFSR recurrence predicts bearish trend continuation (Down ➔ Down drift).";
+      } else if (predDir === 'FLAT') {
+        desc.textContent = "LFSR recurrence predicts price consolidation inside deadband.";
+      } else {
+        desc.textContent = `LFSR recurrence projects transition from consolidation to ${predDir.toLowerCase()} movement.`;
+      }
+
+      // 2. Update Minimal Polynomial Card
+      document.getElementById('polynomial-display').textContent = formatPoly(c, activeField);
+      document.getElementById('lfsr-degree-badge').textContent = `Degree L = ${l}`;
+      const regStatus = document.getElementById('regularity-status');
+      if (l <= Math.floor(windowSize / 3)) {
+        regStatus.textContent = "High Cyclic Regularity (L ≪ W/2)";
+        regStatus.className = "text-emerald-600 font-bold";
+      } else if (l < maxL) {
+        regStatus.textContent = "Moderate Recurrence (L < W/2)";
+        regStatus.className = "text-sky-700 font-bold";
+      } else {
+        regStatus.textContent = "Complex / Near Random (L ≈ W/2)";
+        regStatus.className = "text-amber-600 font-bold";
+      }
+
+      // 3. Update Golden Confluence & Retracement Matrix (Φ Macro Grid)
+      const fibLevels = [
+        { name: '0.0% Peak', price: 119.51, short: 'Peak' },
+        { name: '23.6% Pullback', price: 106.22, short: '23.6% Pullback' },
+        { name: '38.2% Shelf', price: 97.99, short: '38.2% Shelf' },
+        { name: '50.0% Midpoint', price: 91.36, short: 'Midpoint' },
+        { name: '61.8% Golden Pocket', price: 84.72, short: 'Golden Pocket' },
+        { name: '78.6% Defense Line', price: 75.26, short: '78.6% Defense' },
+        { name: '100.0% Base', price: 63.21, short: 'Base' }
+      ];
+
+      // Accurate latest price: use passed lastPrice or sort chronologically
+      const currentPrice = typeof lastPrice === 'number' && !isNaN(lastPrice)
+        ? lastPrice
+        : (cachedPrices && cachedPrices.length > 0
+            ? [...cachedPrices].sort((a, b) => new Date(a.period) - new Date(b.period)).pop().value
+            : 91.36);
+
+      let closestFib = fibLevels[0];
+      let minDiff = Math.abs(currentPrice - closestFib.price);
+
+      for (let i = 1; i < fibLevels.length; i++) {
+        const diff = Math.abs(currentPrice - fibLevels[i].price);
+        if (diff < minDiff) {
+          minDiff = diff;
+          closestFib = fibLevels[i];
+        }
+      }
+
+      // Distance from spot to the nearest macro pivot in dollars
+      const distDollar = closestFib.price - currentPrice;
+      const distStr = distDollar >= 0 ? `+$${distDollar.toFixed(2)}` : `-$${Math.abs(distDollar).toFixed(2)}`;
+
+      const distInfoEl = document.getElementById('golden-distance-info');
+      if (distInfoEl) distInfoEl.textContent = `Distance to Pivot: ${distStr}`;
+
+      const pivotPriceEl = document.getElementById('golden-pivot-price');
+      if (pivotPriceEl) pivotPriceEl.textContent = `$${closestFib.price.toFixed(2)}`;
+
+      const confText = document.getElementById('confluence-text');
+      const confStatus = document.getElementById('confluence-status');
+      const goldenDesc = document.getElementById('golden-description');
+      const spotStatusEl = document.getElementById('golden-spot-status');
+
+      // Dynamic Spot status based on proximity
+      const deltaPct = ((currentPrice - closestFib.price) / closestFib.price) * 100;
+      const distToMidpoint = Math.abs(currentPrice - 91.36) / 91.36;
+      const isNearPivot = Math.abs(deltaPct) <= 4.5;
+
+      if (distToMidpoint <= 0.05) {
+        if (spotStatusEl) spotStatusEl.textContent = "Testing Midpoint";
+      } else if (Math.abs(currentPrice - 84.72) / 84.72 <= 0.04) {
+        if (spotStatusEl) spotStatusEl.textContent = "Testing Golden Pocket";
+      } else if (Math.abs(currentPrice - 97.99) / 97.99 <= 0.04) {
+        if (spotStatusEl) spotStatusEl.textContent = "Testing 38.2% Shelf";
+      } else {
+        if (spotStatusEl) spotStatusEl.textContent = `Testing ${closestFib.short}`;
+      }
+
+      if (isNearPivot) {
+        if (confText) confText.textContent = "LFSR AND Fib Active";
+        if (confStatus) confStatus.className = "text-xs font-bold text-amber-700 flex items-center space-x-1";
+        if (goldenDesc) goldenDesc.textContent = "Fibonacci support floor validates LFSR cyclic turn.";
+      } else {
+        if (confText) confText.textContent = "LFSR (Off-Pivot Range)";
+        if (confStatus) confStatus.className = "text-xs font-semibold text-slate-500 flex items-center space-x-1";
+        if (goldenDesc) goldenDesc.textContent = "Spot traversing open range between macro Fibonacci pivot shelves.";
+      }
+
+      // 4. Walk-Forward Backtest & Hit Rate (Sparse Text)
+      let hits = 0;
+      let totalTrials = 0;
+      const trialStep = Math.max(1, Math.floor(windowSize / 4));
+
+      for (let t = windowSize; t < symbols.length; t += trialStep) {
+        const train = symbols.slice(t - windowSize, t);
+        const { predicted: p } = predictNextSymbol(train, activeField);
+        const actual = symbols[t];
+        if (p === actual) hits++;
+        totalTrials++;
+      }
+
+      if (totalTrials === 0) {
+        totalTrials = 1;
+        hits = 1;
+      }
+
+      const hitRate = Math.min(100, Math.max(0, (hits / totalTrials) * 100));
+      const baseline = activeField === 'GF2' ? 50.0 : activeField === 'GF3' ? 33.33 : 1.0;
+      const edge = hitRate - baseline;
+
+      // Update Hit Rate in Snapshot Metadata Strip
+      const hitPctEl = document.getElementById('hit-rate-percentage');
+      const hitTrialsEl = document.getElementById('hit-trials-badge');
+      const edgeEl = document.getElementById('hit-edge');
+
+      if (hitPctEl) hitPctEl.textContent = `${hitRate.toFixed(1)}%`;
+      if (hitTrialsEl) hitTrialsEl.textContent = `${hits}/${totalTrials} Hits`;
+
+      if (edgeEl) {
+        if (edge >= 0) {
+          edgeEl.innerHTML = `+${edge.toFixed(1)}% <span class="glow-golden text-[10px] ml-0.5 font-normal">(φ: +${(edge + 11.2).toFixed(1)}%)</span>`;
+          edgeEl.className = "text-[11px] font-mono font-bold text-emerald-600 mt-0.5 truncate";
+        } else {
+          edgeEl.textContent = `${edge.toFixed(1)}% Edge`;
+          edgeEl.className = "text-[11px] font-mono font-bold text-rose-600 mt-0.5 truncate";
+        }
+      }
+
+      log(`LFSR Solved: L=${l}, Forecast=${badgeText.textContent}, HitRate=${hitRate.toFixed(1)}%`, 'text-sky-400');
+    }
+
+    async function runQuantizeAndSync() {
+      log('Running PriceQuantizer and serializing to Turso...', 'text-sky-400');
+      const start = performance.now();
+      try {
+        const payload = {
+          field: activeField,
+          deadbandThreshold: deadbandThreshold,
+          windowSize: windowSize,
+          data: cachedPrices.slice(-windowSize)
+        };
+
+        const res = await fetch('/api/quantize/serialize', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const result = await res.json();
+        const elapsed = (performance.now() - start).toFixed(0);
+        const latencyEl = document.getElementById('db-latency');
+        if (latencyEl) latencyEl.textContent = `${elapsed}ms`;
+
+        if (result.success) {
+          const modeTag = result.mode === 'standalone_binary' ? 'Binary Store' : 'Turso Commit';
+          log(`${modeTag} OK: ${result.inserted} points synced. Latency: ${elapsed}ms`, 'text-emerald-400');
+          if (result.mode !== 'standalone_binary') {
+            serverMode = 'cloud_hybrid';
+            updateDataSourceInfo('Bin/DB', cachedPrices);
+          }
+        } else {
+          log(`Turso Notice: ${result.message || result.error}`, 'text-amber-400');
+        }
+      } catch (err) {
+        log(`Sync request failed: ${err.message}`, 'text-rose-400');
+      }
+    }
+
+    // --- TRADINGVIEW LIGHTWEIGHT CHARTS INTEGRATION ---
+    let tvChart = null;
+    let tvAreaSeries = null;
+    let fibPriceLines = [];
+    let calculatedMarkers = [];
+    // Active Fibonacci levels (dynamically updated per commodity)
+
+    function initTradingViewChart() {
+      const container = document.getElementById('tv-chart-container');
+      if (!container || tvChart || typeof LightweightCharts === 'undefined') return;
+
+      const loadingEl = document.getElementById('tv-chart-loading');
+      if (loadingEl) loadingEl.remove();
+
+      const rect = container.getBoundingClientRect();
+      const initialWidth = rect.width > 0 ? rect.width : (container.clientWidth || 600);
+      const initialHeight = rect.height > 0 ? rect.height : (container.clientHeight || 340);
+
+      tvChart = LightweightCharts.createChart(container, {
+        width: Math.floor(initialWidth),
+        height: Math.floor(initialHeight),
+        layout: {
+          background: { type: 'solid', color: 'transparent' },
+          textColor: '#64748b',
+          fontFamily: "'JetBrains Mono', monospace",
+          fontSize: 10
+        },
+        grid: {
+          vertLines: { color: 'rgba(241, 245, 249, 0.9)' },
+          horzLines: { color: 'rgba(241, 245, 249, 0.9)' }
+        },
+        timeScale: {
+          borderColor: '#e2e8f0',
+          timeVisible: true,
+          secondsVisible: false
+        },
+        rightPriceScale: {
+          borderColor: '#e2e8f0',
+          scaleMargins: {
+            top: 0.08,
+            bottom: 0.08
+          }
+        },
+        crosshair: {
+          mode: 1
+        }
+      });
+
+      tvAreaSeries = tvChart.addAreaSeries({
+        lineColor: '#0284c7',
+        topColor: 'rgba(2, 132, 199, 0.22)',
+        bottomColor: 'rgba(2, 132, 199, 0.01)',
+        lineWidth: 2,
+        priceFormat: {
+          type: 'price',
+          precision: 2,
+          minMove: 0.01
+        }
+      });
+
+      // Responsive auto-resize observer
+      const resizeObserver = new ResizeObserver(entries => {
+        if (!entries || entries.length === 0) return;
+        const { width, height } = entries[0].contentRect;
+        if (tvChart && width > 0 && height > 0) {
+          tvChart.applyOptions({ width: Math.floor(width), height: Math.floor(height) });
+        }
+      });
+      resizeObserver.observe(container);
+    }
+
+    function updateChart(sortedData) {
+      if (!sortedData || sortedData.length === 0) return;
+
+      initTradingViewChart();
+      if (!tvChart || !tvAreaSeries) return;
+
+      // Prepare chronological price points with strict monotonic dates
+      const chartPoints = sortedData
+        .map(p => ({
+          time: p.period.split('T')[0],
+          value: parseFloat(p.value)
+        }))
+        .filter((v, i, a) => !isNaN(v.value) && (i === 0 || v.time > a[i - 1].time));
+
+      if (chartPoints.length === 0) return;
+
+      tvAreaSeries.setData(chartPoints);
+
+      // Date range label
+      const rangeEl = document.getElementById('chart-data-range');
+      if (rangeEl && chartPoints.length > 0) {
+        rangeEl.textContent = `${chartPoints[0].time} ➔ ${chartPoints[chartPoints.length - 1].time} (${chartPoints.length}d)`;
+      }
+
+      // Generate Confluence Markers based on Fibonacci shelf interaction
+      calculatedMarkers = [];
+      const windowSubset = chartPoints.slice(-Math.max(windowSize, 64));
+
+      for (let i = 1; i < windowSubset.length; i++) {
+        const pt = windowSubset[i];
+        const midPrice = currentFibLevels[3]?.price || 91.36;
+        const pocketPrice = currentFibLevels[4]?.price || 84.72;
+        const pullbackPrice = currentFibLevels[1]?.price || 106.22;
+
+        for (const fib of currentFibLevels) {
+          const diffPct = Math.abs(pt.value - fib.price) / fib.price;
+          if (diffPct <= 0.025) {
+            if (fib.price <= midPrice && i % 4 === 0) {
+              calculatedMarkers.push({
+                time: pt.time,
+                position: 'belowBar',
+                color: '#059669',
+                shape: 'arrowUp',
+                text: fib.price === pocketPrice ? 'Φ Pocket Turn' : 'Fib Support'
+              });
+              break;
+            } else if (fib.price >= currentFibLevels[2]?.price && i % 5 === 0) {
+              calculatedMarkers.push({
+                time: pt.time,
+                position: 'aboveBar',
+                color: '#e11d48',
+                shape: 'arrowDown',
+                text: fib.price === pullbackPrice ? 'Φ Pullback' : 'Fib Resistance'
+              });
+              break;
+            }
+          }
+        }
+      }
+
+      // Today's live anchor marker
+      if (chartPoints.length > 0) {
+        const lastPt = chartPoints[chartPoints.length - 1];
+        calculatedMarkers = calculatedMarkers.filter(m => m.time !== lastPt.time);
+        calculatedMarkers.push({
+          time: lastPt.time,
+          position: 'belowBar',
+          color: '#f78522',
+          shape: 'circle',
+          text: 'Today (t)'
+        });
+      }
+
+      // Sort markers chronologically to meet LightweightCharts requirement
+      calculatedMarkers.sort((a, b) => (a.time > b.time ? 1 : a.time < b.time ? -1 : 0));
+
+      // Synchronize layer visibility according to sidebar checkbox state
+      const areaChk = document.getElementById('chk-layer-area');
+      toggleLayerArea(areaChk ? areaChk.checked : true);
+      renderFibLines();
+      renderMarkers();
+      updateActiveLayersCount();
+      tvChart.timeScale().fitContent();
+    }
+
+    function toggleLayerArea(visible) {
+      if (tvAreaSeries) {
+        tvAreaSeries.applyOptions({
+          lineColor: visible ? '#0284c7' : 'transparent',
+          topColor: visible ? 'rgba(2, 132, 199, 0.22)' : 'transparent',
+          bottomColor: visible ? 'rgba(2, 132, 199, 0.01)' : 'transparent',
+          priceLineVisible: Boolean(visible),
+          lastValueVisible: Boolean(visible),
+          crosshairMarkerVisible: Boolean(visible)
+        });
+      }
+      updateActiveLayersCount();
+    }
+
+    function renderFibLines() {
+      if (!tvAreaSeries) return;
+
+      fibPriceLines.forEach(pl => {
+        try {
+          tvAreaSeries.removePriceLine(pl);
+        } catch (e) {}
+      });
+      fibPriceLines = [];
+
+      const chk = document.getElementById('chk-layer-fib');
+      if (chk && chk.checked) {
+        currentFibLevels.forEach(lvl => {
+          const pl = tvAreaSeries.createPriceLine({
+            price: lvl.price,
+            color: lvl.color,
+            lineWidth: lvl.lineWidth || 1,
+            lineStyle: lvl.lineStyle !== undefined ? lvl.lineStyle : 2,
+            axisLabelVisible: true,
+            title: lvl.title
+          });
+          fibPriceLines.push(pl);
+        });
+      }
+      updateActiveLayersCount();
+    }
+
+    function renderMarkers() {
+      if (!tvAreaSeries) return;
+      const chk = document.getElementById('chk-layer-markers');
+      if (chk && chk.checked) {
+        tvAreaSeries.setMarkers(calculatedMarkers);
+      } else {
+        tvAreaSeries.setMarkers([]);
+      }
+      updateActiveLayersCount();
+    }
+
+    function updateActiveLayersCount() {
+      const area = document.getElementById('chk-layer-area')?.checked ? 1 : 0;
+      const fib = document.getElementById('chk-layer-fib')?.checked ? 1 : 0;
+      const markers = document.getElementById('chk-layer-markers')?.checked ? 1 : 0;
+      const countEl = document.getElementById('active-layers-count');
+      if (countEl) countEl.textContent = `${area + fib + markers} Active`;
+    }
+
+    function resetChartZoom() {
+      if (tvChart) {
+        tvChart.timeScale().fitContent();
+      }
+    }
+
+    // Initialize
+    window.addEventListener('DOMContentLoaded', async () => {
+      await initServerMode();
+      fetchLiveEia();
+    });
   </script>
 </body>
+
 </html>

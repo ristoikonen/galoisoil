@@ -1,0 +1,72 @@
+[
+  {
+    "symbol": "US_10Y",
+    "name": "United States 10Y Treasury",
+    "filename": "us_10y.bin",
+    "count": 5000,
+    "sizeBytes": 20032,
+    "earliest": "2006-10-31",
+    "latest": "2026-10-26",
+    "latestYield": 5
+  },
+  {
+    "symbol": "JP_10Y",
+    "name": "Japan 10Y JGB",
+    "filename": "jp_10y.bin",
+    "count": 5000,
+    "sizeBytes": 20032,
+    "earliest": "2006-04-24",
+    "latest": "2026-09-30",
+    "latestYield": 3.057
+  },
+  {
+    "symbol": "DE_10Y",
+    "name": "Germany 10Y Bund (Europe)",
+    "filename": "de_10y.bin",
+    "count": 5000,
+    "sizeBytes": 20032,
+    "earliest": "2007-02-15",
+    "latest": "2026-10-27",
+    "latestYield": 3.42
+  },
+  {
+    "symbol": "AU_10Y",
+    "name": "Australia 10Y CGS",
+    "filename": "au_10y.bin",
+    "count": 3380,
+    "sizeBytes": 13552,
+    "earliest": "2013-05-20",
+    "latest": "2026-10-21",
+    "latestYield": 5.277
+  },
+  {
+    "symbol": "UK_10Y",
+    "name": "United Kingdom 10Y Gilt",
+    "filename": "uk_10y.bin",
+    "count": 801,
+    "sizeBytes": 3236,
+    "earliest": "1960-01-01",
+    "latest": "2026-09-01",
+    "latestYield": 5.2421
+  },
+  {
+    "symbol": "NZ_10Y",
+    "name": "New Zealand 10Y Bond",
+    "filename": "nz_10y.bin",
+    "count": 680,
+    "sizeBytes": 2752,
+    "earliest": "1970-01-01",
+    "latest": "2026-09-01",
+    "latestYield": 4.94
+  },
+  {
+    "symbol": "CN_10Y",
+    "name": "China Sovereign Yield",
+    "filename": "cn_10y.bin",
+    "count": 317,
+    "sizeBytes": 1300,
+    "earliest": "1997-06-01",
+    "latest": "2023-11-01",
+    "latestYield": 2.88
+  }
+]

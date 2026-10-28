@@ -71,10 +71,10 @@ export class BinaryPriceStore {
     // 16..19: Record Count N (Uint32)
     view.setUint32(16, count, true);
 
-    // Base Day: Days since Unix epoch (1970-01-01) for the first record
+    // Base Day: Days since Unix epoch (1970-01-01) for the first record (signed Int32 supports pre-1970)
     const firstDate = new Date(sorted[0].period);
     const baseDay = Math.floor(firstDate.getTime() / 86400000);
-    view.setUint32(20, baseDay, true);
+    view.setInt32(20, baseDay, true);
 
     // Base Price: First record's price in scaled integer units
     const basePrice = Math.round(sorted[0].value * scaleMultiplier);
@@ -134,7 +134,7 @@ export class BinaryPriceStore {
     const version = view.getUint16(12, true);
     const scaleMultiplier = view.getUint16(14, true) || 100;
     const count = view.getUint32(16, true);
-    const baseDay = view.getUint32(20, true);
+    const baseDay = view.getInt32(20, true);
     const basePrice = view.getInt32(24, true);
 
     const dayDeltas = new Int16Array(buffer, this.HEADER_SIZE, count);
