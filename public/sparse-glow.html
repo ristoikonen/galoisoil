@@ -243,53 +243,83 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
 
       <!-- FIELD 1: Galois Field Selection -->
-      <div class="white-card top-card-themed rounded-2xl p-5 flex flex-col justify-between">
+      <div class="white-card top-card-themed rounded-2xl p-5 flex flex-col justify-between relative">
         <div>
           <div class="flex items-center justify-between mb-3">
-            <span
-              class="text-[11px] font-bold uppercase tracking-wider text-purple-700 bg-purple-50 px-2 py-0.5 rounded border border-purple-200 font-mono">
-              Field Selection
+            <span id="help-trigger-field" onclick="toggleHelp('help-pop-field', event)"
+              class="help-trigger cursor-pointer text-[11px] font-bold uppercase tracking-wider text-purple-700 bg-purple-50 hover:bg-purple-100 hover:border-purple-300 px-2 py-0.5 rounded border border-purple-200 font-mono transition-all flex items-center space-x-1 select-none"
+              title="Click for explanation">
+              <span>Field Selection</span>
+              <span class="text-[9px] text-purple-400 font-sans font-bold">ℹ</span>
             </span>
             <span class="text-xs themed-subtext font-mono">Field Mode</span>
+
+            <!-- Popover for 'Field Selection' -->
+            <div id="help-pop-field"
+              class="card-help-popover hidden absolute left-0 bottom-[calc(100%+12px)] z-40 w-80 p-4 bg-[#0B2338] text-slate-200 rounded-xl shadow-2xl border border-[#1e3a5f] text-xs leading-relaxed select-text">
+              <div class="flex items-center justify-between pb-2 mb-2 border-b border-[#1e3a5f]">
+                <span class="font-mono font-bold text-[#FFAB70] text-xs uppercase tracking-wide">Galois Field Domain</span>
+                <button onclick="toggleHelp('help-pop-field', event)" class="text-slate-300 hover:text-[#FFAB70] text-base font-bold px-1.5 leading-none transition-colors" title="Close">✕</button>
+              </div>
+              <p class="text-slate-200 font-normal leading-relaxed">
+                Select the finite field domain for discrete price modeling. GF(2) captures binary direction (Up/Down), GF(3) adds a neutral deadband for sideways noise, and GF(2⁸) represents 256 byte states for rich algebraic sequence analysis.
+              </p>
+              <div class="absolute -bottom-2 left-20 w-3.5 h-3.5 bg-[#0B2338] border-r border-b border-[#1e3a5f] transform rotate-45"></div>
+            </div>
           </div>
           <h3 class="text-sm font-bold text-slate-900 mb-1">Galois Field Domain</h3>
-          <p class="text-xs themed-subtext mb-4">Target algebraic space for price transitions.</p>
+          <p class="text-xs themed-subtext mb-2.5">Target algebraic space for price transitions.</p>
 
           <div class="grid grid-cols-3 gap-1.5 p-1 themed-control rounded-xl border border-slate-200" id="field-selector">
             <button onclick="setField('GF2')" id="btn-gf2"
-              class="field-btn py-1.5 text-xs font-mono font-medium rounded-lg themed-control text-slate-600 hover:text-slate-900 transition-all text-center">
+              class="field-btn py-2.5 text-xs font-mono font-medium rounded-lg themed-control text-slate-600 hover:text-slate-900 transition-all text-center">
               GF(2)
             </button>
             <button onclick="setField('GF3')" id="btn-gf3"
-              class="field-btn py-1.5 text-xs font-mono font-bold rounded-lg bg-sky-600 text-white shadow-sm transition-all text-center">
+              class="field-btn py-2.5 text-xs font-mono font-bold rounded-lg bg-sky-600 text-white shadow-sm transition-all text-center">
               GF(3)
             </button>
             <button onclick="setField('GF256')" id="btn-gf256"
-              class="field-btn py-1.5 text-xs font-mono font-medium rounded-lg themed-control text-slate-600 hover:text-slate-900 transition-all text-center">
+              class="field-btn py-2.5 text-xs font-mono font-medium rounded-lg themed-control text-slate-600 hover:text-slate-900 transition-all text-center">
               GF(2⁸)
             </button>
           </div>
         </div>
 
         <div
-          class="mt-4 pt-3 border-t border-sky-100 flex items-center justify-between text-[11px] font-mono themed-subtext">
+          class="mt-2.5 pt-2 border-t border-sky-100 flex items-center justify-between text-[11px] font-mono themed-subtext">
           <span>Active Cardinality:</span>
           <span id="field-cardinality" class="text-sky-700 font-bold">q = 3 {Down, Flat, Up}</span>
         </div>
       </div>
 
       <!-- FIELD 2: Deadband Threshold (theta) -->
-      <div class="white-card top-card-themed rounded-2xl p-5 flex flex-col justify-between">
+      <div class="white-card top-card-themed rounded-2xl p-5 flex flex-col justify-between relative">
         <div>
           <div class="flex items-center justify-between mb-3">
-            <span
-              class="text-[11px] font-bold uppercase tracking-wider text-sky-700 bg-sky-50 px-2 py-0.5 rounded border border-sky-200 font-mono">
-              Threshold (θ)
+            <span id="help-trigger-threshold" onclick="toggleHelp('help-pop-threshold', event)"
+              class="help-trigger cursor-pointer text-[11px] font-bold uppercase tracking-wider text-sky-700 bg-sky-50 hover:bg-sky-100 hover:border-sky-300 px-2 py-0.5 rounded border border-sky-200 font-mono transition-all flex items-center space-x-1 select-none"
+              title="Click for explanation">
+              <span>Threshold (θ)</span>
+              <span class="text-[9px] text-sky-400 font-sans font-bold">ℹ</span>
             </span>
             <span id="threshold-val-badge" class="text-xs font-mono text-sky-700 font-bold">±0.50%</span>
+
+            <!-- Popover for 'Threshold' -->
+            <div id="help-pop-threshold"
+              class="card-help-popover hidden absolute left-0 bottom-[calc(100%+12px)] z-40 w-80 p-4 bg-[#0B2338] text-slate-200 rounded-xl shadow-2xl border border-[#1e3a5f] text-xs leading-relaxed select-text">
+              <div class="flex items-center justify-between pb-2 mb-2 border-b border-[#1e3a5f]">
+                <span class="font-mono font-bold text-[#FFAB70] text-xs uppercase tracking-wide">Ternary Deadband (θ)</span>
+                <button onclick="toggleHelp('help-pop-threshold', event)" class="text-slate-300 hover:text-[#FFAB70] text-base font-bold px-1.5 leading-none transition-colors" title="Close">✕</button>
+              </div>
+              <p class="text-slate-200 font-normal leading-relaxed">
+                Sets percentage deadband threshold for quantizing returns. Daily percentage price changes smaller than ±θ collapse into the neutral Flat (0) token, filtering high-frequency market noise before symbols enter the Berlekamp-Massey LFSR recurrence solver.
+              </p>
+              <div class="absolute -bottom-2 left-20 w-3.5 h-3.5 bg-[#0B2338] border-r border-b border-[#1e3a5f] transform rotate-45"></div>
+            </div>
           </div>
           <h3 class="text-sm font-bold text-slate-900 mb-1">Ternary Deadband</h3>
-          <p class="text-xs themed-subtext mb-4">Price returns inside |r| &le; θ collapse to Flat (0).</p>
+          <p class="text-xs themed-subtext mb-2.5">Price returns inside |r| &le; θ collapse to Flat (0).</p>
 
           <div class="space-y-2">
             <input type="range" id="input-threshold" min="0.001" max="0.03" step="0.001" value="0.005"
@@ -303,7 +333,7 @@
         </div>
 
         <div
-          class="mt-4 pt-3 border-t border-sky-100 flex items-center justify-between text-[11px] font-mono themed-subtext">
+          class="mt-2.5 pt-2 border-t border-sky-100 flex items-center justify-between text-[11px] font-mono themed-subtext">
           <span>Return Filter:</span>
           <span id="filter-state" class="text-slate-700">r &le; <span
               class="text-amber-600 font-semibold">0.0050</span></span>
@@ -311,54 +341,84 @@
       </div>
 
       <!-- FIELD 3: History Window (W) -->
-      <div class="white-card top-card-themed rounded-2xl p-5 flex flex-col justify-between">
+      <div class="white-card top-card-themed rounded-2xl p-5 flex flex-col justify-between relative">
         <div>
           <div class="flex items-center justify-between mb-3">
-            <span
-              class="text-[11px] font-bold uppercase tracking-wider text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200 font-mono">
-              Window (W)
+            <span id="help-trigger-window" onclick="toggleHelp('help-pop-window', event)"
+              class="help-trigger cursor-pointer text-[11px] font-bold uppercase tracking-wider text-amber-700 bg-amber-50 hover:bg-amber-100 hover:border-amber-300 px-2 py-0.5 rounded border border-amber-200 font-mono transition-all flex items-center space-x-1 select-none"
+              title="Click for explanation">
+              <span>Window (W)</span>
+              <span class="text-[9px] text-amber-500 font-sans font-bold">ℹ</span>
             </span>
             <span id="window-val-badge" class="text-xs font-mono text-amber-700 font-bold">34 Days (φ²)</span>
+
+            <!-- Popover for 'Window' -->
+            <div id="help-pop-window"
+              class="card-help-popover hidden absolute left-0 bottom-[calc(100%+12px)] z-40 w-80 p-4 bg-[#0B2338] text-slate-200 rounded-xl shadow-2xl border border-[#1e3a5f] text-xs leading-relaxed select-text">
+              <div class="flex items-center justify-between pb-2 mb-2 border-b border-[#1e3a5f]">
+                <span class="font-mono font-bold text-[#FFAB70] text-xs uppercase tracking-wide">Sequence Window (W)</span>
+                <button onclick="toggleHelp('help-pop-window', event)" class="text-slate-300 hover:text-[#FFAB70] text-base font-bold px-1.5 leading-none transition-colors" title="Close">✕</button>
+              </div>
+              <p class="text-slate-200 font-normal leading-relaxed">
+                Sets the discrete history window length of quantized price symbols supplied to the LFSR solver. Fibonacci sample lengths (13, 34, 89) align sequence sampling with natural macro market cycle resonance and harmonic recurrence.
+              </p>
+              <div class="absolute -bottom-2 left-20 w-3.5 h-3.5 bg-[#0B2338] border-r border-b border-[#1e3a5f] transform rotate-45"></div>
+            </div>
           </div>
           <h3 class="text-sm font-bold text-slate-900 mb-1">Sequence Window</h3>
-          <p class="text-xs themed-subtext mb-4">Length of discrete symbols fed to LFSR solver.</p>
+          <p class="text-xs themed-subtext mb-2.5">Length of discrete symbols fed to LFSR solver.</p>
 
           <div class="grid grid-cols-4 gap-1.5" id="window-selector">
             <button onclick="setWindow(13)"
-              class="win-btn py-1.5 text-xs font-mono rounded-lg themed-control border border-slate-200 hover:border-amber-400 text-slate-600 text-center">13</button>
+              class="win-btn py-2.5 text-xs font-mono rounded-lg themed-control border border-slate-200 hover:border-amber-400 text-slate-600 text-center">13</button>
             <button onclick="setWindow(34)"
-              class="win-btn py-1.5 text-xs font-mono rounded-lg bg-amber-50 border border-amber-300 text-amber-800 font-bold text-center">34</button>
+              class="win-btn py-2.5 text-xs font-mono rounded-lg bg-amber-50 border border-amber-300 text-amber-800 font-bold text-center">34</button>
             <button onclick="setWindow(64)"
-              class="win-btn py-1.5 text-xs font-mono rounded-lg themed-control border border-slate-200 hover:border-amber-400 text-slate-600 text-center">64</button>
+              class="win-btn py-2.5 text-xs font-mono rounded-lg themed-control border border-slate-200 hover:border-amber-400 text-slate-600 text-center">64</button>
             <button onclick="setWindow(89)"
-              class="win-btn py-1.5 text-xs font-mono rounded-lg themed-control border border-slate-200 hover:border-amber-400 text-slate-600 text-center">89</button>
+              class="win-btn py-2.5 text-xs font-mono rounded-lg themed-control border border-slate-200 hover:border-amber-400 text-slate-600 text-center">89</button>
           </div>
         </div>
 
         <div
-          class="mt-4 pt-3 border-t border-sky-100 flex items-center justify-between text-[11px] font-mono themed-subtext">
+          class="mt-2.5 pt-2 border-t border-sky-100 flex items-center justify-between text-[11px] font-mono themed-subtext">
           <span>Theoretical Max L:</span>
           <span id="max-l-badge" class="text-purple-700 font-bold">L &le; 17</span>
         </div>
       </div>
 
       <!-- FIELD 4: Turso Persistence Engine -->
-      <div class="white-card top-card-themed rounded-2xl p-5 flex flex-col justify-between">
+      <div class="white-card top-card-themed rounded-2xl p-5 flex flex-col justify-between relative">
         <div>
           <div class="flex items-center justify-between mb-3">
-            <span
-              class="text-[11px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 font-mono">
-              Turso DB
+            <span id="help-trigger-turso" onclick="toggleHelp('help-pop-turso', event)"
+              class="help-trigger cursor-pointer text-[11px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 hover:bg-emerald-100 hover:border-emerald-300 px-2 py-0.5 rounded border border-emerald-200 font-mono transition-all flex items-center space-x-1 select-none"
+              title="Click for explanation">
+              <span>Turso DB</span>
+              <span class="text-[9px] text-emerald-500 font-sans font-bold">ℹ</span>
             </span>
             <span class="text-xs font-mono text-emerald-600 flex items-center">
               <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5 animate-pulse"></span>Connected
             </span>
+
+            <!-- Popover for 'Turso DB' -->
+            <div id="help-pop-turso"
+              class="card-help-popover hidden absolute right-0 bottom-[calc(100%+12px)] z-40 w-80 p-4 bg-[#0B2338] text-slate-200 rounded-xl shadow-2xl border border-[#1e3a5f] text-xs leading-relaxed select-text">
+              <div class="flex items-center justify-between pb-2 mb-2 border-b border-[#1e3a5f]">
+                <span class="font-mono font-bold text-[#FFAB70] text-xs uppercase tracking-wide">Turso Cloud Serialization</span>
+                <button onclick="toggleHelp('help-pop-turso', event)" class="text-slate-300 hover:text-[#FFAB70] text-base font-bold px-1.5 leading-none transition-colors" title="Close">✕</button>
+              </div>
+              <p class="text-slate-200 font-normal leading-relaxed">
+                Controls live persistent database synchronization with Turso LibSQL cloud. When enabled, each newly calculated discrete price token, LFSR connection polynomial, and forward transition prediction is committed atomically to cloud storage for multi-session persistence.
+              </p>
+              <div class="absolute -bottom-2 right-20 w-3.5 h-3.5 bg-[#0B2338] border-r border-b border-[#1e3a5f] transform rotate-45"></div>
+            </div>
           </div>
           <h3 class="text-sm font-bold text-slate-900 mb-1">Cloud Serialization</h3>
-          <p class="text-xs themed-subtext mb-4">Atomic batch commit of quantized vectors.</p>
+          <p class="text-xs themed-subtext mb-2.5">Atomic batch commit of quantized vectors.</p>
 
           <label
-            class="flex items-center space-x-3 p-2 rounded-xl themed-control border border-slate-200 cursor-pointer hover:border-slate-300 transition-all">
+            class="flex items-center space-x-3 py-3 px-3.5 rounded-xl themed-control border border-slate-200 cursor-pointer hover:border-slate-300 transition-all">
             <input type="checkbox" id="auto-sync-checkbox"
               class="w-4 h-4 rounded text-sky-600 focus:ring-0 bg-white border-slate-300">
             <span class="text-xs font-mono text-slate-700 font-medium">Live DB Upsert</span>
@@ -366,7 +426,7 @@
         </div>
 
         <div
-          class="mt-4 pt-3 border-t border-sky-100 flex items-center justify-between text-[11px] font-mono themed-subtext">
+          class="mt-2.5 pt-2 border-t border-sky-100 flex items-center justify-between text-[11px] font-mono themed-subtext">
           <span>Target Schema:</span>
           <span class="text-slate-800 font-medium">quantized_series</span>
         </div>
@@ -378,23 +438,39 @@
     <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
 
       <!-- OUTCOME 1: State Transition & Tomorrow's Forecast Token -->
-      <div class="white-card top-card-themed rounded-2xl p-5 flex flex-col justify-between">
+      <div class="white-card top-card-themed rounded-2xl p-5 flex flex-col justify-between relative">
         <div>
           <div class="flex items-center justify-between mb-3">
-            <span class="text-[11px] font-bold uppercase tracking-wider text-sky-700 bg-sky-50 px-2 py-0.5 rounded border border-sky-200 font-mono">
-              Transition &amp; Forecast
+            <span id="help-trigger-forecast" onclick="toggleHelp('help-pop-forecast', event)"
+              class="help-trigger cursor-pointer text-[11px] font-bold uppercase tracking-wider text-sky-700 bg-sky-50 hover:bg-sky-100 hover:border-sky-300 px-2 py-0.5 rounded border border-sky-200 font-mono transition-all flex items-center space-x-1 select-none"
+              title="Click for explanation">
+              <span>Transition &amp; Forecast</span>
+              <span class="text-[9px] text-sky-400 font-sans font-bold">ℹ</span>
             </span>
             <span id="forecast-confidence" class="text-xs font-mono text-purple-700 font-bold">L = 6 / 17</span>
+
+            <!-- Popover for 'Transition & Forecast' -->
+            <div id="help-pop-forecast"
+              class="card-help-popover hidden absolute left-0 bottom-[calc(100%+12px)] z-40 w-80 p-4 bg-[#0B2338] text-slate-200 rounded-xl shadow-2xl border border-[#1e3a5f] text-xs leading-relaxed select-text">
+              <div class="flex items-center justify-between pb-2 mb-2 border-b border-[#1e3a5f]">
+                <span class="font-mono font-bold text-[#FFAB70] text-xs uppercase tracking-wide">LFSR State Transition &amp; Forecast</span>
+                <button onclick="toggleHelp('help-pop-forecast', event)" class="text-slate-300 hover:text-[#FFAB70] text-base font-bold px-1.5 leading-none transition-colors" title="Close">✕</button>
+              </div>
+              <p class="text-slate-200 font-normal leading-relaxed">
+                Displays current session's quantized oil token alongside the LFSR forward-recurrence prediction for the upcoming trading session. Evaluates today and tomorrow transition states to identify trend continuation, mean reversion, or consolidation deadband drifts.
+              </p>
+              <div class="absolute -bottom-2 left-20 w-3.5 h-3.5 bg-[#0B2338] border-r border-b border-[#1e3a5f] transform rotate-45"></div>
+            </div>
           </div>
 
           <!-- Dual Pills: Today (t) -> Tomorrow (t+1) -->
-          <div class="flex items-center justify-between gap-2 my-2.5">
+          <div class="flex items-center justify-between gap-2 my-1.5">
             <!-- TODAY (t) -->
-            <div class="flex-1 p-2.5 rounded-xl themed-control border border-slate-200 flex flex-col">
+            <div class="flex-1 py-3.5 px-3 rounded-xl themed-control border border-slate-200 flex flex-col">
               <span class="text-[10px] font-mono uppercase tracking-wider text-slate-500 font-bold mb-1.5">
                 Today (t)
               </span>
-              <div id="today-symbol-badge" class="px-2.5 py-1.5 rounded-lg text-xs font-bold font-mono bg-rose-50 text-rose-700 border border-rose-300 shadow-sm flex items-center justify-center">
+              <div id="today-symbol-badge" class="px-2.5 py-2.5 rounded-lg text-xs font-bold font-mono bg-rose-50 text-rose-700 border border-rose-300 shadow-sm flex items-center justify-center">
                 <span id="today-symbol-text">2 (DOWN)</span>
               </div>
             </div>
@@ -403,64 +479,96 @@
             <div class="text-slate-400 font-mono text-sm px-0.5">➔</div>
 
             <!-- TOMORROW (t+1) -->
-            <div class="flex-1 p-2.5 rounded-xl themed-control border border-sky-200 bg-sky-50/30 flex flex-col">
+            <div class="flex-1 py-3.5 px-3 rounded-xl themed-control border border-sky-200 bg-sky-50/30 flex flex-col">
               <span class="text-[10px] font-mono uppercase tracking-wider text-sky-700 font-bold mb-1.5 flex items-center justify-between">
                 <span>Tomorrow (t+1)</span>
                 <span class="w-1.5 h-1.5 rounded-full bg-sky-500 animate-pulse"></span>
               </span>
-              <div id="forecast-symbol-badge" class="px-2.5 py-1.5 rounded-lg text-xs font-bold font-mono bg-emerald-50 text-emerald-700 border border-emerald-300 shadow-sm flex items-center justify-center">
+              <div id="forecast-symbol-badge" class="px-2.5 py-2.5 rounded-lg text-xs font-bold font-mono bg-emerald-50 text-emerald-700 border border-emerald-300 shadow-sm flex items-center justify-center">
                 <span id="forecast-symbol-text">1 (UP)</span>
               </div>
             </div>
           </div>
 
-          <p id="forecast-description" class="text-xs themed-subtext mt-2 leading-relaxed">
+          <p id="forecast-description" class="text-xs themed-subtext mt-1 leading-relaxed">
             LFSR recurrence predicts counter-trend rebound.
           </p>
         </div>
-        <div class="mt-4 pt-3 border-t border-sky-100 flex items-center justify-between text-[11px] font-mono themed-subtext">
+        <div class="mt-2.5 pt-2 border-t border-sky-100 flex items-center justify-between text-[11px] font-mono themed-subtext">
           <span>Target Date:</span>
           <span id="forecast-date" class="text-slate-800 font-semibold font-mono">Next Trading Session</span>
         </div>
       </div>
 
       <!-- OUTCOME 2: Minimal Polynomial C(D) -->
-      <div class="white-card top-card-themed rounded-2xl p-5 flex flex-col justify-between">
+      <div class="white-card top-card-themed rounded-2xl p-5 flex flex-col justify-between relative">
         <div>
           <div class="flex items-center justify-between mb-3">
-            <span class="text-[11px] font-bold uppercase tracking-wider text-purple-700 bg-purple-50 px-2 py-0.5 rounded border border-purple-200 font-mono">
-              Minimal Polynomial C(D)
+            <span id="help-trigger-poly" onclick="toggleHelp('help-pop-poly', event)"
+              class="help-trigger cursor-pointer text-[11px] font-bold uppercase tracking-wider text-purple-700 bg-purple-50 hover:bg-purple-100 hover:border-purple-300 px-2 py-0.5 rounded border border-purple-200 font-mono transition-all flex items-center space-x-1 select-none"
+              title="Click for explanation">
+              <span>Minimal Polynomial C(D)</span>
+              <span class="text-[9px] text-purple-400 font-sans font-bold">ℹ</span>
             </span>
             <span id="lfsr-degree-badge" class="text-xs font-mono text-purple-700 font-bold">Degree L = 6</span>
+
+            <!-- Popover for 'Minimal Polynomial' -->
+            <div id="help-pop-poly"
+              class="card-help-popover hidden absolute left-0 bottom-[calc(100%+12px)] z-40 w-80 p-4 bg-[#0B2338] text-slate-200 rounded-xl shadow-2xl border border-[#1e3a5f] text-xs leading-relaxed select-text">
+              <div class="flex items-center justify-between pb-2 mb-2 border-b border-[#1e3a5f]">
+                <span class="font-mono font-bold text-[#FFAB70] text-xs uppercase tracking-wide">Minimal Polynomial C(D)</span>
+                <button onclick="toggleHelp('help-pop-poly', event)" class="text-slate-300 hover:text-[#FFAB70] text-base font-bold px-1.5 leading-none transition-colors" title="Close">✕</button>
+              </div>
+              <p class="text-slate-200 font-normal leading-relaxed">
+                The shortest linear feedback shift register polynomial generating the observed discrete oil sequence. A lower linear complexity L relative to window size indicates underlying algebraic regularity, while L ≈ W/2 indicates complex or pseudorandom drift.
+              </p>
+              <div class="absolute -bottom-2 left-20 w-3.5 h-3.5 bg-[#0B2338] border-r border-b border-[#1e3a5f] transform rotate-45"></div>
+            </div>
           </div>
-          <div class="p-2.5 rounded-xl themed-control border border-slate-200 font-mono text-xs text-slate-800 font-semibold my-2 overflow-x-auto whitespace-nowrap shadow-sm">
+          <div class="py-3.5 px-3.5 rounded-xl themed-control border border-slate-200 font-mono text-xs text-slate-800 font-semibold my-1.5 overflow-x-auto whitespace-nowrap shadow-sm">
             <span id="polynomial-display">1 + 2D + D^4 (mod 3)</span>
           </div>
-          <p class="text-xs themed-subtext mt-1">Shortest feedback register generating the observed price sequence.</p>
+          <p class="text-xs themed-subtext mt-0.5">Shortest feedback register generating the observed price sequence.</p>
         </div>
-        <div class="mt-4 pt-3 border-t border-sky-100 flex items-center justify-between text-[11px] font-mono themed-subtext">
+        <div class="mt-2.5 pt-2 border-t border-sky-100 flex items-center justify-between text-[11px] font-mono themed-subtext">
           <span>Algebraic Regularity:</span>
           <span id="regularity-status" class="text-sky-700 font-bold">Cyclic Structure (L &lt; W/2)</span>
         </div>
       </div>
 
       <!-- OUTCOME 3: Golden Confluence & Retracement Matrix (Φ Macro Grid) -->
-      <div class="white-card top-card-themed rounded-2xl p-5 flex flex-col justify-between">
+      <div class="white-card top-card-themed rounded-2xl p-5 flex flex-col justify-between relative">
         <div>
           <div class="flex items-center justify-between mb-3">
-            <span class="text-[11px] font-mono font-bold text-amber-600">
-              Φ Golden Confluence
+            <span id="help-trigger-confluence" onclick="toggleHelp('help-pop-confluence', event)"
+              class="help-trigger cursor-pointer text-[11px] font-bold uppercase tracking-wider text-amber-700 bg-amber-50 hover:bg-amber-100 hover:border-amber-300 px-2 py-0.5 rounded border border-amber-200 font-mono transition-all flex items-center space-x-1 select-none"
+              title="Click for explanation">
+              <span>Golden Confluence</span>
+              <span class="text-[9px] text-amber-500 font-sans font-bold">ℹ</span>
             </span>
             <span id="golden-distance-info" class="text-xs font-mono text-purple-700 font-bold tracking-tight">Distance to Pivot: -$1.67</span>
+
+            <!-- Popover for 'Golden Confluence' -->
+            <div id="help-pop-confluence"
+              class="card-help-popover hidden absolute left-0 bottom-[calc(100%+12px)] z-40 w-80 p-4 bg-[#0B2338] text-slate-200 rounded-xl shadow-2xl border border-[#1e3a5f] text-xs leading-relaxed select-text">
+              <div class="flex items-center justify-between pb-2 mb-2 border-b border-[#1e3a5f]">
+                <span class="font-mono font-bold text-[#FFAB70] text-xs uppercase tracking-wide">Macro Retracement Confluence</span>
+                <button onclick="toggleHelp('help-pop-confluence', event)" class="text-slate-300 hover:text-[#FFAB70] text-base font-bold px-1.5 leading-none transition-colors" title="Close">✕</button>
+              </div>
+              <p class="text-slate-200 font-normal leading-relaxed">
+                Monitors convergence between algebraic LFSR cycle turns and structural Fibonacci swing shelf levels ($119.51 peak down to $63.21 base). Validates high-conviction market pivot entries when spot prices test critical pullback or golden pocket shelves.
+              </p>
+              <div class="absolute -bottom-2 left-20 w-3.5 h-3.5 bg-[#0B2338] border-r border-b border-[#1e3a5f] transform rotate-45"></div>
+            </div>
           </div>
 
-          <div class="my-2.5">
+          <div class="my-1.5">
             <span class="text-[10px] font-mono uppercase text-slate-500 font-bold block mb-1">Nearest Macro Pivot</span>
             <div id="golden-pivot-price" class="text-base font-bold font-mono text-slate-800">$106.22</div>
           </div>
 
           <!-- Confluence Indicator -->
-          <div class="p-2 rounded-xl themed-control border border-slate-200 font-mono text-xs my-2 shadow-sm flex items-center justify-between">
+          <div class="py-3.5 px-3.5 rounded-xl themed-control border border-slate-200 font-mono text-xs my-1.5 shadow-sm flex items-center justify-between">
             <span class="text-[10px] uppercase text-slate-500 font-bold">Confluence:</span>
             <span id="confluence-status" class="text-xs font-bold text-amber-700 flex items-center space-x-1">
               <span class="w-1.5 h-1.5 rounded-full bg-[#f78522] animate-pulse"></span>
@@ -468,12 +576,12 @@
             </span>
           </div>
 
-          <p id="golden-description" class="text-xs themed-subtext mt-1.5 leading-relaxed">
+          <p id="golden-description" class="text-xs themed-subtext mt-0.5 leading-relaxed">
             Fibonacci support floor validates LFSR cyclic turn.
           </p>
         </div>
 
-        <div class="mt-4 pt-3 border-t border-sky-100 flex items-center justify-between text-[11px] font-mono themed-subtext">
+        <div class="mt-2.5 pt-2 border-t border-sky-100 flex items-center justify-between text-[11px] font-mono themed-subtext">
           <span>Spot:</span>
           <span id="golden-spot-status" class="text-slate-800 font-semibold font-mono">Testing Midpoint</span>
         </div>
@@ -603,9 +711,9 @@
       ['gf2', 'gf3', 'gf256'].forEach(f => {
         const btn = document.getElementById(`btn-${f}`);
         if (f.toUpperCase() === field) {
-          btn.className = "field-btn py-1.5 text-xs font-mono font-bold rounded-lg bg-sky-600 text-white shadow-sm transition-all text-center";
+          btn.className = "field-btn py-2.5 text-xs font-mono font-bold rounded-lg bg-sky-600 text-white shadow-sm transition-all text-center";
         } else {
-          btn.className = "field-btn py-1.5 text-xs font-mono font-medium rounded-lg themed-control text-slate-600 hover:text-slate-900 transition-all text-center";
+          btn.className = "field-btn py-2.5 text-xs font-mono font-medium rounded-lg themed-control text-slate-600 hover:text-slate-900 transition-all text-center";
         }
       });
 
@@ -633,14 +741,40 @@
       const buttons = document.querySelectorAll('.win-btn');
       buttons.forEach(btn => {
         if (parseInt(btn.textContent) === w) {
-          btn.className = "win-btn py-1.5 text-xs font-mono rounded-lg bg-amber-50 border border-amber-300 text-amber-800 font-bold text-center";
+          btn.className = "win-btn py-2.5 text-xs font-mono rounded-lg bg-amber-50 border border-amber-300 text-amber-800 font-bold text-center";
         } else {
-          btn.className = "win-btn py-1.5 text-xs font-mono rounded-lg themed-control border border-slate-200 hover:border-amber-400 text-slate-600 text-center";
+          btn.className = "win-btn py-2.5 text-xs font-mono rounded-lg themed-control border border-slate-200 hover:border-amber-400 text-slate-600 text-center";
         }
       });
       log(`Window resized to ${w} trading days`, 'text-amber-400');
       renderRibbon();
     }
+
+    function toggleHelp(id, e) {
+      if (e) e.stopPropagation();
+      const allPopovers = document.querySelectorAll('.card-help-popover');
+      const target = document.getElementById(id);
+      const willOpen = target && target.classList.contains('hidden');
+
+      allPopovers.forEach(pop => pop.classList.add('hidden'));
+
+      if (target && willOpen) {
+        target.classList.remove('hidden');
+      }
+    }
+
+    // Dismiss popovers on outside click or Escape key
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.card-help-popover') && !e.target.closest('.help-trigger')) {
+        document.querySelectorAll('.card-help-popover').forEach(pop => pop.classList.add('hidden'));
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        document.querySelectorAll('.card-help-popover').forEach(pop => pop.classList.add('hidden'));
+      }
+    });
 
     async function fetchLiveEia() {
       log('Querying Bun server /api/wti...', 'text-sky-400');
@@ -895,40 +1029,40 @@
       if (activeField === 'GF2') {
         if (currentSym === 1) {
           todayDir = 'UP';
-          todayBadge.className = "px-2.5 py-1.5 rounded-lg text-xs font-bold font-mono bg-emerald-50 text-emerald-700 border border-emerald-300 shadow-sm flex items-center justify-center";
+          todayBadge.className = "px-2.5 py-2.5 rounded-lg text-xs font-bold font-mono bg-emerald-50 text-emerald-700 border border-emerald-300 shadow-sm flex items-center justify-center";
           todayText.textContent = "1 (UP)";
         } else {
           todayDir = 'DOWN';
-          todayBadge.className = "px-2.5 py-1.5 rounded-lg text-xs font-bold font-mono bg-rose-50 text-rose-700 border border-rose-300 shadow-sm flex items-center justify-center";
+          todayBadge.className = "px-2.5 py-2.5 rounded-lg text-xs font-bold font-mono bg-rose-50 text-rose-700 border border-rose-300 shadow-sm flex items-center justify-center";
           todayText.textContent = "0 (DOWN)";
         }
       } else if (activeField === 'GF3') {
         if (currentSym === 1) {
           todayDir = 'UP';
-          todayBadge.className = "px-2.5 py-1.5 rounded-lg text-xs font-bold font-mono bg-emerald-50 text-emerald-700 border border-emerald-300 shadow-sm flex items-center justify-center";
+          todayBadge.className = "px-2.5 py-2.5 rounded-lg text-xs font-bold font-mono bg-emerald-50 text-emerald-700 border border-emerald-300 shadow-sm flex items-center justify-center";
           todayText.textContent = "1 (UP)";
         } else if (currentSym === 2) {
           todayDir = 'DOWN';
-          todayBadge.className = "px-2.5 py-1.5 rounded-lg text-xs font-bold font-mono bg-rose-50 text-rose-700 border border-rose-300 shadow-sm flex items-center justify-center";
+          todayBadge.className = "px-2.5 py-2.5 rounded-lg text-xs font-bold font-mono bg-rose-50 text-rose-700 border border-rose-300 shadow-sm flex items-center justify-center";
           todayText.textContent = "2 (DOWN)";
         } else {
           todayDir = 'FLAT';
-          todayBadge.className = "px-2.5 py-1.5 rounded-lg text-xs font-bold font-mono bg-slate-100 text-slate-700 border border-slate-300 shadow-sm flex items-center justify-center";
+          todayBadge.className = "px-2.5 py-2.5 rounded-lg text-xs font-bold font-mono bg-slate-100 text-slate-700 border border-slate-300 shadow-sm flex items-center justify-center";
           todayText.textContent = "0 (FLAT)";
         }
       } else {
         const hexToday = `0x${currentSym.toString(16).padStart(2, '0').toUpperCase()}`;
         if (currentSym > 132) {
           todayDir = 'UP';
-          todayBadge.className = "px-2.5 py-1.5 rounded-lg text-xs font-bold font-mono bg-emerald-50 text-emerald-700 border border-emerald-300 shadow-sm flex items-center justify-center";
+          todayBadge.className = "px-2.5 py-2.5 rounded-lg text-xs font-bold font-mono bg-emerald-50 text-emerald-700 border border-emerald-300 shadow-sm flex items-center justify-center";
           todayText.textContent = `${hexToday} (UP)`;
         } else if (currentSym < 124) {
           todayDir = 'DOWN';
-          todayBadge.className = "px-2.5 py-1.5 rounded-lg text-xs font-bold font-mono bg-rose-50 text-rose-700 border border-rose-300 shadow-sm flex items-center justify-center";
+          todayBadge.className = "px-2.5 py-2.5 rounded-lg text-xs font-bold font-mono bg-rose-50 text-rose-700 border border-rose-300 shadow-sm flex items-center justify-center";
           todayText.textContent = `${hexToday} (DOWN)`;
         } else {
           todayDir = 'FLAT';
-          todayBadge.className = "px-2.5 py-1.5 rounded-lg text-xs font-bold font-mono bg-slate-100 text-slate-700 border border-slate-300 shadow-sm flex items-center justify-center";
+          todayBadge.className = "px-2.5 py-2.5 rounded-lg text-xs font-bold font-mono bg-slate-100 text-slate-700 border border-slate-300 shadow-sm flex items-center justify-center";
           todayText.textContent = `${hexToday} (FLAT)`;
         }
       }
@@ -937,25 +1071,25 @@
       if (activeField === 'GF2') {
         if (predicted === 1) {
           predDir = 'UP';
-          badge.className = "px-2.5 py-1.5 rounded-lg text-xs font-bold font-mono bg-emerald-50 text-emerald-700 border border-emerald-300 shadow-sm flex items-center justify-center";
+          badge.className = "px-2.5 py-2.5 rounded-lg text-xs font-bold font-mono bg-emerald-50 text-emerald-700 border border-emerald-300 shadow-sm flex items-center justify-center";
           badgeText.textContent = "1 (UP)";
         } else {
           predDir = 'DOWN';
-          badge.className = "px-2.5 py-1.5 rounded-lg text-xs font-bold font-mono bg-rose-50 text-rose-700 border border-rose-300 shadow-sm flex items-center justify-center";
+          badge.className = "px-2.5 py-2.5 rounded-lg text-xs font-bold font-mono bg-rose-50 text-rose-700 border border-rose-300 shadow-sm flex items-center justify-center";
           badgeText.textContent = "0 (DOWN)";
         }
       } else if (activeField === 'GF3') {
         if (predicted === 1) {
           predDir = 'UP';
-          badge.className = "px-2.5 py-1.5 rounded-lg text-xs font-bold font-mono bg-emerald-50 text-emerald-700 border border-emerald-300 shadow-sm flex items-center justify-center";
+          badge.className = "px-2.5 py-2.5 rounded-lg text-xs font-bold font-mono bg-emerald-50 text-emerald-700 border border-emerald-300 shadow-sm flex items-center justify-center";
           badgeText.textContent = "1 (UP)";
         } else if (predicted === 2) {
           predDir = 'DOWN';
-          badge.className = "px-2.5 py-1.5 rounded-lg text-xs font-bold font-mono bg-rose-50 text-rose-700 border border-rose-300 shadow-sm flex items-center justify-center";
+          badge.className = "px-2.5 py-2.5 rounded-lg text-xs font-bold font-mono bg-rose-50 text-rose-700 border border-rose-300 shadow-sm flex items-center justify-center";
           badgeText.textContent = "2 (DOWN)";
         } else {
           predDir = 'FLAT';
-          badge.className = "px-2.5 py-1.5 rounded-lg text-xs font-bold font-mono bg-slate-100 text-slate-700 border border-slate-300 shadow-sm flex items-center justify-center";
+          badge.className = "px-2.5 py-2.5 rounded-lg text-xs font-bold font-mono bg-slate-100 text-slate-700 border border-slate-300 shadow-sm flex items-center justify-center";
           badgeText.textContent = "0 (FLAT)";
         }
       } else {
@@ -965,15 +1099,15 @@
 
         if (predicted > 132) {
           predDir = 'UP';
-          badge.className = "px-2.5 py-1.5 rounded-lg text-xs font-bold font-mono bg-emerald-50 text-emerald-700 border border-emerald-300 shadow-sm flex items-center justify-center";
+          badge.className = "px-2.5 py-2.5 rounded-lg text-xs font-bold font-mono bg-emerald-50 text-emerald-700 border border-emerald-300 shadow-sm flex items-center justify-center";
           badgeText.textContent = `${hex} (UP)`;
         } else if (predicted < 124) {
           predDir = 'DOWN';
-          badge.className = "px-2.5 py-1.5 rounded-lg text-xs font-bold font-mono bg-rose-50 text-rose-700 border border-rose-300 shadow-sm flex items-center justify-center";
+          badge.className = "px-2.5 py-2.5 rounded-lg text-xs font-bold font-mono bg-rose-50 text-rose-700 border border-rose-300 shadow-sm flex items-center justify-center";
           badgeText.textContent = `${hex} (DOWN)`;
         } else {
           predDir = 'FLAT';
-          badge.className = "px-2.5 py-1.5 rounded-lg text-xs font-bold font-mono bg-slate-100 text-slate-700 border border-slate-300 shadow-sm flex items-center justify-center";
+          badge.className = "px-2.5 py-2.5 rounded-lg text-xs font-bold font-mono bg-slate-100 text-slate-700 border border-slate-300 shadow-sm flex items-center justify-center";
           badgeText.textContent = `${hex} (FLAT)`;
         }
       }
