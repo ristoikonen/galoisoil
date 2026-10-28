@@ -697,11 +697,11 @@
           <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 flex flex-col justify-between">
             <div class="flex items-center justify-between">
               <span class="text-[10px] font-mono uppercase text-slate-500 font-semibold">Hit Rate</span>
-              <span id="hit-trials-badge" class="text-[10px] font-mono text-slate-400 font-medium">30/48 Hits</span>
+              <span id="hit-trials-badge" class="text-[10px] font-mono text-slate-400 font-medium">1/1 Hits</span>
             </div>
-            <div class="flex items-baseline justify-between mt-0.5">
-              <span id="hit-rate-percentage" class="text-lg font-bold font-mono text-emerald-600">62.5%</span>
-              <span id="hit-edge" class="text-xs font-mono font-bold text-emerald-600">+29.2%</span>
+            <div class="mt-0.5">
+              <div id="hit-rate-percentage" class="text-xl font-bold font-mono text-emerald-600">100.0%</div>
+              <div id="hit-edge" class="text-[11px] font-mono font-bold text-emerald-600 mt-0.5 truncate">+66.7% <span class="glow-golden text-[10px] ml-0.5 font-normal">(φ: +77.9%)</span></div>
             </div>
           </div>
         </div>
@@ -758,13 +758,13 @@
         </div>
 
         <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 text-[11px] font-mono space-y-1.5">
-          <div class="flex justify-between text-slate-600">
-            <span>Serialization Latency:</span>
-            <span id="db-latency" class="text-emerald-600 font-bold">~42ms</span>
+          <div class="flex justify-between items-center text-slate-600">
+            <span class="text-slate-500 font-medium">Data source:</span>
+            <span id="data-source-badge" class="font-bold text-sky-700 bg-sky-50 px-2 py-0.5 rounded border border-sky-200">Bin</span>
           </div>
-          <div class="flex justify-between text-slate-600">
-            <span>Next Phase:</span>
-            <span class="text-purple-700 font-semibold">Berlekamp-Massey LFSR</span>
+          <div class="flex justify-between items-center text-slate-600">
+            <span class="text-slate-500 font-medium">Date:</span>
+            <span id="data-last-date" class="text-slate-800 font-semibold">Bin: 20/10/2026</span>
           </div>
         </div>
       </div>
@@ -878,6 +878,54 @@
       }
     });
 
+    let serverMode = 'standalone_binary';
+
+    function formatAuDate(dateStr) {
+      if (!dateStr) return '--/--/----';
+      const clean = dateStr.split('T')[0];
+      const parts = clean.split('-');
+      if (parts.length === 3) {
+        const [y, m, d] = parts;
+        return `${d}/${m}/${y}`;
+      }
+      return dateStr;
+    }
+
+    function updateDataSourceInfo(source, prices) {
+      const sourceBadge = document.getElementById('data-source-badge');
+      const dateEl = document.getElementById('data-last-date');
+      if (!sourceBadge || !dateEl) return;
+
+      const latestPrice = prices && prices.length > 0 ? prices[prices.length - 1] : null;
+      const binDateAu = latestPrice ? formatAuDate(latestPrice.period) : '20/10/2026';
+
+      const isHybrid = serverMode === 'cloud_hybrid' || source === 'Bin/DB';
+
+      if (isHybrid) {
+        sourceBadge.textContent = 'Bin/DB';
+        sourceBadge.className = 'font-bold text-purple-700 bg-purple-50 px-2 py-0.5 rounded border border-purple-200';
+        dateEl.innerHTML = `<span>DB: today</span> <span class="text-slate-400 font-normal">|</span> <span>Bin: ${binDateAu}</span>`;
+      } else if (source === 'eia_live' || source === 'DB') {
+        sourceBadge.textContent = 'DB';
+        sourceBadge.className = 'font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200';
+        dateEl.textContent = `DB: today`;
+      } else {
+        sourceBadge.textContent = 'Bin';
+        sourceBadge.className = 'font-bold text-sky-700 bg-sky-50 px-2 py-0.5 rounded border border-sky-200';
+        dateEl.textContent = `Bin: ${binDateAu}`;
+      }
+    }
+
+    async function initServerMode() {
+      try {
+        const res = await fetch('/api/series/list');
+        const json = await res.json();
+        if (json.mode) {
+          serverMode = json.mode;
+        }
+      } catch (e) {}
+    }
+
     async function fetchLiveEia() {
       log('Querying commodity series /api/wti...', 'text-sky-400');
       try {
@@ -887,6 +935,7 @@
           cachedPrices = json.data;
           const srcTag = json.source === 'binary_store' ? '40-Year Binary Store' : 'EIA API';
           log(`Loaded ${cachedPrices.length} points via ${srcTag}`, 'text-emerald-400');
+          updateDataSourceInfo(json.source === 'binary_store' ? 'Bin' : 'DB', cachedPrices);
           renderRibbon();
         } else {
           throw new Error(json.error || 'No data returned');
@@ -1349,11 +1398,11 @@
 
       if (edgeEl) {
         if (edge >= 0) {
-          edgeEl.innerHTML = `+${edge.toFixed(1)}% <span class="glow-golden text-[10px] ml-0.5">(φ: +${(edge + 11.2).toFixed(1)}%)</span>`;
-          edgeEl.className = "text-xs font-mono font-bold text-emerald-600";
+          edgeEl.innerHTML = `+${edge.toFixed(1)}% <span class="glow-golden text-[10px] ml-0.5 font-normal">(φ: +${(edge + 11.2).toFixed(1)}%)</span>`;
+          edgeEl.className = "text-[11px] font-mono font-bold text-emerald-600 mt-0.5 truncate";
         } else {
           edgeEl.textContent = `${edge.toFixed(1)}% Edge`;
-          edgeEl.className = "text-xs font-mono font-bold text-rose-600";
+          edgeEl.className = "text-[11px] font-mono font-bold text-rose-600 mt-0.5 truncate";
         }
       }
 
@@ -1379,11 +1428,16 @@
 
         const result = await res.json();
         const elapsed = (performance.now() - start).toFixed(0);
-        document.getElementById('db-latency').textContent = `${elapsed}ms`;
+        const latencyEl = document.getElementById('db-latency');
+        if (latencyEl) latencyEl.textContent = `${elapsed}ms`;
 
         if (result.success) {
           const modeTag = result.mode === 'standalone_binary' ? 'Binary Store' : 'Turso Commit';
           log(`${modeTag} OK: ${result.inserted} points synced. Latency: ${elapsed}ms`, 'text-emerald-400');
+          if (result.mode !== 'standalone_binary') {
+            serverMode = 'cloud_hybrid';
+            updateDataSourceInfo('Bin/DB', cachedPrices);
+          }
         } else {
           log(`Turso Notice: ${result.message || result.error}`, 'text-amber-400');
         }
@@ -1620,7 +1674,8 @@
     }
 
     // Initialize
-    window.addEventListener('DOMContentLoaded', () => {
+    window.addEventListener('DOMContentLoaded', async () => {
+      await initServerMode();
       fetchLiveEia();
     });
   </script>
