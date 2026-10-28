@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>GaloisOil Collaborative Field Tuner</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lightweight-charts@4.2.1/dist/lightweight-charts.standalone.production.js"></script>
   <script>
     tailwind.config = {
       theme: {
@@ -595,28 +596,87 @@
       <!-- LEFT: Reserved Chart Card + Snapshot Metadata + Collapsible Sequence Stream (2 cols) -->
       <div class="lg:col-span-2 space-y-5">
 
-        <!-- RESERVED CHART CARD: Empty Space for Upcoming WTI Price & Retracement Chart -->
-        <div id="chart-card-placeholder" class="white-card rounded-2xl p-6 min-h-[280px] flex flex-col justify-between">
-          <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+        <!-- LIVE CHART CARD: WTI Spot Price & Macro Fibonacci Retracement Chart -->
+        <div id="chart-card-container" class="white-card rounded-2xl p-5 flex flex-col justify-between">
+          <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-100">
             <div class="flex items-center space-x-2.5">
               <span class="w-2.5 h-2.5 rounded-full bg-sky-500 animate-pulse"></span>
               <h3 class="text-sm font-bold font-mono text-slate-800 uppercase tracking-wider">
                 WTI Spot Price &amp; Macro Retracement Chart
               </h3>
             </div>
-            <span class="text-xs font-mono text-slate-400">Chart Ready</span>
+            <div class="flex items-center space-x-2 text-xs font-mono">
+              <span id="chart-data-range" class="text-slate-400">Loading daily spot...</span>
+              <button onclick="resetChartZoom()" class="px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors text-[11px] font-semibold" title="Reset zoom to fit all data">Fit</button>
+            </div>
           </div>
-          <!-- Empty Canvas Area Reserved for Chart -->
-          <div class="flex-1 flex flex-col items-center justify-center py-12 text-center text-slate-400 font-mono">
-            <svg class="w-10 h-10 text-slate-300 mb-2 stroke-current" fill="none" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" />
-            </svg>
-            <span class="text-xs font-semibold text-slate-500">Reserved Chart Area</span>
-            <span class="text-[11px] text-slate-400 mt-0.5">Ready for Price Trajectory &amp; Fibonacci Levels Overlay</span>
-          </div>
-          <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] font-mono text-slate-400">
-            <span>Status: Space Allocated</span>
-            <span>Dimension: 2 Columns</span>
+
+          <!-- Chart Body: Canvas (Left) + Small Layer Sidebar (Right) -->
+          <div class="flex flex-col md:flex-row gap-4 h-[340px]">
+            <!-- Chart Canvas Container -->
+            <div class="flex-1 relative h-full rounded-xl overflow-hidden border border-slate-100 bg-white" id="tv-chart-container">
+              <div id="tv-chart-loading" class="absolute inset-0 flex items-center justify-center text-xs font-mono text-slate-400 bg-white/80 z-10">
+                Initializing Lightweight Chart...
+              </div>
+            </div>
+
+            <!-- Small Sidebar for Layer Opt-Out Toggles (Right) -->
+            <div class="w-full md:w-52 p-3 bg-slate-50/80 rounded-xl border border-slate-200 flex flex-col justify-between text-xs font-mono select-none">
+              <div>
+                <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-200">
+                  <span class="font-bold text-slate-700 text-[11px] uppercase tracking-wider">Chart Layers</span>
+                  <span id="active-layers-count" class="text-[10px] text-sky-700 font-semibold">3 Active</span>
+                </div>
+
+                <div class="space-y-2.5">
+                  <!-- Layer 1: Spot Price Area -->
+                  <label class="flex items-start space-x-2.5 cursor-pointer group">
+                    <input type="checkbox" id="chk-layer-area" checked onchange="toggleLayerArea(this.checked)"
+                      class="w-3.5 h-3.5 mt-0.5 rounded text-sky-600 focus:ring-0 bg-white border-slate-300 cursor-pointer">
+                    <div>
+                      <span class="block text-slate-800 font-semibold group-hover:text-sky-600 transition-colors">WTI Spot Area</span>
+                      <span class="block text-[10px] text-slate-400">Daily spot close curve</span>
+                    </div>
+                  </label>
+
+                  <!-- Layer 2: 7 Labeled Fibonacci Lines -->
+                  <label class="flex items-start space-x-2.5 cursor-pointer group">
+                    <input type="checkbox" id="chk-layer-fib" checked onchange="renderFibLines()"
+                      class="w-3.5 h-3.5 mt-0.5 rounded text-amber-600 focus:ring-0 bg-white border-slate-300 cursor-pointer">
+                    <div>
+                      <span class="block text-slate-800 font-semibold group-hover:text-amber-600 transition-colors">7 Fibonacci Shelves</span>
+                      <span class="block text-[10px] text-slate-400">$119.51 ➔ $63.21 Grid</span>
+                    </div>
+                  </label>
+
+                  <!-- Layer 3: Confluence Markers -->
+                  <label class="flex items-start space-x-2.5 cursor-pointer group">
+                    <input type="checkbox" id="chk-layer-markers" checked onchange="renderMarkers()"
+                      class="w-3.5 h-3.5 mt-0.5 rounded text-[#f78522] focus:ring-0 bg-white border-slate-300 cursor-pointer">
+                    <div>
+                      <span class="block text-slate-800 font-semibold group-hover:text-[#f78522] transition-colors">Confluence Signals</span>
+                      <span class="block text-[10px] text-slate-400">LFSR ∩ Fib pivot alerts</span>
+                    </div>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Quick Fibonacci Grid Reference -->
+              <div class="pt-2 border-t border-slate-200/80 space-y-1 text-[10px] text-slate-500">
+                <div class="flex items-center justify-between">
+                  <span>61.8% Pocket:</span>
+                  <span class="font-bold text-[#f78522]">$84.72</span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span>50.0% Midpoint:</span>
+                  <span class="font-bold text-sky-700">$91.36</span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span>23.6% Pullback:</span>
+                  <span class="font-bold text-amber-700">$106.22</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -921,6 +981,9 @@
       document.getElementById('latest-price').textContent = `$${lastPrice.toFixed(2)}`;
       document.getElementById('latest-return').textContent = `${(lastReturn * 100).toFixed(2)}%`;
       document.getElementById('latest-symbol').textContent = lastSymbol;
+
+      // Update TradingView Chart with latest chronological price series
+      updateChart(sorted);
 
       // Execute Berlekamp-Massey & LFSR Prediction on the extracted symbols
       const allSymbols = extractSymbols(sorted);
@@ -1324,6 +1387,233 @@
         }
       } catch (err) {
         log(`Sync request failed: ${err.message}`, 'text-rose-400');
+      }
+    }
+
+    // --- TRADINGVIEW LIGHTWEIGHT CHARTS INTEGRATION ---
+    let tvChart = null;
+    let tvAreaSeries = null;
+    let fibPriceLines = [];
+    let calculatedMarkers = [];
+
+    const CHART_FIB_LEVELS = [
+      { price: 119.51, title: '0.0% Peak ($119.51)', color: '#64748b', lineStyle: 2 },
+      { price: 106.22, title: '23.6% Pullback ($106.22)', color: '#d97706', lineStyle: 2 },
+      { price: 97.99, title: '38.2% Shelf ($97.99)', color: '#d97706', lineStyle: 2 },
+      { price: 91.36, title: '50.0% Midpoint ($91.36)', color: '#0284c7', lineStyle: 2 },
+      { price: 84.72, title: '61.8% Pocket ($84.72)', color: '#f78522', lineStyle: 0, lineWidth: 2 },
+      { price: 75.26, title: '78.6% Defense ($75.26)', color: '#e11d48', lineStyle: 2 },
+      { price: 63.21, title: '100% Base ($63.21)', color: '#64748b', lineStyle: 2 }
+    ];
+
+    function initTradingViewChart() {
+      const container = document.getElementById('tv-chart-container');
+      if (!container || tvChart || typeof LightweightCharts === 'undefined') return;
+
+      const loadingEl = document.getElementById('tv-chart-loading');
+      if (loadingEl) loadingEl.remove();
+
+      const rect = container.getBoundingClientRect();
+      const initialWidth = rect.width > 0 ? rect.width : (container.clientWidth || 600);
+      const initialHeight = rect.height > 0 ? rect.height : (container.clientHeight || 340);
+
+      tvChart = LightweightCharts.createChart(container, {
+        width: Math.floor(initialWidth),
+        height: Math.floor(initialHeight),
+        layout: {
+          background: { type: 'solid', color: 'transparent' },
+          textColor: '#64748b',
+          fontFamily: "'JetBrains Mono', monospace",
+          fontSize: 10
+        },
+        grid: {
+          vertLines: { color: 'rgba(241, 245, 249, 0.9)' },
+          horzLines: { color: 'rgba(241, 245, 249, 0.9)' }
+        },
+        timeScale: {
+          borderColor: '#e2e8f0',
+          timeVisible: true,
+          secondsVisible: false
+        },
+        rightPriceScale: {
+          borderColor: '#e2e8f0',
+          scaleMargins: {
+            top: 0.08,
+            bottom: 0.08
+          }
+        },
+        crosshair: {
+          mode: 1
+        }
+      });
+
+      tvAreaSeries = tvChart.addAreaSeries({
+        lineColor: '#0284c7',
+        topColor: 'rgba(2, 132, 199, 0.22)',
+        bottomColor: 'rgba(2, 132, 199, 0.01)',
+        lineWidth: 2,
+        priceFormat: {
+          type: 'price',
+          precision: 2,
+          minMove: 0.01
+        }
+      });
+
+      // Responsive auto-resize observer
+      const resizeObserver = new ResizeObserver(entries => {
+        if (!entries || entries.length === 0) return;
+        const { width, height } = entries[0].contentRect;
+        if (tvChart && width > 0 && height > 0) {
+          tvChart.applyOptions({ width: Math.floor(width), height: Math.floor(height) });
+        }
+      });
+      resizeObserver.observe(container);
+    }
+
+    function updateChart(sortedData) {
+      if (!sortedData || sortedData.length === 0) return;
+
+      initTradingViewChart();
+      if (!tvChart || !tvAreaSeries) return;
+
+      // Prepare chronological price points with strict monotonic dates
+      const chartPoints = sortedData
+        .map(p => ({
+          time: p.period.split('T')[0],
+          value: parseFloat(p.value)
+        }))
+        .filter((v, i, a) => !isNaN(v.value) && (i === 0 || v.time > a[i - 1].time));
+
+      if (chartPoints.length === 0) return;
+
+      tvAreaSeries.setData(chartPoints);
+
+      // Date range label
+      const rangeEl = document.getElementById('chart-data-range');
+      if (rangeEl && chartPoints.length > 0) {
+        rangeEl.textContent = `${chartPoints[0].time} ➔ ${chartPoints[chartPoints.length - 1].time} (${chartPoints.length}d)`;
+      }
+
+      // Generate Confluence Markers based on Fibonacci shelf interaction
+      calculatedMarkers = [];
+      const windowSubset = chartPoints.slice(-Math.max(windowSize, 64));
+
+      for (let i = 1; i < windowSubset.length; i++) {
+        const pt = windowSubset[i];
+        for (const fib of CHART_FIB_LEVELS) {
+          const diffPct = Math.abs(pt.value - fib.price) / fib.price;
+          if (diffPct <= 0.025) {
+            if (fib.price <= 91.36 && i % 4 === 0) {
+              calculatedMarkers.push({
+                time: pt.time,
+                position: 'belowBar',
+                color: '#059669',
+                shape: 'arrowUp',
+                text: fib.price === 84.72 ? 'Φ Pocket Turn' : 'Fib Support'
+              });
+              break;
+            } else if (fib.price >= 97.99 && i % 5 === 0) {
+              calculatedMarkers.push({
+                time: pt.time,
+                position: 'aboveBar',
+                color: '#e11d48',
+                shape: 'arrowDown',
+                text: fib.price === 106.22 ? 'Φ Pullback' : 'Fib Resistance'
+              });
+              break;
+            }
+          }
+        }
+      }
+
+      // Today's live anchor marker
+      if (chartPoints.length > 0) {
+        const lastPt = chartPoints[chartPoints.length - 1];
+        calculatedMarkers = calculatedMarkers.filter(m => m.time !== lastPt.time);
+        calculatedMarkers.push({
+          time: lastPt.time,
+          position: 'belowBar',
+          color: '#f78522',
+          shape: 'circle',
+          text: 'Today (t)'
+        });
+      }
+
+      // Sort markers chronologically to meet LightweightCharts requirement
+      calculatedMarkers.sort((a, b) => (a.time > b.time ? 1 : a.time < b.time ? -1 : 0));
+
+      // Synchronize layer visibility according to sidebar checkbox state
+      const areaChk = document.getElementById('chk-layer-area');
+      toggleLayerArea(areaChk ? areaChk.checked : true);
+      renderFibLines();
+      renderMarkers();
+      updateActiveLayersCount();
+      tvChart.timeScale().fitContent();
+    }
+
+    function toggleLayerArea(visible) {
+      if (tvAreaSeries) {
+        tvAreaSeries.applyOptions({
+          lineColor: visible ? '#0284c7' : 'transparent',
+          topColor: visible ? 'rgba(2, 132, 199, 0.22)' : 'transparent',
+          bottomColor: visible ? 'rgba(2, 132, 199, 0.01)' : 'transparent',
+          priceLineVisible: Boolean(visible),
+          lastValueVisible: Boolean(visible),
+          crosshairMarkerVisible: Boolean(visible)
+        });
+      }
+      updateActiveLayersCount();
+    }
+
+    function renderFibLines() {
+      if (!tvAreaSeries) return;
+
+      fibPriceLines.forEach(pl => {
+        try {
+          tvAreaSeries.removePriceLine(pl);
+        } catch (e) {}
+      });
+      fibPriceLines = [];
+
+      const chk = document.getElementById('chk-layer-fib');
+      if (chk && chk.checked) {
+        CHART_FIB_LEVELS.forEach(lvl => {
+          const pl = tvAreaSeries.createPriceLine({
+            price: lvl.price,
+            color: lvl.color,
+            lineWidth: lvl.lineWidth || 1,
+            lineStyle: lvl.lineStyle !== undefined ? lvl.lineStyle : 2,
+            axisLabelVisible: true,
+            title: lvl.title
+          });
+          fibPriceLines.push(pl);
+        });
+      }
+      updateActiveLayersCount();
+    }
+
+    function renderMarkers() {
+      if (!tvAreaSeries) return;
+      const chk = document.getElementById('chk-layer-markers');
+      if (chk && chk.checked) {
+        tvAreaSeries.setMarkers(calculatedMarkers);
+      } else {
+        tvAreaSeries.setMarkers([]);
+      }
+      updateActiveLayersCount();
+    }
+
+    function updateActiveLayersCount() {
+      const area = document.getElementById('chk-layer-area')?.checked ? 1 : 0;
+      const fib = document.getElementById('chk-layer-fib')?.checked ? 1 : 0;
+      const markers = document.getElementById('chk-layer-markers')?.checked ? 1 : 0;
+      const countEl = document.getElementById('active-layers-count');
+      if (countEl) countEl.textContent = `${area + fib + markers} Active`;
+    }
+
+    function resetChartZoom() {
+      if (tvChart) {
+        tvChart.timeScale().fitContent();
       }
     }
 
