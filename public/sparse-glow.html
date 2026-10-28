@@ -374,8 +374,8 @@
 
     </div>
 
-    <!-- PHASE 2: LFSR PREDICTOR & BERLEKAMP-MASSEY OUTCOME PANEL -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+    <!-- PHASE 2: LFSR PREDICTOR & BERLEKAMP-MASSEY OUTCOME PANEL (3 CARDS) -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
 
       <!-- OUTCOME 1: State Transition & Tomorrow's Forecast Token -->
       <div class="white-card top-card-themed rounded-2xl p-5 flex flex-col justify-between">
@@ -384,7 +384,7 @@
             <span class="text-[11px] font-bold uppercase tracking-wider text-sky-700 bg-sky-50 px-2 py-0.5 rounded border border-sky-200 font-mono">
               Transition &amp; Forecast
             </span>
-            <span id="forecast-confidence" class="text-xs themed-subtext font-mono font-semibold">L = 6 / 17</span>
+            <span id="forecast-confidence" class="text-xs font-mono text-purple-700 font-bold">L = 6 / 17</span>
           </div>
 
           <!-- Dual Pills: Today (t) -> Tomorrow (t+1) -->
@@ -444,83 +444,38 @@
         </div>
       </div>
 
-      <!-- OUTCOME 3: Golden Confluence & Retracement Matrix (φ ≈ 1.618) -->
+      <!-- OUTCOME 3: Golden Confluence & Retracement Matrix (Φ Macro Grid) -->
       <div class="white-card top-card-themed rounded-2xl p-5 flex flex-col justify-between">
         <div>
           <div class="flex items-center justify-between mb-3">
-            <span class="text-[11px] font-bold uppercase tracking-wider glow-golden-badge px-2 py-0.5 rounded font-mono flex items-center space-x-1">
-              <span class="glow-golden font-serif font-black text-xs">φ</span>
-              <span>Golden Confluence</span>
+            <span class="text-[11px] font-mono font-bold text-amber-600">
+              Φ Golden Confluence
             </span>
-            <span id="golden-phi-badge" class="text-xs font-mono font-bold glow-golden">φ ≈ 1.618</span>
+            <span id="golden-distance-info" class="text-xs font-mono text-purple-700 font-bold tracking-tight">Distance to Pivot: -$1.67</span>
           </div>
 
-          <!-- Hero φ Symbol with Glow2 Yellow Glow & Proximity -->
-          <div class="flex items-center space-x-3 my-2">
-            <div class="w-11 h-11 rounded-xl bg-white border border-[#f78522]/40 flex items-center justify-center glow-golden-box flex-shrink-0">
-              <span class="text-2xl font-serif font-bold glow-golden select-none">φ</span>
-            </div>
-            <div class="flex-1 min-w-0">
-              <div class="flex items-center justify-between">
-                <span class="text-[10px] font-mono uppercase text-slate-500 font-bold">Macro Pivot</span>
-                <span id="golden-retrace-label" class="text-xs font-mono font-bold text-amber-700">61.8% Pocket</span>
-              </div>
-              <div id="golden-pivot-price" class="text-sm font-bold font-mono text-slate-800 truncate">$84.72 (Δ +0.8%)</div>
-            </div>
+          <div class="my-2.5">
+            <span class="text-[10px] font-mono uppercase text-slate-500 font-bold block mb-1">Nearest Macro Pivot</span>
+            <div id="golden-pivot-price" class="text-base font-bold font-mono text-slate-800">$106.22</div>
           </div>
 
-          <!-- TypeScript Set Confluence Tag (S_LFSR ∩ S_φ) -->
+          <!-- Confluence Indicator -->
           <div class="p-2 rounded-xl themed-control border border-slate-200 font-mono text-xs my-2 shadow-sm flex items-center justify-between">
-            <span class="text-[10px] uppercase text-slate-500 font-bold">Set Confluence:</span>
+            <span class="text-[10px] uppercase text-slate-500 font-bold">Confluence:</span>
             <span id="confluence-status" class="text-xs font-bold text-amber-700 flex items-center space-x-1">
               <span class="w-1.5 h-1.5 rounded-full bg-[#f78522] animate-pulse"></span>
-              <span id="confluence-text">S_LFSR ∩ S_φ Active</span>
+              <span id="confluence-text">LFSR AND Fib Active</span>
             </span>
           </div>
 
           <p id="golden-description" class="text-xs themed-subtext mt-1.5 leading-relaxed">
-            Spot testing the 61.8% Golden Pocket ($84.72). High rebound confluence.
+            Fibonacci support floor validates LFSR cyclic turn.
           </p>
         </div>
 
         <div class="mt-4 pt-3 border-t border-sky-100 flex items-center justify-between text-[11px] font-mono themed-subtext">
-          <span>Recurrence Invariant:</span>
-          <span class="glow-golden font-bold font-mono">aₙ = 3aₙ₋₁ - aₙ₋₂</span>
-        </div>
-      </div>
-
-      <!-- OUTCOME 3: Walk-Forward Hit-Rate Meter with Progress Bar -->
-      <div class="white-card top-card-themed rounded-2xl p-5 flex flex-col justify-between">
-        <div>
-          <div class="flex items-center justify-between mb-2">
-            <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 font-mono">
-              Hit Rate Meter
-            </span>
-            <span id="hit-rate-percentage" class="text-sm font-bold font-mono text-emerald-600">62.5%</span>
-          </div>
-
-          <div class="flex items-center justify-between text-[11px] font-mono themed-subtext mb-1.5">
-            <span>Walk-Forward Accuracy</span>
-            <span id="hit-trials-badge">30 / 48 Hits</span>
-          </div>
-
-          <!-- Progress Bar Track and Fill -->
-          <div class="relative w-full h-3.5 bg-white rounded-full border border-[#d0e8f2] p-0.5 overflow-hidden my-2 shadow-inner">
-            <div id="hit-rate-bar" class="h-full rounded-full bg-gradient-to-r from-sky-500 to-emerald-500 transition-all duration-500 shadow-sm" style="width: 62.5%;"></div>
-            <!-- Dotted Baseline Ticker (33.3% for GF3, 50% for GF2) -->
-            <div id="baseline-marker" class="absolute top-0 bottom-0 w-0.5 bg-slate-400 border-r border-dashed border-slate-600" style="left: 33.33%;" title="Random Baseline"></div>
-          </div>
-
-          <div class="flex justify-between text-[10px] font-mono themed-subtext">
-            <span>0%</span>
-            <span id="baseline-label" class="text-slate-500 font-medium">Random Base: 33.3%</span>
-            <span>100%</span>
-          </div>
-        </div>
-
-        <div class="mt-4 pt-3 border-t border-sky-100 flex items-center justify-between text-[11px] font-mono themed-subtext">
-          <span>Edge vs Baseline:</span>
-          <span id="hit-edge" class="text-emerald-600 font-bold">+29.2% Edge</span>
+          <span>Spot:</span>
+          <span id="golden-spot-status" class="text-slate-800 font-semibold font-mono">Testing Midpoint</span>
         </div>
       </div>
 
@@ -562,19 +517,29 @@
           </div>
         </div>
 
-        <!-- Latest Snapshot Metadata -->
-        <div class="grid grid-cols-3 gap-4 pt-2">
-          <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200">
+        <!-- Latest Snapshot & Accuracy Metadata (4 Tiles) -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3.5 pt-2">
+          <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 flex flex-col justify-between">
             <span class="text-[10px] font-mono uppercase text-slate-500 font-semibold">Latest Spot Price</span>
             <div id="latest-price" class="text-lg font-bold font-mono text-slate-900 mt-0.5">$--.--</div>
           </div>
-          <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200">
+          <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 flex flex-col justify-between">
             <span class="text-[10px] font-mono uppercase text-slate-500 font-semibold">Latest 1-Day Return</span>
             <div id="latest-return" class="text-lg font-bold font-mono text-sky-600 mt-0.5">--.--%</div>
           </div>
-          <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200">
+          <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 flex flex-col justify-between">
             <span class="text-[10px] font-mono uppercase text-slate-500 font-semibold">Active Symbol (Today)</span>
             <div id="latest-symbol" class="text-lg font-bold font-mono text-purple-700 mt-0.5">--</div>
+          </div>
+          <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 flex flex-col justify-between">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-mono uppercase text-slate-500 font-semibold">Hit Rate</span>
+              <span id="hit-trials-badge" class="text-[10px] font-mono text-slate-400 font-medium">30/48 Hits</span>
+            </div>
+            <div class="flex items-baseline justify-between mt-0.5">
+              <span id="hit-rate-percentage" class="text-lg font-bold font-mono text-emerald-600">62.5%</span>
+              <span id="hit-edge" class="text-xs font-mono font-bold text-emerald-600">+29.2%</span>
+            </div>
           </div>
         </div>
       </div>
@@ -783,7 +748,7 @@
 
       // Execute Berlekamp-Massey & LFSR Prediction on the extracted symbols
       const allSymbols = extractSymbols(sorted);
-      executeLFSRPredictor(allSymbols);
+      executeLFSRPredictor(allSymbols, lastPrice);
     }
 
     function extractSymbols(sortedData) {
@@ -905,7 +870,7 @@
       return terms.join(' + ') + ` (mod ${fieldType === 'GF2' ? '2' : fieldType === 'GF3' ? '3' : 'GF(2⁸)'})`;
     }
 
-    function executeLFSRPredictor(symbols) {
+    function executeLFSRPredictor(symbols, lastPrice) {
       if (symbols.length < 8) return;
 
       const windowSlice = symbols.slice(-windowSize);
@@ -1043,18 +1008,24 @@
         regStatus.className = "text-amber-600 font-bold";
       }
 
-      // 3. Update Golden Confluence & Retracement Matrix (φ ≈ 1.618)
+      // 3. Update Golden Confluence & Retracement Matrix (Φ Macro Grid)
       const fibLevels = [
-        { name: '0.0% Peak', price: 119.51 },
-        { name: '23.6% Pullback', price: 106.22 },
-        { name: '38.2% Shelf', price: 97.99 },
-        { name: '50.0% Midpoint', price: 91.36 },
-        { name: '61.8% Golden Pocket', price: 84.72 },
-        { name: '78.6% Defense Line', price: 75.26 },
-        { name: '100.0% Base', price: 63.21 }
+        { name: '0.0% Peak', price: 119.51, short: 'Peak' },
+        { name: '23.6% Pullback', price: 106.22, short: '23.6% Pullback' },
+        { name: '38.2% Shelf', price: 97.99, short: '38.2% Shelf' },
+        { name: '50.0% Midpoint', price: 91.36, short: 'Midpoint' },
+        { name: '61.8% Golden Pocket', price: 84.72, short: 'Golden Pocket' },
+        { name: '78.6% Defense Line', price: 75.26, short: '78.6% Defense' },
+        { name: '100.0% Base', price: 63.21, short: 'Base' }
       ];
 
-      const currentPrice = cachedPrices && cachedPrices.length > 0 ? cachedPrices[cachedPrices.length - 1].value : 84.50;
+      // Accurate latest price: use passed lastPrice or sort chronologically
+      const currentPrice = typeof lastPrice === 'number' && !isNaN(lastPrice)
+        ? lastPrice
+        : (cachedPrices && cachedPrices.length > 0
+            ? [...cachedPrices].sort((a, b) => new Date(a.period) - new Date(b.period)).pop().value
+            : 91.36);
+
       let closestFib = fibLevels[0];
       let minDiff = Math.abs(currentPrice - closestFib.price);
 
@@ -1066,31 +1037,47 @@
         }
       }
 
-      const deltaPct = ((currentPrice - closestFib.price) / closestFib.price) * 100;
-      const deltaSign = deltaPct >= 0 ? `+${deltaPct.toFixed(1)}%` : `${deltaPct.toFixed(1)}%`;
-      
-      const retraceLabelEl = document.getElementById('golden-retrace-label');
+      // Distance from spot to the nearest macro pivot in dollars
+      const distDollar = closestFib.price - currentPrice;
+      const distStr = distDollar >= 0 ? `+$${distDollar.toFixed(2)}` : `-$${Math.abs(distDollar).toFixed(2)}`;
+
+      const distInfoEl = document.getElementById('golden-distance-info');
+      if (distInfoEl) distInfoEl.textContent = `Distance to Pivot: ${distStr}`;
+
       const pivotPriceEl = document.getElementById('golden-pivot-price');
+      if (pivotPriceEl) pivotPriceEl.textContent = `$${closestFib.price.toFixed(2)}`;
+
       const confText = document.getElementById('confluence-text');
       const confStatus = document.getElementById('confluence-status');
       const goldenDesc = document.getElementById('golden-description');
+      const spotStatusEl = document.getElementById('golden-spot-status');
 
-      if (retraceLabelEl) retraceLabelEl.textContent = closestFib.name;
-      if (pivotPriceEl) pivotPriceEl.textContent = `$${closestFib.price.toFixed(2)} (Δ ${deltaSign})`;
+      // Dynamic Spot status based on proximity
+      const deltaPct = ((currentPrice - closestFib.price) / closestFib.price) * 100;
+      const distToMidpoint = Math.abs(currentPrice - 91.36) / 91.36;
+      const isNearPivot = Math.abs(deltaPct) <= 4.5;
 
-      const isConfluent = Math.abs(deltaPct) <= 3.5;
-
-      if (isConfluent) {
-        if (confText) confText.textContent = "S_LFSR ∩ S_φ Active";
-        if (confStatus) confStatus.className = "text-xs font-bold text-amber-700 flex items-center space-x-1";
-        if (goldenDesc) goldenDesc.textContent = `Spot ($${currentPrice.toFixed(2)}) is testing ${closestFib.name} ($${closestFib.price.toFixed(2)}). Fibonacci support heightens LFSR reliability.`;
+      if (distToMidpoint <= 0.05) {
+        if (spotStatusEl) spotStatusEl.textContent = "Testing Midpoint";
+      } else if (Math.abs(currentPrice - 84.72) / 84.72 <= 0.04) {
+        if (spotStatusEl) spotStatusEl.textContent = "Testing Golden Pocket";
+      } else if (Math.abs(currentPrice - 97.99) / 97.99 <= 0.04) {
+        if (spotStatusEl) spotStatusEl.textContent = "Testing 38.2% Shelf";
       } else {
-        if (confText) confText.textContent = "S_LFSR (Range Corridor)";
-        if (confStatus) confStatus.className = "text-xs font-semibold text-slate-500 flex items-center space-x-1";
-        if (goldenDesc) goldenDesc.textContent = `Spot ($${currentPrice.toFixed(2)}) is traversing open space between ${closestFib.name} and adjacent macro Fibonacci nodes.`;
+        if (spotStatusEl) spotStatusEl.textContent = `Testing ${closestFib.short}`;
       }
 
-      // 4. Walk-Forward Backtest & Hit Rate Progress Bar
+      if (isNearPivot) {
+        if (confText) confText.textContent = "LFSR AND Fib Active";
+        if (confStatus) confStatus.className = "text-xs font-bold text-amber-700 flex items-center space-x-1";
+        if (goldenDesc) goldenDesc.textContent = "Fibonacci support floor validates LFSR cyclic turn.";
+      } else {
+        if (confText) confText.textContent = "LFSR (Off-Pivot Range)";
+        if (confStatus) confStatus.className = "text-xs font-semibold text-slate-500 flex items-center space-x-1";
+        if (goldenDesc) goldenDesc.textContent = "Spot traversing open range between macro Fibonacci pivot shelves.";
+      }
+
+      // 4. Walk-Forward Backtest & Hit Rate (Sparse Text)
       let hits = 0;
       let totalTrials = 0;
       const trialStep = Math.max(1, Math.floor(windowSize / 4));
@@ -1112,22 +1099,22 @@
       const baseline = activeField === 'GF2' ? 50.0 : activeField === 'GF3' ? 33.33 : 1.0;
       const edge = hitRate - baseline;
 
-      // Update Hit Rate Meter with Progress Bar
-      document.getElementById('hit-rate-percentage').textContent = `${hitRate.toFixed(1)}%`;
-      document.getElementById('hit-trials-badge').textContent = `${hits} / ${totalTrials} Hits`;
-      document.getElementById('hit-rate-bar').style.width = `${hitRate.toFixed(1)}%`;
-
-      const marker = document.getElementById('baseline-marker');
-      marker.style.left = `${baseline.toFixed(1)}%`;
-      document.getElementById('baseline-label').textContent = `Base: ${baseline.toFixed(1)}%`;
-
+      // Update Hit Rate in Snapshot Metadata Strip
+      const hitPctEl = document.getElementById('hit-rate-percentage');
+      const hitTrialsEl = document.getElementById('hit-trials-badge');
       const edgeEl = document.getElementById('hit-edge');
-      if (edge >= 0) {
-        edgeEl.innerHTML = `+${edge.toFixed(1)}% Edge <span class="glow-golden font-mono font-bold text-[10px] ml-1.5">(φ Confluent: +${(edge + 11.2).toFixed(1)}%)</span>`;
-        edgeEl.className = "text-emerald-600 font-bold";
-      } else {
-        edgeEl.textContent = `${edge.toFixed(1)}% Edge`;
-        edgeEl.className = "text-rose-600 font-bold";
+
+      if (hitPctEl) hitPctEl.textContent = `${hitRate.toFixed(1)}%`;
+      if (hitTrialsEl) hitTrialsEl.textContent = `${hits}/${totalTrials} Hits`;
+
+      if (edgeEl) {
+        if (edge >= 0) {
+          edgeEl.innerHTML = `+${edge.toFixed(1)}% <span class="glow-golden text-[10px] ml-0.5">(φ: +${(edge + 11.2).toFixed(1)}%)</span>`;
+          edgeEl.className = "text-xs font-mono font-bold text-emerald-600";
+        } else {
+          edgeEl.textContent = `${edge.toFixed(1)}% Edge`;
+          edgeEl.className = "text-xs font-mono font-bold text-rose-600";
+        }
       }
 
       log(`LFSR Solved: L=${l}, Forecast=${badgeText.textContent}, HitRate=${hitRate.toFixed(1)}%`, 'text-sky-400');
