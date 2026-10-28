@@ -1,0 +1,22 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "cleanUrls": true,
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/index"
+    },
+    {
+      "source": "/sparse",
+      "destination": "/public/sparse-glow.html"
+    },
+    {
+      "source": "/plan",
+      "destination": "/public/plan.html"
+    },
+    {
+      "source": "/",
+      "destination": "/public/sparse-glow.html"
+    }
+  ]
+}

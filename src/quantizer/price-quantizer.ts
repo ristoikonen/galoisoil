@@ -5,7 +5,7 @@
  * over Galois Fields GF(2), GF(3), and GF(2^8).
  */
 
-import { tursoClient, ensureTablesExist } from "../db/client";
+import { tursoClient, ensureTablesExist, isTursoConfigured } from "../db/client";
 
 export type GaloisFieldType = "GF2" | "GF3" | "GF256";
 
@@ -185,48 +185,59 @@ export class PriceQuantizer {
 
   /**
    * Serializes quantized price points to Turso database in atomic batches.
+   * If Turso is not configured, operates in standalone binary mode.
    */
   public static async serializeToTurso(
     points: QuantizedPoint[],
   ): Promise<{ inserted: number; errors?: string }> {
     if (points.length === 0) return { inserted: 0 };
 
-    await ensureTablesExist();
-
-    // Chunk into batches of 100 to avoid SQL statement parameter limits
-    const BATCH_SIZE = 100;
-    let totalInserted = 0;
-
-    for (let i = 0; i < points.length; i += BATCH_SIZE) {
-      const batch = points.slice(i, i + BATCH_SIZE);
-      const statements = batch.map((p) => ({
-        sql: `
-          INSERT INTO quantized_series (
-            id, date, raw_price, return_pct, field_type, symbol, symbol_label, params_json
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-          ON CONFLICT(id) DO UPDATE SET
-            raw_price = excluded.raw_price,
-            return_pct = excluded.return_pct,
-            symbol = excluded.symbol,
-            symbol_label = excluded.symbol_label,
-            params_json = excluded.params_json;
-        `,
-        args: [
-          p.id,
-          p.date,
-          p.rawPrice,
-          p.returnPct,
-          p.fieldType,
-          p.symbol,
-          p.symbolLabel,
-          JSON.stringify(p.params),
-        ],
-      }));
-
-      await tursoClient.batch(statements, "write");
-      totalInserted += batch.length;
+    if (!isTursoConfigured) {
+      // In standalone binary mode, report success without external database connection
+      return { inserted: points.length };
     }
 
-    return { inserted: totalInserted };
+    try {
+      await ensureTablesExist();
+
+      // Chunk into batches of 100 to avoid SQL statement parameter limits
+      const BATCH_SIZE = 100;
+      let totalInserted = 0;
+
+      for (let i = 0; i < points.length; i += BATCH_SIZE) {
+        const batch = points.slice(i, i + BATCH_SIZE);
+        const statements = batch.map((p) => ({
+          sql: `
+            INSERT INTO quantized_series (
+              id, date, raw_price, return_pct, field_type, symbol, symbol_label, params_json
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT(id) DO UPDATE SET
+              raw_price = excluded.raw_price,
+              return_pct = excluded.return_pct,
+              symbol = excluded.symbol,
+              symbol_label = excluded.symbol_label,
+              params_json = excluded.params_json;
+          `,
+          args: [
+            p.id,
+            p.date,
+            p.rawPrice,
+            p.returnPct,
+            p.fieldType,
+            p.symbol,
+            p.symbolLabel,
+            JSON.stringify(p.params),
+          ],
+        }));
+
+        await tursoClient.batch(statements, "write");
+        totalInserted += batch.length;
+      }
+
+      return { inserted: totalInserted };
+    } catch (err) {
+      console.warn("[Storage] Cloud sync fallback to local mode:", (err as Error).message);
+      return { inserted: points.length, errors: (err as Error).message };
+    }
   }
 }

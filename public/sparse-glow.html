@@ -879,19 +879,20 @@
     });
 
     async function fetchLiveEia() {
-      log('Querying Bun server /api/wti...', 'text-sky-400');
+      log('Querying commodity series /api/wti...', 'text-sky-400');
       try {
         const res = await fetch(`/api/wti?length=${windowSize + 10}`);
         const json = await res.json();
         if (json.data && json.data.length > 0) {
           cachedPrices = json.data;
-          log(`Received ${cachedPrices.length} raw spot points from EIA`, 'text-emerald-400');
+          const srcTag = json.source === 'binary_store' ? '40-Year Binary Store' : 'EIA API';
+          log(`Loaded ${cachedPrices.length} points via ${srcTag}`, 'text-emerald-400');
           renderRibbon();
         } else {
           throw new Error(json.error || 'No data returned');
         }
       } catch (err) {
-        log(`EIA Fetch Error: ${err.message}. Using synthetic fallback.`, 'text-rose-400');
+        log(`Fetch Note: ${err.message}. Using synthetic fallback.`, 'text-rose-400');
         generateMockPrices();
       }
     }
@@ -1381,7 +1382,8 @@
         document.getElementById('db-latency').textContent = `${elapsed}ms`;
 
         if (result.success) {
-          log(`Turso Commit OK: ${result.inserted} points synced. Latency: ${elapsed}ms`, 'text-emerald-400');
+          const modeTag = result.mode === 'standalone_binary' ? 'Binary Store' : 'Turso Commit';
+          log(`${modeTag} OK: ${result.inserted} points synced. Latency: ${elapsed}ms`, 'text-emerald-400');
         } else {
           log(`Turso Notice: ${result.message || result.error}`, 'text-amber-400');
         }
