@@ -5,10 +5,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>GaloisOil Estimator</title>
-  <meta name="GaloisOil - Estimates Wti, Brent and Henry Hub price movements" content="Predictions based on Galois Field Theory, LFSR Theory, Berlekamp-Massey Algorithm and Golden Ratio limits.>
+  <meta name="description" content="GaloisOil - Estimates WTI, Brent and Henry Hub price movements based on Galois Field Theory, LFSR Theory, Berlekamp-Massey Algorithm and Golden Ratio limits.">
 
-  <script src=" https://cdn.tailwindcss.com">
-  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lightweight-charts@4.2.1/dist/lightweight-charts.standalone.production.js"></script>
   <script>
     tailwind.config = {
@@ -176,10 +175,6 @@
         <div class="flex items-center space-x-2">
           <span class="font-bold text-xl sm:text-2xl tracking-tight text-slate-900">GALOIS<span
               class="text-sky-600">OIL</span></span>
-          <span
-            class="px-2.5 py-0.5 text-[11px] font-mono font-semibold bg-purple-50 text-purple-700 border border-purple-200 rounded-full">
-            BY RISUKKO TECH
-          </span>
         </div>
       </div>
     </div>
@@ -243,9 +238,7 @@
                   title="Close">✕</button>
               </div>
               <p class="text-slate-200 font-normal leading-relaxed">
-                Select the finite field domain for discrete price modeling. GF(2) captures binary direction (Up/Down),
-                GF(3) adds a neutral deadband for sideways noise, and GF(2⁸) represents 256 byte states for rich
-                algebraic sequence analysis.
+                Select the field for price modeling. GF(2) captures direction (Up/Down), GF(3) adds a neutral deadband for sideways noise, and GF(2⁸) represents 256 byte states for sequence analysis.
               </p>
               <div
                 class="absolute -bottom-2 left-20 w-3.5 h-3.5 bg-[#0B2338] border-r border-b border-[#1e3a5f] transform rotate-45">
@@ -302,9 +295,7 @@
                   title="Close">✕</button>
               </div>
               <p class="text-slate-200 font-normal leading-relaxed">
-                Sets percentage deadband threshold for quantizing returns. Daily percentage price changes smaller than
-                ±θ collapse into the neutral Flat (0) token, filtering high-frequency market noise before symbols enter
-                the Berlekamp-Massey LFSR recurrence solver.
+                Sets percentage deadband threshold for quantizing returns. Price changes smaller than ±θ% collapse into Flat (0) token, filtering market noise.
               </p>
               <div
                 class="absolute -bottom-2 left-20 w-3.5 h-3.5 bg-[#0B2338] border-r border-b border-[#1e3a5f] transform rotate-45">
@@ -356,9 +347,7 @@
                   title="Close">✕</button>
               </div>
               <p class="text-slate-200 font-normal leading-relaxed">
-                Sets the discrete history window length of quantized price symbols supplied to the LFSR solver.
-                Fibonacci sample lengths (13, 34, 89) align sequence sampling with natural macro market cycle resonance
-                and harmonic recurrence.
+                Sets the history window length of quantized price symbols to the LFSR solver. Fibonacci sample lengths align sequence sampling with macro market cycle.
               </p>
               <div
                 class="absolute -bottom-2 left-20 w-3.5 h-3.5 bg-[#0B2338] border-r border-b border-[#1e3a5f] transform rotate-45">
@@ -392,13 +381,14 @@
         <div>
           <div class="flex items-center justify-between mb-3">
             <span id="help-trigger-turso" onclick="toggleHelp('help-pop-turso', event)"
-              class="help-trigger cursor-pointer text-[11px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 hover:bg-emerald-100 hover:border-emerald-300 px-2 py-0.5 rounded border border-emerald-200 font-mono transition-all flex items-center space-x-1 select-none"
+              class="help-trigger cursor-pointer text-[11px] font-bold uppercase tracking-wider text-slate-600 bg-slate-100 hover:bg-slate-200 hover:border-slate-300 px-2 py-0.5 rounded border border-slate-200 font-mono transition-all flex items-center space-x-1 select-none"
               title="Click for explanation">
               <span>Turso DB</span>
-              <span class="text-[9px] text-emerald-500 font-sans font-bold">ℹ</span>
+              <span class="text-[9px] text-slate-400 font-sans font-bold">ℹ</span>
             </span>
-            <span class="text-xs font-mono text-emerald-600 flex items-center">
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5 animate-pulse"></span>Connected
+            <span id="turso-status-badge" class="text-xs font-mono text-slate-500 flex items-center font-medium">
+              <span id="turso-status-dot" class="w-1.5 h-1.5 rounded-full bg-slate-400 mr-1.5"></span>
+              <span id="turso-status-text">Not connected</span>
             </span>
 
             <!-- Popover for 'Turso DB' -->
@@ -411,10 +401,8 @@
                   class="text-slate-300 hover:text-[#FFAB70] text-base font-bold px-1.5 leading-none transition-colors"
                   title="Close">✕</button>
               </div>
-              <p class="text-slate-200 font-normal leading-relaxed">
-                Controls live persistent database synchronization with Turso LibSQL cloud. When enabled, each newly
-                calculated discrete price token, LFSR connection polynomial, and forward transition prediction is
-                committed atomically to cloud storage for multi-session persistence.
+              <p id="turso-popup-text" class="text-slate-200 font-normal leading-relaxed">
+                When enabled, each price token, LFSR polynomial, and forward prediction is committed to Turso storage. When disabled, prediction data is not stored and historical prices in Bin are used.
               </p>
               <div
                 class="absolute -bottom-2 right-20 w-3.5 h-3.5 bg-[#0B2338] border-r border-b border-[#1e3a5f] transform rotate-45">
@@ -424,11 +412,12 @@
           <h3 class="text-sm font-bold text-slate-900 mb-1">Cloud Serialization</h3>
           <p class="text-xs themed-subtext mb-2.5">Atomic batch commit of quantized vectors.</p>
 
-          <label
-            class="flex items-center space-x-3 py-3 px-3.5 rounded-xl themed-control border border-slate-200 cursor-pointer hover:border-slate-300 transition-all">
-            <input type="checkbox" id="auto-sync-checkbox"
-              class="w-4 h-4 rounded text-sky-600 focus:ring-0 bg-white border-slate-300">
-            <span class="text-xs font-mono text-slate-700 font-medium">Live DB Upsert</span>
+          <label id="auto-sync-label"
+            class="flex items-center space-x-3 py-3 px-3.5 rounded-xl themed-control border border-slate-200 cursor-not-allowed opacity-60 transition-all"
+            title="When disabled, prediction data is not stored and historical prices in Bin are used. See Bin data date in the Telemetry & Turso Sync section.">
+            <input type="checkbox" id="auto-sync-checkbox" disabled
+              class="w-4 h-4 rounded text-sky-600 focus:ring-0 bg-white border-slate-300 cursor-not-allowed">
+            <span class="text-xs font-mono text-slate-500 font-medium">Live DB Upsert</span>
           </label>
         </div>
 
@@ -806,7 +795,7 @@
             <div class="text-slate-500">// System initialized. Bun.serve listening.</div>
             <div class="text-sky-400">&gt; EIA API Client: Ready (RWTC daily spot).</div>
             <div class="text-purple-400">&gt; Galois Field Arithmetic: GF(2), GF(3), GF(2^8).</div>
-            <div class="text-emerald-400">&gt; Turso DB: Tables verified (quantized_series).</div>
+            <div id="turso-telemetry-init" class="text-slate-400">&gt; Turso DB: Standalone Binary Mode (not connected).</div>
           </div>
         </div>
 
@@ -1127,6 +1116,64 @@
       }
     }
 
+    function updateTursoUI(isConfigured) {
+      const statusBadge = document.getElementById('turso-status-badge');
+      const statusDot = document.getElementById('turso-status-dot');
+      const statusText = document.getElementById('turso-status-text');
+      const checkbox = document.getElementById('auto-sync-checkbox');
+      const label = document.getElementById('auto-sync-label');
+      const popupText = document.getElementById('turso-popup-text');
+      const helpTrigger = document.getElementById('help-trigger-turso');
+      const initLog = document.getElementById('turso-telemetry-init');
+
+      if (isConfigured) {
+        if (statusBadge) statusBadge.className = 'text-xs font-mono text-emerald-600 flex items-center font-medium';
+        if (statusDot) statusDot.className = 'w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5 animate-pulse';
+        if (statusText) statusText.textContent = 'Connected';
+        if (helpTrigger) {
+          helpTrigger.className = 'help-trigger cursor-pointer text-[11px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 hover:bg-emerald-100 hover:border-emerald-300 px-2 py-0.5 rounded border border-emerald-200 font-mono transition-all flex items-center space-x-1 select-none';
+        }
+        if (checkbox) {
+          checkbox.disabled = false;
+          checkbox.classList.remove('cursor-not-allowed');
+        }
+        if (label) {
+          label.className = 'flex items-center space-x-3 py-3 px-3.5 rounded-xl themed-control border border-slate-200 cursor-pointer hover:border-slate-300 transition-all';
+          label.title = 'Controls live persistent database synchronization with Turso LibSQL cloud.';
+        }
+        if (popupText) {
+          popupText.textContent = 'Controls live persistent database synchronization with Turso LibSQL cloud. When enabled, each newly calculated discrete price token, LFSR connection polynomial, and forward transition prediction is committed atomically to cloud storage for multi-session persistence.';
+        }
+        if (initLog) {
+          initLog.className = 'text-emerald-400';
+          initLog.textContent = '> Turso DB: Tables verified (quantized_series).';
+        }
+      } else {
+        if (statusBadge) statusBadge.className = 'text-xs font-mono text-slate-500 flex items-center font-medium';
+        if (statusDot) statusDot.className = 'w-1.5 h-1.5 rounded-full bg-slate-400 mr-1.5';
+        if (statusText) statusText.textContent = 'Not connected';
+        if (helpTrigger) {
+          helpTrigger.className = 'help-trigger cursor-pointer text-[11px] font-bold uppercase tracking-wider text-slate-600 bg-slate-100 hover:bg-slate-200 hover:border-slate-300 px-2 py-0.5 rounded border border-slate-200 font-mono transition-all flex items-center space-x-1 select-none';
+        }
+        if (checkbox) {
+          checkbox.disabled = true;
+          checkbox.checked = false;
+          checkbox.classList.add('cursor-not-allowed');
+        }
+        if (label) {
+          label.className = 'flex items-center space-x-3 py-3 px-3.5 rounded-xl themed-control border border-slate-200 cursor-not-allowed opacity-60 transition-all';
+          label.title = 'When disabled, prediction data is not stored and historical prices in Bin are used.';
+        }
+        if (popupText) {
+          popupText.textContent = 'When enabled, each price token, LFSR polynomial, and forward prediction is committed to Turso storage. When disabled, prediction data is not stored and historical prices in Bin are used.';
+        }
+        if (initLog) {
+          initLog.className = 'text-slate-400';
+          initLog.textContent = '> Turso DB: Standalone Binary Mode (not connected).';
+        }
+      }
+    }
+
     async function initServerMode() {
       try {
         const res = await fetch('/api/series/list');
@@ -1134,7 +1181,11 @@
         if (json.mode) {
           serverMode = json.mode;
         }
-      } catch (e) { }
+        const isConfigured = Boolean(json.isTursoConfigured ?? (json.mode === 'cloud_hybrid'));
+        updateTursoUI(isConfigured);
+      } catch (e) {
+        updateTursoUI(false);
+      }
     }
 
     async function fetchLiveEia() {
@@ -1622,6 +1673,11 @@
     }
 
     async function runQuantizeAndSync() {
+      const chk = document.getElementById('auto-sync-checkbox');
+      if (chk && (chk.disabled || !chk.checked)) {
+        log('Live DB Upsert skipped (Turso DB not connected or upsert disabled).', 'text-slate-400');
+        return;
+      }
       log('Running PriceQuantizer and serializing to Turso...', 'text-sky-400');
       const start = performance.now();
       try {

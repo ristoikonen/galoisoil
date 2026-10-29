@@ -4,7 +4,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GaloisOil Collaborative Field Tuner</title>
+  <title>GaloisOil Estimator</title>
+  <meta name="description" content="GaloisOil - Estimates WTI, Brent and Henry Hub price movements based on Galois Field Theory, LFSR Theory, Berlekamp-Massey Algorithm and Golden Ratio limits.">
+
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lightweight-charts@4.2.1/dist/lightweight-charts.standalone.production.js"></script>
   <script>
@@ -173,10 +175,6 @@
         <div class="flex items-center space-x-2">
           <span class="font-bold text-xl sm:text-2xl tracking-tight text-slate-900">GALOIS<span
               class="text-sky-600">OIL</span></span>
-          <span
-            class="px-2.5 py-0.5 text-[11px] font-mono font-semibold bg-purple-50 text-purple-700 border border-purple-200 rounded-full">
-            BY RISUKKO TECH
-          </span>
         </div>
       </div>
     </div>
@@ -233,19 +231,25 @@
             <div id="help-pop-field"
               class="card-help-popover hidden absolute left-0 bottom-[calc(100%+12px)] z-40 w-80 p-4 bg-[#0B2338] text-slate-200 rounded-xl shadow-2xl border border-[#1e3a5f] text-xs leading-relaxed select-text">
               <div class="flex items-center justify-between pb-2 mb-2 border-b border-[#1e3a5f]">
-                <span class="font-mono font-bold text-[#FFAB70] text-xs uppercase tracking-wide">Galois Field Domain</span>
-                <button onclick="toggleHelp('help-pop-field', event)" class="text-slate-300 hover:text-[#FFAB70] text-base font-bold px-1.5 leading-none transition-colors" title="Close">✕</button>
+                <span class="font-mono font-bold text-[#FFAB70] text-xs uppercase tracking-wide">Galois Field
+                  Domain</span>
+                <button onclick="toggleHelp('help-pop-field', event)"
+                  class="text-slate-300 hover:text-[#FFAB70] text-base font-bold px-1.5 leading-none transition-colors"
+                  title="Close">✕</button>
               </div>
               <p class="text-slate-200 font-normal leading-relaxed">
-                Select the finite field domain for discrete price modeling. GF(2) captures binary direction (Up/Down), GF(3) adds a neutral deadband for sideways noise, and GF(2⁸) represents 256 byte states for rich algebraic sequence analysis.
+                Select the field for price modeling. GF(2) captures direction (Up/Down), GF(3) adds a neutral deadband for sideways noise, and GF(2⁸) represents 256 byte states for sequence analysis.
               </p>
-              <div class="absolute -bottom-2 left-20 w-3.5 h-3.5 bg-[#0B2338] border-r border-b border-[#1e3a5f] transform rotate-45"></div>
+              <div
+                class="absolute -bottom-2 left-20 w-3.5 h-3.5 bg-[#0B2338] border-r border-b border-[#1e3a5f] transform rotate-45">
+              </div>
             </div>
           </div>
           <h3 class="text-sm font-bold text-slate-900 mb-1">Galois Field Domain</h3>
           <p class="text-xs themed-subtext mb-2.5">Target algebraic space for price transitions.</p>
 
-          <div class="grid grid-cols-3 gap-1.5 p-1 themed-control rounded-xl border border-slate-200" id="field-selector">
+          <div class="grid grid-cols-3 gap-1.5 p-1 themed-control rounded-xl border border-slate-200"
+            id="field-selector">
             <button onclick="setField('GF2')" id="btn-gf2"
               class="field-btn py-2.5 text-xs font-mono font-medium rounded-lg themed-control text-slate-600 hover:text-slate-900 transition-all text-center">
               GF(2)
@@ -284,13 +288,18 @@
             <div id="help-pop-threshold"
               class="card-help-popover hidden absolute left-0 bottom-[calc(100%+12px)] z-40 w-80 p-4 bg-[#0B2338] text-slate-200 rounded-xl shadow-2xl border border-[#1e3a5f] text-xs leading-relaxed select-text">
               <div class="flex items-center justify-between pb-2 mb-2 border-b border-[#1e3a5f]">
-                <span class="font-mono font-bold text-[#FFAB70] text-xs uppercase tracking-wide">Ternary Deadband (θ)</span>
-                <button onclick="toggleHelp('help-pop-threshold', event)" class="text-slate-300 hover:text-[#FFAB70] text-base font-bold px-1.5 leading-none transition-colors" title="Close">✕</button>
+                <span class="font-mono font-bold text-[#FFAB70] text-xs uppercase tracking-wide">Ternary Deadband
+                  (θ)</span>
+                <button onclick="toggleHelp('help-pop-threshold', event)"
+                  class="text-slate-300 hover:text-[#FFAB70] text-base font-bold px-1.5 leading-none transition-colors"
+                  title="Close">✕</button>
               </div>
               <p class="text-slate-200 font-normal leading-relaxed">
-                Sets percentage deadband threshold for quantizing returns. Daily percentage price changes smaller than ±θ collapse into the neutral Flat (0) token, filtering high-frequency market noise before symbols enter the Berlekamp-Massey LFSR recurrence solver.
+                Sets percentage deadband threshold for quantizing returns. Price changes smaller than ±θ% collapse into Flat (0) token, filtering market noise.
               </p>
-              <div class="absolute -bottom-2 left-20 w-3.5 h-3.5 bg-[#0B2338] border-r border-b border-[#1e3a5f] transform rotate-45"></div>
+              <div
+                class="absolute -bottom-2 left-20 w-3.5 h-3.5 bg-[#0B2338] border-r border-b border-[#1e3a5f] transform rotate-45">
+              </div>
             </div>
           </div>
           <h3 class="text-sm font-bold text-slate-900 mb-1">Ternary Deadband</h3>
@@ -331,13 +340,18 @@
             <div id="help-pop-window"
               class="card-help-popover hidden absolute left-0 bottom-[calc(100%+12px)] z-40 w-80 p-4 bg-[#0B2338] text-slate-200 rounded-xl shadow-2xl border border-[#1e3a5f] text-xs leading-relaxed select-text">
               <div class="flex items-center justify-between pb-2 mb-2 border-b border-[#1e3a5f]">
-                <span class="font-mono font-bold text-[#FFAB70] text-xs uppercase tracking-wide">Sequence Window (W)</span>
-                <button onclick="toggleHelp('help-pop-window', event)" class="text-slate-300 hover:text-[#FFAB70] text-base font-bold px-1.5 leading-none transition-colors" title="Close">✕</button>
+                <span class="font-mono font-bold text-[#FFAB70] text-xs uppercase tracking-wide">Sequence Window
+                  (W)</span>
+                <button onclick="toggleHelp('help-pop-window', event)"
+                  class="text-slate-300 hover:text-[#FFAB70] text-base font-bold px-1.5 leading-none transition-colors"
+                  title="Close">✕</button>
               </div>
               <p class="text-slate-200 font-normal leading-relaxed">
-                Sets the discrete history window length of quantized price symbols supplied to the LFSR solver. Fibonacci sample lengths (13, 34, 89) align sequence sampling with natural macro market cycle resonance and harmonic recurrence.
+                Sets the history window length of quantized price symbols to the LFSR solver. Fibonacci sample lengths align sequence sampling with macro market cycle.
               </p>
-              <div class="absolute -bottom-2 left-20 w-3.5 h-3.5 bg-[#0B2338] border-r border-b border-[#1e3a5f] transform rotate-45"></div>
+              <div
+                class="absolute -bottom-2 left-20 w-3.5 h-3.5 bg-[#0B2338] border-r border-b border-[#1e3a5f] transform rotate-45">
+              </div>
             </div>
           </div>
           <h3 class="text-sm font-bold text-slate-900 mb-1">Sequence Window</h3>
@@ -367,36 +381,43 @@
         <div>
           <div class="flex items-center justify-between mb-3">
             <span id="help-trigger-turso" onclick="toggleHelp('help-pop-turso', event)"
-              class="help-trigger cursor-pointer text-[11px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 hover:bg-emerald-100 hover:border-emerald-300 px-2 py-0.5 rounded border border-emerald-200 font-mono transition-all flex items-center space-x-1 select-none"
+              class="help-trigger cursor-pointer text-[11px] font-bold uppercase tracking-wider text-slate-600 bg-slate-100 hover:bg-slate-200 hover:border-slate-300 px-2 py-0.5 rounded border border-slate-200 font-mono transition-all flex items-center space-x-1 select-none"
               title="Click for explanation">
               <span>Turso DB</span>
-              <span class="text-[9px] text-emerald-500 font-sans font-bold">ℹ</span>
+              <span class="text-[9px] text-slate-400 font-sans font-bold">ℹ</span>
             </span>
-            <span class="text-xs font-mono text-emerald-600 flex items-center">
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5 animate-pulse"></span>Connected
+            <span id="turso-status-badge" class="text-xs font-mono text-slate-500 flex items-center font-medium">
+              <span id="turso-status-dot" class="w-1.5 h-1.5 rounded-full bg-slate-400 mr-1.5"></span>
+              <span id="turso-status-text">Not connected</span>
             </span>
 
             <!-- Popover for 'Turso DB' -->
             <div id="help-pop-turso"
               class="card-help-popover hidden absolute right-0 bottom-[calc(100%+12px)] z-40 w-80 p-4 bg-[#0B2338] text-slate-200 rounded-xl shadow-2xl border border-[#1e3a5f] text-xs leading-relaxed select-text">
               <div class="flex items-center justify-between pb-2 mb-2 border-b border-[#1e3a5f]">
-                <span class="font-mono font-bold text-[#FFAB70] text-xs uppercase tracking-wide">Turso Cloud Serialization</span>
-                <button onclick="toggleHelp('help-pop-turso', event)" class="text-slate-300 hover:text-[#FFAB70] text-base font-bold px-1.5 leading-none transition-colors" title="Close">✕</button>
+                <span class="font-mono font-bold text-[#FFAB70] text-xs uppercase tracking-wide">Turso Cloud
+                  Serialization</span>
+                <button onclick="toggleHelp('help-pop-turso', event)"
+                  class="text-slate-300 hover:text-[#FFAB70] text-base font-bold px-1.5 leading-none transition-colors"
+                  title="Close">✕</button>
               </div>
-              <p class="text-slate-200 font-normal leading-relaxed">
-                Controls live persistent database synchronization with Turso LibSQL cloud. When enabled, each newly calculated discrete price token, LFSR connection polynomial, and forward transition prediction is committed atomically to cloud storage for multi-session persistence.
+              <p id="turso-popup-text" class="text-slate-200 font-normal leading-relaxed">
+                When enabled, each price token, LFSR polynomial, and forward prediction is committed to Turso storage. When disabled, prediction data is not stored and historical prices in Bin are used.
               </p>
-              <div class="absolute -bottom-2 right-20 w-3.5 h-3.5 bg-[#0B2338] border-r border-b border-[#1e3a5f] transform rotate-45"></div>
+              <div
+                class="absolute -bottom-2 right-20 w-3.5 h-3.5 bg-[#0B2338] border-r border-b border-[#1e3a5f] transform rotate-45">
+              </div>
             </div>
           </div>
           <h3 class="text-sm font-bold text-slate-900 mb-1">Cloud Serialization</h3>
           <p class="text-xs themed-subtext mb-2.5">Atomic batch commit of quantized vectors.</p>
 
-          <label
-            class="flex items-center space-x-3 py-3 px-3.5 rounded-xl themed-control border border-slate-200 cursor-pointer hover:border-slate-300 transition-all">
-            <input type="checkbox" id="auto-sync-checkbox"
-              class="w-4 h-4 rounded text-sky-600 focus:ring-0 bg-white border-slate-300">
-            <span class="text-xs font-mono text-slate-700 font-medium">Live DB Upsert</span>
+          <label id="auto-sync-label"
+            class="flex items-center space-x-3 py-3 px-3.5 rounded-xl themed-control border border-slate-200 cursor-not-allowed opacity-60 transition-all"
+            title="When disabled, prediction data is not stored and historical prices in Bin are used. See Bin data date in the Telemetry & Turso Sync section.">
+            <input type="checkbox" id="auto-sync-checkbox" disabled
+              class="w-4 h-4 rounded text-sky-600 focus:ring-0 bg-white border-slate-300 cursor-not-allowed">
+            <span class="text-xs font-mono text-slate-500 font-medium">Live DB Upsert</span>
           </label>
         </div>
 
@@ -428,13 +449,20 @@
             <div id="help-pop-forecast"
               class="card-help-popover hidden absolute left-0 bottom-[calc(100%+12px)] z-40 w-80 p-4 bg-[#0B2338] text-slate-200 rounded-xl shadow-2xl border border-[#1e3a5f] text-xs leading-relaxed select-text">
               <div class="flex items-center justify-between pb-2 mb-2 border-b border-[#1e3a5f]">
-                <span class="font-mono font-bold text-[#FFAB70] text-xs uppercase tracking-wide">LFSR State Transition &amp; Forecast</span>
-                <button onclick="toggleHelp('help-pop-forecast', event)" class="text-slate-300 hover:text-[#FFAB70] text-base font-bold px-1.5 leading-none transition-colors" title="Close">✕</button>
+                <span class="font-mono font-bold text-[#FFAB70] text-xs uppercase tracking-wide">LFSR State Transition
+                  &amp; Forecast</span>
+                <button onclick="toggleHelp('help-pop-forecast', event)"
+                  class="text-slate-300 hover:text-[#FFAB70] text-base font-bold px-1.5 leading-none transition-colors"
+                  title="Close">✕</button>
               </div>
               <p class="text-slate-200 font-normal leading-relaxed">
-                Displays current session's quantized oil token alongside the LFSR forward-recurrence prediction for the upcoming trading session. Evaluates today and tomorrow transition states to identify trend continuation, mean reversion, or consolidation deadband drifts.
+                Displays current session's quantized oil token alongside the LFSR forward-recurrence prediction for the
+                upcoming trading session. Evaluates today and tomorrow transition states to identify trend continuation,
+                mean reversion, or consolidation deadband drifts.
               </p>
-              <div class="absolute -bottom-2 left-20 w-3.5 h-3.5 bg-[#0B2338] border-r border-b border-[#1e3a5f] transform rotate-45"></div>
+              <div
+                class="absolute -bottom-2 left-20 w-3.5 h-3.5 bg-[#0B2338] border-r border-b border-[#1e3a5f] transform rotate-45">
+              </div>
             </div>
           </div>
 
@@ -445,7 +473,8 @@
               <span class="text-[10px] font-mono uppercase tracking-wider text-slate-500 font-bold mb-1.5">
                 Today (t)
               </span>
-              <div id="today-symbol-badge" class="px-2.5 py-2.5 rounded-lg text-xs font-bold font-mono bg-rose-50 text-rose-700 border border-rose-300 shadow-sm flex items-center justify-center">
+              <div id="today-symbol-badge"
+                class="px-2.5 py-2.5 rounded-lg text-xs font-bold font-mono bg-rose-50 text-rose-700 border border-rose-300 shadow-sm flex items-center justify-center">
                 <span id="today-symbol-text">2 (DOWN)</span>
               </div>
             </div>
@@ -455,11 +484,13 @@
 
             <!-- TOMORROW (t+1) -->
             <div class="flex-1 py-3.5 px-3 rounded-xl themed-control border border-sky-200 bg-sky-50/30 flex flex-col">
-              <span class="text-[10px] font-mono uppercase tracking-wider text-sky-700 font-bold mb-1.5 flex items-center justify-between">
+              <span
+                class="text-[10px] font-mono uppercase tracking-wider text-sky-700 font-bold mb-1.5 flex items-center justify-between">
                 <span>Tomorrow (t+1)</span>
                 <span class="w-1.5 h-1.5 rounded-full bg-sky-500 animate-pulse"></span>
               </span>
-              <div id="forecast-symbol-badge" class="px-2.5 py-2.5 rounded-lg text-xs font-bold font-mono bg-emerald-50 text-emerald-700 border border-emerald-300 shadow-sm flex items-center justify-center">
+              <div id="forecast-symbol-badge"
+                class="px-2.5 py-2.5 rounded-lg text-xs font-bold font-mono bg-emerald-50 text-emerald-700 border border-emerald-300 shadow-sm flex items-center justify-center">
                 <span id="forecast-symbol-text">1 (UP)</span>
               </div>
             </div>
@@ -469,7 +500,8 @@
             LFSR recurrence predicts counter-trend rebound.
           </p>
         </div>
-        <div class="mt-2.5 pt-2 border-t border-sky-100 flex items-center justify-between text-[11px] font-mono themed-subtext">
+        <div
+          class="mt-2.5 pt-2 border-t border-sky-100 flex items-center justify-between text-[11px] font-mono themed-subtext">
           <span>Target Date:</span>
           <span id="forecast-date" class="text-slate-800 font-semibold font-mono">Next Trading Session</span>
         </div>
@@ -491,21 +523,31 @@
             <div id="help-pop-poly"
               class="card-help-popover hidden absolute left-0 bottom-[calc(100%+12px)] z-40 w-80 p-4 bg-[#0B2338] text-slate-200 rounded-xl shadow-2xl border border-[#1e3a5f] text-xs leading-relaxed select-text">
               <div class="flex items-center justify-between pb-2 mb-2 border-b border-[#1e3a5f]">
-                <span class="font-mono font-bold text-[#FFAB70] text-xs uppercase tracking-wide">Minimal Polynomial C(D)</span>
-                <button onclick="toggleHelp('help-pop-poly', event)" class="text-slate-300 hover:text-[#FFAB70] text-base font-bold px-1.5 leading-none transition-colors" title="Close">✕</button>
+                <span class="font-mono font-bold text-[#FFAB70] text-xs uppercase tracking-wide">Minimal Polynomial
+                  C(D)</span>
+                <button onclick="toggleHelp('help-pop-poly', event)"
+                  class="text-slate-300 hover:text-[#FFAB70] text-base font-bold px-1.5 leading-none transition-colors"
+                  title="Close">✕</button>
               </div>
               <p class="text-slate-200 font-normal leading-relaxed">
-                The shortest linear feedback shift register polynomial generating the observed discrete oil sequence. A lower linear complexity L relative to window size indicates underlying algebraic regularity, while L ≈ W/2 indicates complex or pseudorandom drift.
+                The shortest linear feedback shift register polynomial generating the observed discrete oil sequence. A
+                lower linear complexity L relative to window size indicates underlying algebraic regularity, while L ≈
+                W/2 indicates complex or pseudorandom drift.
               </p>
-              <div class="absolute -bottom-2 left-20 w-3.5 h-3.5 bg-[#0B2338] border-r border-b border-[#1e3a5f] transform rotate-45"></div>
+              <div
+                class="absolute -bottom-2 left-20 w-3.5 h-3.5 bg-[#0B2338] border-r border-b border-[#1e3a5f] transform rotate-45">
+              </div>
             </div>
           </div>
-          <div class="py-3.5 px-3.5 rounded-xl themed-control border border-slate-200 font-mono text-xs text-slate-800 font-semibold my-1.5 overflow-x-auto whitespace-nowrap shadow-sm">
+          <div
+            class="py-3.5 px-3.5 rounded-xl themed-control border border-slate-200 font-mono text-xs text-slate-800 font-semibold my-1.5 overflow-x-auto whitespace-nowrap shadow-sm">
             <span id="polynomial-display">1 + 2D + D^4 (mod 3)</span>
           </div>
-          <p class="text-xs themed-subtext mt-0.5">Shortest feedback register generating the observed price sequence.</p>
+          <p class="text-xs themed-subtext mt-0.5">Shortest feedback register generating the observed price sequence.
+          </p>
         </div>
-        <div class="mt-2.5 pt-2 border-t border-sky-100 flex items-center justify-between text-[11px] font-mono themed-subtext">
+        <div
+          class="mt-2.5 pt-2 border-t border-sky-100 flex items-center justify-between text-[11px] font-mono themed-subtext">
           <span>Algebraic Regularity:</span>
           <span id="regularity-status" class="text-sky-700 font-bold">Cyclic Structure (L &lt; W/2)</span>
         </div>
@@ -521,19 +563,27 @@
               <span>Golden Confluence</span>
               <span class="text-[9px] text-amber-500 font-sans font-bold">ℹ</span>
             </span>
-            <span id="golden-distance-info" class="text-xs font-mono text-purple-700 font-bold tracking-tight">Distance to Pivot: -$1.67</span>
+            <span id="golden-distance-info" class="text-xs font-mono text-purple-700 font-bold tracking-tight">Distance
+              to Pivot: -$1.67</span>
 
             <!-- Popover for 'Golden Confluence' -->
             <div id="help-pop-confluence"
               class="card-help-popover hidden absolute left-0 bottom-[calc(100%+12px)] z-40 w-80 p-4 bg-[#0B2338] text-slate-200 rounded-xl shadow-2xl border border-[#1e3a5f] text-xs leading-relaxed select-text">
               <div class="flex items-center justify-between pb-2 mb-2 border-b border-[#1e3a5f]">
-                <span class="font-mono font-bold text-[#FFAB70] text-xs uppercase tracking-wide">Macro Retracement Confluence</span>
-                <button onclick="toggleHelp('help-pop-confluence', event)" class="text-slate-300 hover:text-[#FFAB70] text-base font-bold px-1.5 leading-none transition-colors" title="Close">✕</button>
+                <span class="font-mono font-bold text-[#FFAB70] text-xs uppercase tracking-wide">Macro Retracement
+                  Confluence</span>
+                <button onclick="toggleHelp('help-pop-confluence', event)"
+                  class="text-slate-300 hover:text-[#FFAB70] text-base font-bold px-1.5 leading-none transition-colors"
+                  title="Close">✕</button>
               </div>
               <p class="text-slate-200 font-normal leading-relaxed">
-                Monitors convergence between algebraic LFSR cycle turns and structural Fibonacci swing shelf levels ($119.51 peak down to $63.21 base). Validates high-conviction market pivot entries when spot prices test critical pullback or golden pocket shelves.
+                Monitors convergence between algebraic LFSR cycle turns and structural Fibonacci swing shelf levels
+                ($119.51 peak down to $63.21 base). Validates high-conviction market pivot entries when spot prices test
+                critical pullback or golden pocket shelves.
               </p>
-              <div class="absolute -bottom-2 left-20 w-3.5 h-3.5 bg-[#0B2338] border-r border-b border-[#1e3a5f] transform rotate-45"></div>
+              <div
+                class="absolute -bottom-2 left-20 w-3.5 h-3.5 bg-[#0B2338] border-r border-b border-[#1e3a5f] transform rotate-45">
+              </div>
             </div>
           </div>
 
@@ -543,7 +593,8 @@
           </div>
 
           <!-- Confluence Indicator -->
-          <div class="py-3.5 px-3.5 rounded-xl themed-control border border-slate-200 font-mono text-xs my-1.5 shadow-sm flex items-center justify-between">
+          <div
+            class="py-3.5 px-3.5 rounded-xl themed-control border border-slate-200 font-mono text-xs my-1.5 shadow-sm flex items-center justify-between">
             <span class="text-[10px] uppercase text-slate-500 font-bold">Confluence:</span>
             <span id="confluence-status" class="text-xs font-bold text-amber-700 flex items-center space-x-1">
               <span class="w-1.5 h-1.5 rounded-full bg-[#f78522] animate-pulse"></span>
@@ -556,7 +607,8 @@
           </p>
         </div>
 
-        <div class="mt-2.5 pt-2 border-t border-sky-100 flex items-center justify-between text-[11px] font-mono themed-subtext">
+        <div
+          class="mt-2.5 pt-2 border-t border-sky-100 flex items-center justify-between text-[11px] font-mono themed-subtext">
           <span>Spot:</span>
           <span id="golden-spot-status" class="text-slate-800 font-semibold font-mono">Testing Midpoint</span>
         </div>
@@ -581,21 +633,26 @@
             </div>
             <div class="flex items-center space-x-2 text-xs font-mono">
               <span id="chart-data-range" class="text-slate-400">Loading daily spot...</span>
-              <button onclick="resetChartZoom()" class="px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors text-[11px] font-semibold" title="Reset zoom to fit all data">Fit</button>
+              <button onclick="resetChartZoom()"
+                class="px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors text-[11px] font-semibold"
+                title="Reset zoom to fit all data">Fit</button>
             </div>
           </div>
 
           <!-- Chart Body: Canvas (Left) + Small Layer Sidebar (Right) -->
           <div class="flex flex-col md:flex-row gap-4 h-[340px]">
             <!-- Chart Canvas Container -->
-            <div class="flex-1 relative h-full rounded-xl overflow-hidden border border-slate-100 bg-white" id="tv-chart-container">
-              <div id="tv-chart-loading" class="absolute inset-0 flex items-center justify-center text-xs font-mono text-slate-400 bg-white/80 z-10">
+            <div class="flex-1 relative h-full rounded-xl overflow-hidden border border-slate-100 bg-white"
+              id="tv-chart-container">
+              <div id="tv-chart-loading"
+                class="absolute inset-0 flex items-center justify-center text-xs font-mono text-slate-400 bg-white/80 z-10">
                 Initializing Lightweight Chart...
               </div>
             </div>
 
             <!-- Small Sidebar for Layer Opt-Out Toggles (Right) -->
-            <div class="w-full md:w-52 p-3 bg-slate-50/80 rounded-xl border border-slate-200 flex flex-col justify-between text-xs font-mono select-none">
+            <div
+              class="w-full md:w-52 p-3 bg-slate-50/80 rounded-xl border border-slate-200 flex flex-col justify-between text-xs font-mono select-none">
               <div>
                 <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-200">
                   <span class="font-bold text-slate-700 text-[11px] uppercase tracking-wider">Chart Layers</span>
@@ -608,7 +665,9 @@
                     <input type="checkbox" id="chk-layer-area" checked onchange="toggleLayerArea(this.checked)"
                       class="w-3.5 h-3.5 mt-0.5 rounded text-sky-600 focus:ring-0 bg-white border-slate-300 cursor-pointer">
                     <div>
-                      <span id="layer-area-label" class="block text-slate-800 font-semibold group-hover:text-sky-600 transition-colors">WTI Spot Area</span>
+                      <span id="layer-area-label"
+                        class="block text-slate-800 font-semibold group-hover:text-sky-600 transition-colors">WTI Spot
+                        Area</span>
                       <span id="layer-area-sub" class="block text-[10px] text-slate-400">Daily spot close curve</span>
                     </div>
                   </label>
@@ -618,7 +677,8 @@
                     <input type="checkbox" id="chk-layer-fib" checked onchange="renderFibLines()"
                       class="w-3.5 h-3.5 mt-0.5 rounded text-amber-600 focus:ring-0 bg-white border-slate-300 cursor-pointer">
                     <div>
-                      <span class="block text-slate-800 font-semibold group-hover:text-amber-600 transition-colors">7 Fibonacci Shelves</span>
+                      <span class="block text-slate-800 font-semibold group-hover:text-amber-600 transition-colors">7
+                        Fibonacci Shelves</span>
                       <span id="fib-grid-sub" class="block text-[10px] text-slate-400">$119.51 ➔ $63.21 Grid</span>
                     </div>
                   </label>
@@ -628,7 +688,9 @@
                     <input type="checkbox" id="chk-layer-markers" checked onchange="renderMarkers()"
                       class="w-3.5 h-3.5 mt-0.5 rounded text-[#f78522] focus:ring-0 bg-white border-slate-300 cursor-pointer">
                     <div>
-                      <span class="block text-slate-800 font-semibold group-hover:text-[#f78522] transition-colors">Confluence Signals</span>
+                      <span
+                        class="block text-slate-800 font-semibold group-hover:text-[#f78522] transition-colors">Confluence
+                        Signals</span>
                       <span class="block text-[10px] text-slate-400">LFSR ∩ Fib pivot alerts</span>
                     </div>
                   </label>
@@ -675,7 +737,8 @@
             </div>
             <div class="mt-0.5">
               <div id="hit-rate-percentage" class="text-xl font-bold font-mono text-emerald-600">100.0%</div>
-              <div id="hit-edge" class="text-[11px] font-mono font-bold text-emerald-600 mt-0.5 truncate">+66.7% <span class="glow-golden text-[10px] ml-0.5 font-normal">(φ: +77.9%)</span></div>
+              <div id="hit-edge" class="text-[11px] font-mono font-bold text-emerald-600 mt-0.5 truncate">+66.7% <span
+                  class="glow-golden text-[10px] ml-0.5 font-normal">(φ: +77.9%)</span></div>
             </div>
           </div>
         </div>
@@ -689,14 +752,19 @@
           </button>
 
           <!-- Collapsible Sequence Panel (Hidden by default) -->
-          <div id="collapsible-sequence-panel" class="hidden mt-2 p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs font-mono pb-2 border-b border-slate-200">
+          <div id="collapsible-sequence-panel"
+            class="hidden mt-2 p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
+            <div
+              class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs font-mono pb-2 border-b border-slate-200">
               <span class="font-bold text-slate-700">Chronological Galois Symbols (Oldest ➔ Today)</span>
               <div class="flex items-center space-x-3 text-[11px]">
                 <span class="text-slate-400">Legend:</span>
-                <span class="text-emerald-700 flex items-center font-medium"><span class="w-2 h-2 rounded bg-emerald-500 mr-1"></span>UP (1)</span>
-                <span class="text-slate-500 flex items-center font-medium"><span class="w-2 h-2 rounded bg-slate-400 mr-1"></span>FLAT (0)</span>
-                <span class="text-rose-700 flex items-center font-medium"><span class="w-2 h-2 rounded bg-rose-500 mr-1"></span>DOWN (2)</span>
+                <span class="text-emerald-700 flex items-center font-medium"><span
+                    class="w-2 h-2 rounded bg-emerald-500 mr-1"></span>UP (1)</span>
+                <span class="text-slate-500 flex items-center font-medium"><span
+                    class="w-2 h-2 rounded bg-slate-400 mr-1"></span>FLAT (0)</span>
+                <span class="text-rose-700 flex items-center font-medium"><span
+                    class="w-2 h-2 rounded bg-rose-500 mr-1"></span>DOWN (2)</span>
               </div>
             </div>
             <!-- Ribbon Tiles Container -->
@@ -727,14 +795,15 @@
             <div class="text-slate-500">// System initialized. Bun.serve listening.</div>
             <div class="text-sky-400">&gt; EIA API Client: Ready (RWTC daily spot).</div>
             <div class="text-purple-400">&gt; Galois Field Arithmetic: GF(2), GF(3), GF(2^8).</div>
-            <div class="text-emerald-400">&gt; Turso DB: Tables verified (quantized_series).</div>
+            <div id="turso-telemetry-init" class="text-slate-400">&gt; Turso DB: Standalone Binary Mode (not connected).</div>
           </div>
         </div>
 
         <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 text-[11px] font-mono space-y-1.5">
           <div class="flex justify-between items-center text-slate-600">
             <span class="text-slate-500 font-medium">Data source:</span>
-            <span id="data-source-badge" class="font-bold text-sky-700 bg-sky-50 px-2 py-0.5 rounded border border-sky-200">Bin</span>
+            <span id="data-source-badge"
+              class="font-bold text-sky-700 bg-sky-50 px-2 py-0.5 rounded border border-sky-200">Bin</span>
           </div>
           <div class="flex justify-between items-center text-slate-600">
             <span class="text-slate-500 font-medium">Date:</span>
@@ -1047,6 +1116,64 @@
       }
     }
 
+    function updateTursoUI(isConfigured) {
+      const statusBadge = document.getElementById('turso-status-badge');
+      const statusDot = document.getElementById('turso-status-dot');
+      const statusText = document.getElementById('turso-status-text');
+      const checkbox = document.getElementById('auto-sync-checkbox');
+      const label = document.getElementById('auto-sync-label');
+      const popupText = document.getElementById('turso-popup-text');
+      const helpTrigger = document.getElementById('help-trigger-turso');
+      const initLog = document.getElementById('turso-telemetry-init');
+
+      if (isConfigured) {
+        if (statusBadge) statusBadge.className = 'text-xs font-mono text-emerald-600 flex items-center font-medium';
+        if (statusDot) statusDot.className = 'w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5 animate-pulse';
+        if (statusText) statusText.textContent = 'Connected';
+        if (helpTrigger) {
+          helpTrigger.className = 'help-trigger cursor-pointer text-[11px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 hover:bg-emerald-100 hover:border-emerald-300 px-2 py-0.5 rounded border border-emerald-200 font-mono transition-all flex items-center space-x-1 select-none';
+        }
+        if (checkbox) {
+          checkbox.disabled = false;
+          checkbox.classList.remove('cursor-not-allowed');
+        }
+        if (label) {
+          label.className = 'flex items-center space-x-3 py-3 px-3.5 rounded-xl themed-control border border-slate-200 cursor-pointer hover:border-slate-300 transition-all';
+          label.title = 'Controls live persistent database synchronization with Turso LibSQL cloud.';
+        }
+        if (popupText) {
+          popupText.textContent = 'Controls live persistent database synchronization with Turso LibSQL cloud. When enabled, each newly calculated discrete price token, LFSR connection polynomial, and forward transition prediction is committed atomically to cloud storage for multi-session persistence.';
+        }
+        if (initLog) {
+          initLog.className = 'text-emerald-400';
+          initLog.textContent = '> Turso DB: Tables verified (quantized_series).';
+        }
+      } else {
+        if (statusBadge) statusBadge.className = 'text-xs font-mono text-slate-500 flex items-center font-medium';
+        if (statusDot) statusDot.className = 'w-1.5 h-1.5 rounded-full bg-slate-400 mr-1.5';
+        if (statusText) statusText.textContent = 'Not connected';
+        if (helpTrigger) {
+          helpTrigger.className = 'help-trigger cursor-pointer text-[11px] font-bold uppercase tracking-wider text-slate-600 bg-slate-100 hover:bg-slate-200 hover:border-slate-300 px-2 py-0.5 rounded border border-slate-200 font-mono transition-all flex items-center space-x-1 select-none';
+        }
+        if (checkbox) {
+          checkbox.disabled = true;
+          checkbox.checked = false;
+          checkbox.classList.add('cursor-not-allowed');
+        }
+        if (label) {
+          label.className = 'flex items-center space-x-3 py-3 px-3.5 rounded-xl themed-control border border-slate-200 cursor-not-allowed opacity-60 transition-all';
+          label.title = 'When disabled, prediction data is not stored and historical prices in Bin are used.';
+        }
+        if (popupText) {
+          popupText.textContent = 'When enabled, each price token, LFSR polynomial, and forward prediction is committed to Turso storage. When disabled, prediction data is not stored and historical prices in Bin are used.';
+        }
+        if (initLog) {
+          initLog.className = 'text-slate-400';
+          initLog.textContent = '> Turso DB: Standalone Binary Mode (not connected).';
+        }
+      }
+    }
+
     async function initServerMode() {
       try {
         const res = await fetch('/api/series/list');
@@ -1054,7 +1181,11 @@
         if (json.mode) {
           serverMode = json.mode;
         }
-      } catch (e) {}
+        const isConfigured = Boolean(json.isTursoConfigured ?? (json.mode === 'cloud_hybrid'));
+        updateTursoUI(isConfigured);
+      } catch (e) {
+        updateTursoUI(false);
+      }
     }
 
     async function fetchLiveEia() {
@@ -1444,8 +1575,8 @@
       const currentPrice = typeof lastPrice === 'number' && !isNaN(lastPrice)
         ? lastPrice
         : (cachedPrices && cachedPrices.length > 0
-            ? [...cachedPrices].sort((a, b) => new Date(a.period) - new Date(b.period)).pop().value
-            : 91.36);
+          ? [...cachedPrices].sort((a, b) => new Date(a.period) - new Date(b.period)).pop().value
+          : 91.36);
 
       let closestFib = fibLevels[0];
       let minDiff = Math.abs(currentPrice - closestFib.price);
@@ -1542,6 +1673,11 @@
     }
 
     async function runQuantizeAndSync() {
+      const chk = document.getElementById('auto-sync-checkbox');
+      if (chk && (chk.disabled || !chk.checked)) {
+        log('Live DB Upsert skipped (Turso DB not connected or upsert disabled).', 'text-slate-400');
+        return;
+      }
       log('Running PriceQuantizer and serializing to Turso...', 'text-sky-400');
       const start = performance.now();
       try {
@@ -1754,7 +1890,7 @@
       fibPriceLines.forEach(pl => {
         try {
           tvAreaSeries.removePriceLine(pl);
-        } catch (e) {}
+        } catch (e) { }
       });
       fibPriceLines = [];
 

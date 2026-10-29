@@ -18,13 +18,9 @@
  */
 
 import { BinaryPriceStore, type PriceRecord } from "../src/db/binary-store";
-import { writeFileSync, mkdirSync, existsSync } from "fs";
 import { join } from "path";
 
 const OUT_DIR = join(process.cwd(), "bonds_pbin");
-if (!existsSync(OUT_DIR)) {
-  mkdirSync(OUT_DIR, { recursive: true });
-}
 
 // Target 5,000 records (~20.0 KB = 5,000 * 4 bytes + 32 byte header)
 const TARGET_RECORDS = 5000;
@@ -196,7 +192,7 @@ async function main() {
       const buffer = BinaryPriceStore.encode(d.code, records, SCALE);
       const filename = `${d.code.toLowerCase()}.bin`;
       const outPath = join(OUT_DIR, filename);
-      writeFileSync(outPath, Buffer.from(buffer));
+      await Bun.write(outPath, buffer);
 
       const sizeBytes = buffer.byteLength;
       const earliest = records[0].period;
@@ -221,7 +217,7 @@ async function main() {
   }
 
   // Write manifest JSON
-  writeFileSync(join(OUT_DIR, "manifest.json"), JSON.stringify(manifest, null, 2));
+  await Bun.write(join(OUT_DIR, "manifest.json"), JSON.stringify(manifest, null, 2));
 
   // Write standalone unpacker script
   const unpackerCode = `/**
@@ -289,7 +285,7 @@ export function decodeBondPBIN(buffer: ArrayBuffer): DecodedBondSeries {
   return { symbol, count, scaleMultiplier, data };
 }
 `;
-  writeFileSync(join(OUT_DIR, "unpacker.ts"), unpackerCode);
+  await Bun.write(join(OUT_DIR, "unpacker.ts"), unpackerCode);
 
   console.log(`\nSuccessfully created all bond PBIN files in ${OUT_DIR}`);
 }

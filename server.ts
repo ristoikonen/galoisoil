@@ -142,6 +142,7 @@ const server = Bun.serve({
 
                 return Response.json({
                     mode: isTursoConfigured ? "cloud_hybrid" : "standalone_binary",
+                    isTursoConfigured,
                     commodities,
                 });
             },
