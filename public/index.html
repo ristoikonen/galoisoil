@@ -818,7 +818,7 @@
           </div>
           <div class="flex justify-between items-center text-slate-600">
             <span class="text-slate-500 font-medium">Date:</span>
-            <span id="data-last-date" class="text-slate-800 font-semibold">Bin: 20/10/2026</span>
+            <span id="data-last-date" class="text-slate-800 font-semibold">Bin: 27/10/2026</span>
           </div>
         </div>
       </div>
@@ -1108,11 +1108,15 @@
       if (!sourceBadge || !dateEl) return;
 
       const latestPrice = prices && prices.length > 0 ? prices[prices.length - 1] : null;
-      const binDateAu = latestPrice ? formatAuDate(latestPrice.period) : '20/10/2026';
+      const binDateAu = latestPrice ? formatAuDate(latestPrice.period) : '27/10/2026';
 
       const isHybrid = serverMode === 'cloud_hybrid' || source === 'Bin/DB';
 
-      if (isHybrid) {
+      if (source === 'Mock') {
+        sourceBadge.textContent = 'Mock (Server Offline)';
+        sourceBadge.className = 'font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded border border-rose-200';
+        dateEl.textContent = `Synthetic: ${binDateAu}`;
+      } else if (isHybrid) {
         sourceBadge.textContent = 'Bin/DB';
         sourceBadge.className = 'font-bold text-purple-700 bg-purple-50 px-2 py-0.5 rounded border border-purple-200';
         dateEl.innerHTML = `<span>DB: today</span> <span class="text-slate-400 font-normal">|</span> <span>Bin: ${binDateAu}</span>`;
@@ -1222,7 +1226,7 @@
 
     function generateMockPrices() {
       cachedPrices = [];
-      let base = 75.0;
+      let base = 103.37;
       const today = new Date();
       for (let i = windowSize + 10; i >= 0; i--) {
         const d = new Date(today);
@@ -1234,6 +1238,7 @@
           value: parseFloat(base.toFixed(2))
         });
       }
+      updateDataSourceInfo('Mock', cachedPrices);
       renderRibbon();
     }
 
