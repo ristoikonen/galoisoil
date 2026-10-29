@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "bun run --watch server.ts",
+    "hots": "bun run --hot server.ts",
     "bug": "bun --inspect-wait server.ts",
     "dug": "bun --inspect server.ts"
   },

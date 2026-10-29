@@ -5,6 +5,15 @@ import { PriceQuantizer, type GaloisFieldType } from "./src/quantizer/price-quan
 import { ensureTablesExist, isTursoConfigured } from "./src/db/client";
 import { BerlekampMassey } from "./src/math/berlekamp-massey";
 import { BinaryPriceStore, type PriceRecord, type DecodedSeries } from "./src/db/binary-store";
+import { renderDocsPageHtml } from "./src/docs/DocsPage";
+
+export interface GaloisSettings {
+    readonly mode: "read_only";
+}
+
+const galoisSettings: GaloisSettings = {
+    mode: "read_only",
+};
 
 const port = Number(Bun.env.APP_PORT ?? 3000);
 const host = Bun.env.APP_HOST ?? "localhost";
@@ -79,6 +88,20 @@ const server = Bun.serve({
                 return new Response(String(planPageText), {
                     headers: { "Content-Type": "text/html" },
                 });
+            },
+        },
+
+        "/docs": {
+            GET: async () => {
+                return new Response(renderDocsPageHtml(), {
+                    headers: { "Content-Type": "text/html; charset=utf-8" },
+                });
+            },
+        },
+
+        "/api/settings": {
+            GET: async () => {
+                return Response.json(galoisSettings);
             },
         },
 

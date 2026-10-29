@@ -5,7 +5,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>GaloisOil Estimator</title>
-  <meta name="description" content="GaloisOil - Estimates WTI, Brent and Henry Hub price movements based on Galois Field Theory, LFSR Theory, Berlekamp-Massey Algorithm and Golden Ratio limits.">
+  <meta name="description"
+    content="GaloisOil - Estimates WTI, Brent and Henry Hub price movements based on Galois Field Theory, LFSR Theory, Berlekamp-Massey Algorithm and Golden Ratio limits.">
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lightweight-charts@4.2.1/dist/lightweight-charts.standalone.production.js"></script>
@@ -161,8 +162,8 @@
   <header class="border-b border-slate-200 bg-white/90 backdrop-blur sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between">
       <!-- Left Branding -->
-      <div class="flex items-center space-x-3.5">
-        <!-- Twig SVG Logo -->
+      <div class="flex items-center space-x-3.5" onclick="window.alert('rirriir')">
+        <!-- RISUKKO SVG Logo -->
         <div class="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center shadow-md p-1.5 flex-shrink-0">
           <svg version="1.0" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%"
             viewBox="0 0 128.000000 128.000000" preserveAspectRatio="xMidYMid meet">
@@ -176,6 +177,11 @@
           <span class="font-bold text-xl sm:text-2xl tracking-tight text-slate-900">GALOIS<span
               class="text-sky-600">OIL</span></span>
         </div>
+      </div>
+
+      <!-- Upper-Right Corner Attribution -->
+      <div class="text-xs text-slate-500">
+        Part of Risukko Project. All rights reserved. ©Risto Ikonen 2026
       </div>
     </div>
   </header>
@@ -238,7 +244,8 @@
                   title="Close">✕</button>
               </div>
               <p class="text-slate-200 font-normal leading-relaxed">
-                Select the field for price modeling. GF(2) captures direction (Up/Down), GF(3) adds a neutral deadband for sideways noise, and GF(2⁸) represents 256 byte states for sequence analysis.
+                Select the field for price modeling. GF(2) captures direction (Up/Down), GF(3) adds a neutral deadband
+                for sideways noise, and GF(2⁸) represents 256 byte states for sequence analysis.
               </p>
               <div
                 class="absolute -bottom-2 left-20 w-3.5 h-3.5 bg-[#0B2338] border-r border-b border-[#1e3a5f] transform rotate-45">
@@ -295,7 +302,8 @@
                   title="Close">✕</button>
               </div>
               <p class="text-slate-200 font-normal leading-relaxed">
-                Sets percentage deadband threshold for quantizing returns. Price changes smaller than ±θ% collapse into Flat (0) token, filtering market noise.
+                Sets percentage deadband threshold for quantizing returns. Price changes smaller than ±θ% collapse into
+                Flat (0) token, filtering market noise.
               </p>
               <div
                 class="absolute -bottom-2 left-20 w-3.5 h-3.5 bg-[#0B2338] border-r border-b border-[#1e3a5f] transform rotate-45">
@@ -347,7 +355,8 @@
                   title="Close">✕</button>
               </div>
               <p class="text-slate-200 font-normal leading-relaxed">
-                Sets the history window length of quantized price symbols to the LFSR solver. Fibonacci sample lengths align sequence sampling with macro market cycle.
+                Sets the history window length of quantized price symbols to the LFSR solver. Fibonacci sample lengths
+                align sequence sampling with macro market cycle.
               </p>
               <div
                 class="absolute -bottom-2 left-20 w-3.5 h-3.5 bg-[#0B2338] border-r border-b border-[#1e3a5f] transform rotate-45">
@@ -402,7 +411,8 @@
                   title="Close">✕</button>
               </div>
               <p id="turso-popup-text" class="text-slate-200 font-normal leading-relaxed">
-                When enabled, each price token, LFSR polynomial, and forward prediction is committed to Turso storage. When disabled, prediction data is not stored and historical prices in Bin are used.
+                When enabled, each price token, LFSR polynomial, and forward prediction is committed to Turso storage.
+                When disabled, prediction data is not stored and historical prices in Bin are used.
               </p>
               <div
                 class="absolute -bottom-2 right-20 w-3.5 h-3.5 bg-[#0B2338] border-r border-b border-[#1e3a5f] transform rotate-45">
@@ -795,7 +805,8 @@
             <div class="text-slate-500">// System initialized. Bun.serve listening.</div>
             <div class="text-sky-400">&gt; EIA API Client: Ready (RWTC daily spot).</div>
             <div class="text-purple-400">&gt; Galois Field Arithmetic: GF(2), GF(3), GF(2^8).</div>
-            <div id="turso-telemetry-init" class="text-slate-400">&gt; Turso DB: Standalone Binary Mode (not connected).</div>
+            <div id="turso-telemetry-init" class="text-slate-400">&gt; Turso DB: Standalone Binary Mode (not connected).
+            </div>
           </div>
         </div>
 
